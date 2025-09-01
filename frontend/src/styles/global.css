@@ -1,0 +1,129 @@
+/* Modern CSS Custom Properties for 2024 Design System */
+:root {
+  /* === Color System (User Palette) === */
+  /* Background */
+  --bg-0: #ffffff; /* page background (60) */
+  --bg-50: #f7f7f7; /* subtle section background */
+
+  /* Main & Sub Accents */
+  --accent-main: #8b5cf6; /* Violet (70) */
+  --accent-main-contrast: #ffffff;
+  --accent-sub: #f59e0b; /* Warm Yellow (30) */
+  --accent-sub-contrast: #111827;
+
+  /* Neutral */
+  --color-neutral-0: #ffffff;
+  --color-neutral-50: #f9fafb;
+  --color-neutral-100: #f3f4f6;
+  --color-neutral-200: #e5e7eb;
+  --color-neutral-300: #d1d5db;
+  --color-neutral-400: #9ca3af;
+  --color-neutral-500: #6b7280;
+  --color-neutral-600: #4b5563;
+  --color-neutral-700: #374151;
+  --color-neutral-800: #1f2937;
+  --color-neutral-900: #111827;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  /* Radius */
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+
+  /* Animation */
+  --anim-fast: 150ms;
+  --anim-normal: 300ms;
+}
+
+/* Utility */
+.smooth-transition {
+  transition: all var(--anim-normal) ease;
+}
+
+/* === Bento Grid Utilities === */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 16px;
+}
+
+.bento-cell {
+  background: var(--bg-0);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  padding: 16px;
+  transition:
+    transform var(--anim-fast) ease,
+    box-shadow var(--anim-fast) ease,
+    border-color var(--anim-fast) ease;
+}
+
+.bento-cell:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-neutral-300);
+}
+
+/* Accent Variants */
+.bento-accent-main {
+  background: linear-gradient(
+    180deg,
+    rgba(139, 92, 246, 0.06),
+    rgba(139, 92, 246, 0.02)
+  );
+  border-color: rgba(139, 92, 246, 0.25);
+}
+
+.bento-accent-sub {
+  background: linear-gradient(
+    180deg,
+    rgba(245, 158, 11, 0.08),
+    rgba(245, 158, 11, 0.03)
+  );
+  border-color: rgba(245, 158, 11, 0.28);
+}
+
+/* Suggested Layout Helpers */
+.bento-col-3 {
+  grid-column: span 3;
+}
+.bento-col-4 {
+  grid-column: span 4;
+}
+.bento-col-6 {
+  grid-column: span 6;
+}
+.bento-col-8 {
+  grid-column: span 8;
+}
+.bento-col-12 {
+  grid-column: span 12;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .bento-grid {
+    grid-template-columns: repeat(8, 1fr);
+  }
+}
+@media (max-width: 900px) {
+  .bento-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .bento-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .bento-col-6 {
+    grid-column: span 4;
+  }
+  .bento-col-8 {
+    grid-column: span 4;
+  }
+}

@@ -1,0 +1,4 @@
+# This is a placeholder for favicon.ico
+# In a real project, you would convert the SVG to ICO format
+# You can use online tools like favicon.io or favicon-generator.org
+# Or use ImageMagick: convert favicon.svg -resize 16x16 favicon.ico
