@@ -1,12 +1,8 @@
-## What
-- EPIC: `EPIC-`
-- 연관 이슈: Closes #
+## 📝 작업 내용
+- 
 
-## Why
-- 한두 줄
+## 🔗 연관 이슈
+- Close #
 
-## Changes
-- 핵심 변경점 1
-
-## Validation
-- [ ] 동작 확인
+## ✅ 확인 사항
+- [ ] 
