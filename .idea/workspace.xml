@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ea831497-ec27-48ca-8ebb-2bdbf1bf382e" name="변경" comment="Simplify and unify refactor issue templates" />
+    <list default="true" id="ea831497-ec27-48ca-8ebb-2bdbf1bf382e" name="변경" comment="Simplify and unify refactor issue templates">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -163,7 +165,7 @@
       <workItem from="1774772334741" duration="2687000" />
       <workItem from="1775457109962" duration="9694000" />
       <workItem from="1775491641516" duration="15000" />
-      <workItem from="1775491662782" duration="455000" />
+      <workItem from="1775491662782" duration="1452000" />
     </task>
     <task id="LOCAL-00001" summary="Simplify and unify refactor issue templates">
       <option name="closed" value="true" />

@@ -20,14 +20,11 @@
 
 ## 🧪 검증 방법
 <!-- 실제로 실행한 명령어와 결과를 작성해주세요 -->
-- [ ] frontend prettier 확인 (`cd frontend && npx prettier --check .`)
-- [ ] frontend eslint 통과 (`cd frontend && npm run lint`)
-- [ ] backend prettier 확인 (`cd backend && npx prettier --check "src/**/*.ts" "test/**/*.ts"`)
-- [ ] backend eslint 통과 (`cd backend && npm run lint`)
-- [ ] backend test 통과 (`cd backend && npm run test`)
+- [ ] frontend prettier/eslint 확인
+- [ ] backend prettier/eslint 확인
 - [ ] 수동 확인 완료 (주요 시나리오 작성)
 
-## ⚠️ 리뷰 포인트
+## ⚠️ 리뷰 포인트 (선택)
 <!-- 리뷰어가 중점적으로 봐야 할 부분, 고민 지점, 트레이드오프를 적어주세요 -->
 
 ## 📸 스크린샷 (선택)
