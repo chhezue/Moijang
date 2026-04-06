@@ -1,8 +1,38 @@
-## 📝 작업 내용
+## 📌 관련 이슈
+<!-- 관련된 이슈 번호를 적어주세요 (예: #123) -->
+- closes #
+
+## 📝 작업 목적
+<!-- 왜 이 변경이 필요한지 간단히 작성해주세요 -->
+
+## ✅ 작업 내용
+<!-- 이번 PR에서 변경한 핵심 내용을 항목으로 작성해주세요 -->
+- 
 - 
 
-## 🔗 연관 이슈
-- Close #
+## 🎯 변경 범위
+<!-- 해당하는 항목에 체크해주세요 -->
+- [ ] frontend (Next.js)
+- [ ] backend (NestJS)
+- [ ] API 스펙/계약 변경
+- [ ] DB/환경변수 변경
+- [ ] 문서/가이드 변경
 
-## ✅ 확인 사항
-- [ ] 
+## 🧪 검증 방법
+<!-- 실제로 실행한 명령어와 결과를 작성해주세요 -->
+- [ ] frontend prettier 확인 (`cd frontend && npx prettier --check .`)
+- [ ] frontend eslint 통과 (`cd frontend && npm run lint`)
+- [ ] backend prettier 확인 (`cd backend && npx prettier --check "src/**/*.ts" "test/**/*.ts"`)
+- [ ] backend eslint 통과 (`cd backend && npm run lint`)
+- [ ] backend test 통과 (`cd backend && npm run test`)
+- [ ] 수동 확인 완료 (주요 시나리오 작성)
+
+## ⚠️ 리뷰 포인트
+<!-- 리뷰어가 중점적으로 봐야 할 부분, 고민 지점, 트레이드오프를 적어주세요 -->
+
+## 📸 스크린샷 (선택)
+<!-- UI 변경이 있다면 첨부해주세요 -->
+
+
+
+
