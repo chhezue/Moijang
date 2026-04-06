@@ -1,0 +1,94 @@
+name: "Refactor Task"
+description: "EPIC 하위 구현 작업(백엔드/프론트/인프라) 이슈"
+title: "[TASK][EPIC-XXX] "
+labels:
+  - refactor
+body:
+  - type: dropdown
+    id: epic_axis
+    attributes:
+      label: EPIC 축
+      options:
+        - EPIC-AUTH
+        - EPIC-DOMAIN
+        - EPIC-CHAT
+        - EPIC-PAY
+        - EPIC-MSG
+        - EPIC-RELEASE
+    validations:
+      required: true
+
+  - type: dropdown
+    id: layer
+    attributes:
+      label: 작업 레이어
+      options:
+        - Backend
+        - Frontend
+        - Infra
+        - Data
+        - QA
+        - Docs
+    validations:
+      required: true
+
+  - type: input
+    id: parent
+    attributes:
+      label: 상위 EPIC 이슈
+      description: 예) #123
+      placeholder: "#123"
+    validations:
+      required: true
+
+  - type: textarea
+    id: objective
+    attributes:
+      label: 작업 목표
+      placeholder: |
+        이 작업이 해결해야 하는 단일 목표를 적어주세요.
+    validations:
+      required: true
+
+  - type: textarea
+    id: implementation
+    attributes:
+      label: 구현 항목
+      placeholder: |
+        - [ ] 항목 1
+        - [ ] 항목 2
+        - [ ] 항목 3
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 완료 조건 (AC)
+      placeholder: |
+        - [ ] 기능 동작 확인
+        - [ ] 테스트 추가/수정
+        - [ ] 회귀 영향 점검
+    validations:
+      required: true
+
+  - type: textarea
+    id: test_plan
+    attributes:
+      label: 테스트 계획
+      placeholder: |
+        - Unit:
+        - Integration:
+        - Manual:
+    validations:
+      required: false
+
+  - type: textarea
+    id: risks
+    attributes:
+      label: 리스크 / 롤백
+      placeholder: |
+        - 리스크:
+        - 롤백 방식:
+    validations:
+      required: false
