@@ -4,12 +4,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ea831497-ec27-48ca-8ebb-2bdbf1bf382e" name="변경" comment="Feat[#2] - University 스키마 정의">
+    <list default="true" id="ea831497-ec27-48ca-8ebb-2bdbf1bf382e" name="변경" comment="Feat[#2] - 실제 대학교 데이터 삽입">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/script/schools_list.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/university/dto/university.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/university/dto/university.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/script/seed-universities.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/script/seed-universities.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/group-buying/dto/create-group-buying.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/group-buying/dto/create-group-buying.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/group-buying/schema/group-buying.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/group-buying/schema/group-buying.schema.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/participant/schema/participant.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/participant/schema/participant.schema.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/user/dto/user.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/user/dto/user.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/user/schema/user.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/user/schema/user.schema.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/web-push/schema/subscription.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/web-push/schema/subscription.schema.ts" afterDir="false" />
+    </list>
+    <list id="924fbec2-dc3e-4d65-9940-73962c528919" name="ㄴㅇㄹㄴㄹ" comment="">
+      <change afterPath="$PROJECT_DIR$/backend/src/university/dto/get-university.dto.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/university/dto/search-university.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/university/dto/university.dto.ts" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/university/schema/university.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/university/schema/university.schema.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/university/university.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/university/university.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/university/university.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/university/university.module.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/university/university.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/university/university.repository.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/university/university.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/university/university.service.ts" afterDir="false" />
     </list>
@@ -63,6 +74,9 @@
     &quot;accountId&quot;: &quot;cd3d3b42-68f4-4e1f-a3b1-5c11439d609e&quot;
   }
 }</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
 }</component>
@@ -83,10 +97,12 @@
     "git-widget-placeholder": "backend/2-create-university",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/sesil/WebstormProjects/Moijang/backend/src/university",
+    "last_opened_file_path": "/Users/sesil/WebstormProjects/Moijang/backend/src/university/dto",
     "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.standard": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.standard": "",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "npm.dev.executor": "Run",
@@ -96,6 +112,7 @@
     "npm.reset-universities.executor": "Run",
     "npm.seed-universities.executor": "Run",
     "npm.start:dev.executor": "Run",
+    "settings.editor.selected.configurable": "settings.javascript.linters.eslint",
     "to.speed.mode.migration.done": "true",
     "ts.external.directory.path": "/Users/sesil/WebstormProjects/Moijang/frontend/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
@@ -103,6 +120,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/backend/src/university/dto" />
       <recent name="$PROJECT_DIR$/backend/src/university" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -180,6 +198,7 @@
   <component name="TaskManager">
     <task active="true" id="Default" summary="디폴트 작업">
       <changelist id="ea831497-ec27-48ca-8ebb-2bdbf1bf382e" name="변경" comment="" />
+      <changelist id="924fbec2-dc3e-4d65-9940-73962c528919" name="ㄴㅇㄹㄴㄹ" comment="" />
       <created>1763292599535</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -193,7 +212,7 @@
       <workItem from="1775457109962" duration="9694000" />
       <workItem from="1775491641516" duration="15000" />
       <workItem from="1775491662782" duration="2113000" />
-      <workItem from="1775493906051" duration="10860000" />
+      <workItem from="1775493906051" duration="20996000" />
     </task>
     <task id="LOCAL-00001" summary="Simplify and unify refactor issue templates">
       <option name="closed" value="true" />
@@ -211,7 +230,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775644518721</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Feat[#2] - 실제 대학교 데이터 삽입">
+      <option name="closed" value="true" />
+      <created>1775654246363</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1775654246363</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -231,6 +258,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Simplify and unify refactor issue templates" />
     <MESSAGE value="Feat[#2] - University 스키마 정의" />
-    <option name="LAST_COMMIT_MESSAGE" value="Feat[#2] - University 스키마 정의" />
+    <MESSAGE value="Feat[#2] - 실제 대학교 데이터 삽입" />
+    <option name="LAST_COMMIT_MESSAGE" value="Feat[#2] - 실제 대학교 데이터 삽입" />
   </component>
 </project>

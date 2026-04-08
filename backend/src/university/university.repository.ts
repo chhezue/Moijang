@@ -1,51 +1,38 @@
-import { Injectable } from '@nestjs/common';
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
-import { University } from './schema/university.schema';
-import { UniversityDto } from './dto/university.dto';
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model, FilterQuery } from "mongoose";
+import { University } from "./schema/university.schema";
+import { SearchUniversityDto } from "./dto/search-university.dto";
+import { CommonService } from "../common/common.service";
+import { PageResponseDto } from "../common/dto/page-response.dto";
 
 @Injectable()
 export class UniversityRepository {
   constructor(
     @InjectModel(University.name)
     private readonly universityModel: Model<University>,
+    private readonly commonService: CommonService, // CommonService 주입
   ) {}
 
-  async upsertMany(universities: UniversityDto[]): Promise<void> {
-    if (!universities.length) {
-      return;
+  async findAllWithPagination(
+    searchDto: SearchUniversityDto,
+  ): Promise<PageResponseDto<University>> {
+    const { keyword, page = 1, limit = 10 } = searchDto;
+    const query: FilterQuery<University> = {};
+
+    if (keyword) {
+      query.name = { $regex: keyword, $options: "i" };
     }
 
-    await this.universityModel.bulkWrite(
-      universities.map((university) => ({
-        updateOne: {
-          filter: { name: university.name },
-          update: {
-            $set: {
-              domain: university.domain,
-            },
-          },
-          upsert: true,
-        },
-      })),
-      { ordered: false },
+    // CommonService의 헬퍼 함수를 호출하여 바로 PageResponseDto 반환
+    return this.commonService.findWithPagination<University>(
+      this.universityModel,
+      query,
+      { page, limit },
     );
   }
 
-  async replaceAll(universities: UniversityDto[]): Promise<void> {
-    const indexes = await this.universityModel.collection.indexes();
-    const legacyUniqueNameIndex = indexes.find(
-      (index) => index.unique === true && index.key?.name === 1,
-    );
-
-    if (legacyUniqueNameIndex?.name) {
-      await this.universityModel.collection.dropIndex(legacyUniqueNameIndex.name);
-    }
-
-    await this.universityModel.deleteMany({});
-    if (!universities.length) {
-      return;
-    }
-    await this.universityModel.insertMany(universities, { ordered: true });
+  async findById(id: string): Promise<University | null> {
+    return this.universityModel.findById(id).exec();
   }
 }
