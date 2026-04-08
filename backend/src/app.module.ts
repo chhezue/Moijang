@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ParticipantModule } from './participant/participant.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
+import { UniversityModule } from './university/university.module';
 import { CommonModule } from './common/common.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { WebPushModule } from './web-push/web-push.module';
@@ -31,6 +32,7 @@ import { WebPushModule } from './web-push/web-push.module';
     AuthModule,
     CommonModule,
     WebPushModule,
+    UniversityModule,
   ],
   controllers: [AppController],
   providers: [AppService],
