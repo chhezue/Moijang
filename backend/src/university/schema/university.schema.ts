@@ -3,11 +3,17 @@ import { Document } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class University extends Document {
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   name: string;
 
-  @Prop()
+  @Prop({required: false})
   domain: string;
+
+  @Prop()
+  campusType: string;
+
+  @Prop()
+  region: string;
 }
 
 export const UniversitySchema = SchemaFactory.createForClass(University);

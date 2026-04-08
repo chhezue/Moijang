@@ -21,7 +21,9 @@
     "make-products": "ts-node -r tsconfig-paths/register script/make-group-buying.ts",
     "make-participants": "ts-node -r tsconfig-paths/register script/make-participants.ts",
     "make-all-dummy": "ts-node -r tsconfig-paths/register script/make-all-dummy-data.ts",
-    "make-web-push-key": "ts-node -r tsconfig-paths/register script/generate-keys.ts"
+    "make-web-push-key": "ts-node -r tsconfig-paths/register script/generate-keys.ts",
+    "seed-universities": "ts-node -r tsconfig-paths/register script/seed-universities.ts",
+    "reset-universities": "ts-node -r tsconfig-paths/register script/reset-universities-from-csv.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",

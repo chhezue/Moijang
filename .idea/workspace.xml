@@ -4,10 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ea831497-ec27-48ca-8ebb-2bdbf1bf382e" name="변경" comment="Simplify and unify refactor issue templates">
-      <change afterPath="$PROJECT_DIR$/backend/script/schools_list.csv" afterDir="false" />
+    <list default="true" id="ea831497-ec27-48ca-8ebb-2bdbf1bf382e" name="변경" comment="Feat[#2] - University 스키마 정의">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/app.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/app.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/script/schools_list.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/university/dto/university.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/university/dto/university.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/university/schema/university.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/university/schema/university.schema.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/university/university.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/university/university.repository.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/university/university.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/university/university.service.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,7 +78,6 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
     "git-widget-placeholder": "backend/2-create-university",
@@ -89,6 +92,9 @@
     "npm.dev.executor": "Run",
     "npm.make-all-dummy.executor": "Run",
     "npm.make-products.executor": "Run",
+    "npm.merge-school-emails.executor": "Run",
+    "npm.reset-universities.executor": "Run",
+    "npm.seed-universities.executor": "Run",
     "npm.start:dev.executor": "Run",
     "to.speed.mode.migration.done": "true",
     "ts.external.directory.path": "/Users/sesil/WebstormProjects/Moijang/frontend/node_modules/typescript/lib",
@@ -103,7 +109,7 @@
       <recent name="$PROJECT_DIR$/backend/script" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.start:dev">
+  <component name="RunManager" selected="npm.seed-universities">
     <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/frontend/package.json" />
       <command value="run" />
@@ -114,21 +120,31 @@
       <envs />
       <method v="2" />
     </configuration>
-    <configuration name="make-all-dummy" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+    <configuration name="merge-school-emails" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/backend/package.json" />
       <command value="run" />
       <scripts>
-        <script value="make-all-dummy" />
+        <script value="merge-school-emails" />
       </scripts>
       <node-interpreter value="project" />
       <envs />
       <method v="2" />
     </configuration>
-    <configuration name="make-products" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+    <configuration name="reset-universities" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/backend/package.json" />
       <command value="run" />
       <scripts>
-        <script value="make-products" />
+        <script value="reset-universities" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="seed-universities" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/backend/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="seed-universities" />
       </scripts>
       <node-interpreter value="project" />
       <envs />
@@ -146,10 +162,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="npm.seed-universities" />
+        <item itemvalue="npm.reset-universities" />
+        <item itemvalue="npm.merge-school-emails" />
         <item itemvalue="npm.start:dev" />
         <item itemvalue="npm.dev" />
-        <item itemvalue="npm.make-products" />
-        <item itemvalue="npm.make-all-dummy" />
       </list>
     </recent_temporary>
   </component>
@@ -176,7 +193,7 @@
       <workItem from="1775457109962" duration="9694000" />
       <workItem from="1775491641516" duration="15000" />
       <workItem from="1775491662782" duration="2113000" />
-      <workItem from="1775493906051" duration="6174000" />
+      <workItem from="1775493906051" duration="10860000" />
     </task>
     <task id="LOCAL-00001" summary="Simplify and unify refactor issue templates">
       <option name="closed" value="true" />
@@ -186,7 +203,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775491265282</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Feat[#2] - University 스키마 정의">
+      <option name="closed" value="true" />
+      <created>1775644518721</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1775644518721</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -205,6 +230,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Simplify and unify refactor issue templates" />
-    <option name="LAST_COMMIT_MESSAGE" value="Simplify and unify refactor issue templates" />
+    <MESSAGE value="Feat[#2] - University 스키마 정의" />
+    <option name="LAST_COMMIT_MESSAGE" value="Feat[#2] - University 스키마 정의" />
   </component>
 </project>
