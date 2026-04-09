@@ -4,26 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ea831497-ec27-48ca-8ebb-2bdbf1bf382e" name="변경" comment="Feat[#2] - 실제 대학교 데이터 삽입">
-      <change afterPath="$PROJECT_DIR$/backend/docs/LOGIN_REFACTORING.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/user/dto/create-user.dto.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/user/dto/get-user.dto.ts" afterDir="false" />
+    <list default="true" id="ea831497-ec27-48ca-8ebb-2bdbf1bf382e" name="변경" comment="Feat[#2] - Create User API 구현">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/script/seed-universities.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/script/seed-universities.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/auth/auth.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/auth/auth.controller.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/auth/dto/teams-auth-end.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/auth/dto/teams-auth-end.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/auth/auth.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/auth/auth.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/auth/dto/teams-auth-end.dto.ts" beforeDir="false" />
+    </list>
+    <list id="fa172298-1f0f-4457-bb62-bb22dcf80207" name="[Issue #2] User 스키마 관련" comment="">
+      <change afterPath="$PROJECT_DIR$/backend/docs/LOGIN_REFACTORING.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/script/seed-universities.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/script/seed-universities.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/group-buying/dto/create-group-buying.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/group-buying/dto/create-group-buying.dto.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/group-buying/schema/group-buying.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/group-buying/schema/group-buying.schema.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/participant/schema/participant.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/participant/schema/participant.schema.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/university/university.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/university/university.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/user/dto/user.dto.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/user/schema/user.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/user/schema/user.schema.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/user/user.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/user/user.controller.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/user/user.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/user/user.repository.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/user/user.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/user/user.service.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/web-push/schema/subscription.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/web-push/schema/subscription.schema.ts" afterDir="false" />
     </list>
-    <list id="fa172298-1f0f-4457-bb62-bb22dcf80207" name="[Issue #2] User 스키마 관련" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -32,7 +26,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="backend/2-create-university" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -51,6 +45,10 @@
             <RecentBranchesForRepo>
               <option name="branches">
                 <list>
+                  <RecentBranch>
+                    <option name="branchName" value="backend/1-login-teams-to-university" />
+                    <option name="lastUsedInstant" value="1775757451" />
+                  </RecentBranch>
                   <RecentBranch>
                     <option name="branchName" value="backend/2-create-university" />
                     <option name="lastUsedInstant" value="1775494080" />
@@ -94,7 +92,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "backend/2-create-university",
+    "git-widget-placeholder": "backend/1-login-teams-to-university",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/sesil/WebstormProjects/Moijang/backend/src/user/dto",
@@ -128,7 +126,7 @@
       <recent name="$PROJECT_DIR$/backend/script" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.seed-universities">
+  <component name="RunManager" selected="npm.start:dev">
     <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/frontend/package.json" />
       <command value="run" />
@@ -181,10 +179,10 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="npm.start:dev" />
         <item itemvalue="npm.seed-universities" />
         <item itemvalue="npm.reset-universities" />
         <item itemvalue="npm.merge-school-emails" />
-        <item itemvalue="npm.start:dev" />
         <item itemvalue="npm.dev" />
       </list>
     </recent_temporary>
@@ -214,7 +212,7 @@
       <workItem from="1775457109962" duration="9694000" />
       <workItem from="1775491641516" duration="15000" />
       <workItem from="1775491662782" duration="2113000" />
-      <workItem from="1775493906051" duration="31327000" />
+      <workItem from="1775493906051" duration="32172000" />
     </task>
     <task id="LOCAL-00001" summary="Simplify and unify refactor issue templates">
       <option name="closed" value="true" />
@@ -248,7 +246,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775672078587</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Feat[#2] - Create User API 구현">
+      <option name="closed" value="true" />
+      <created>1775757182120</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1775757182120</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -270,6 +276,7 @@
     <MESSAGE value="Feat[#2] - University 스키마 정의" />
     <MESSAGE value="Feat[#2] - 실제 대학교 데이터 삽입" />
     <MESSAGE value="Feat[#2] - 회원가입용 대학교 조회 로직 구현" />
-    <option name="LAST_COMMIT_MESSAGE" value="Feat[#2] - 회원가입용 대학교 조회 로직 구현" />
+    <MESSAGE value="Feat[#2] - Create User API 구현" />
+    <option name="LAST_COMMIT_MESSAGE" value="Feat[#2] - Create User API 구현" />
   </component>
 </project>
