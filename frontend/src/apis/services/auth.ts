@@ -1,19 +1,50 @@
 import apiClient from "@/apis/apiClient";
+import type {
+  LoginRequest,
+  RegisterRequest,
+  SendCodeRequest,
+  VerifyCodeRequest,
+  UserDto,
+  CheckUsernameResponse,
+  VerifyCodeResponse,
+} from "@/types/auth";
 
-export const redirectToLogin = () => {
-  window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/login`;
+export const login = async (data: LoginRequest): Promise<void> => {
+  await apiClient.post("/api/auth/login", data);
 };
 
-export const logout = async () => {
-  return await apiClient.post("/api/auth/logout");
+export const register = async (data: RegisterRequest): Promise<void> => {
+  await apiClient.post("/api/auth/register", data);
 };
 
-export const getMyInfo = async () => {
-  try {
-    const response = await apiClient.get("/api/auth/me");
-    return response.data;
-  } catch (error) {
-    // 401 에러를 포함한 모든 에러를 호출자에게 던집니다.
-    throw error;
-  }
+export const checkDuplicateUsername = async (
+  username: string
+): Promise<CheckUsernameResponse> => {
+  const res = await apiClient.get("/api/auth/check-username", {
+    params: { username },
+  });
+  return res.data;
 };
+
+export const sendVerificationCode = async (
+  data: SendCodeRequest
+): Promise<void> => {
+  await apiClient.post("/api/auth/email/send", data);
+};
+
+export const verifyCode = async (
+  data: VerifyCodeRequest
+): Promise<VerifyCodeResponse> => {
+  const res = await apiClient.post("/api/auth/email/verify", data);
+  return res.data;
+};
+
+export const logout = async (): Promise<void> => {
+  await apiClient.post("/api/auth/logout");
+};
+
+export const getMyInfo = async (): Promise<UserDto> => {
+  const res = await apiClient.get("/api/auth/me");
+  return res.data;
+};
+

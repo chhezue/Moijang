@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { Suspense } from "react";
 import { Box } from "@mui/material";
 import SearchAndFilterHeader from "@/app/(home)/group-buying/list/component/SearchAndFilterBar/SearchAndFilterHeader";
 
@@ -39,7 +39,7 @@ export default function GroupBuyingViewLayout({
               mb: "1rem",
             }}
           >
-            <SearchAndFilterHeader />
+            <Suspense><SearchAndFilterHeader /></Suspense>
           </Box>
 
           {children}
