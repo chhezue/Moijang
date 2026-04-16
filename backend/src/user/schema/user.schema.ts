@@ -29,16 +29,10 @@ export class User extends Document {
   password: string;
 
   @Prop({ required: true })
-  displayName: string;
+  name: string;
 
   @Prop({ required: true, unique: true })
   universityEmail: string;
-
-  @Prop({ required: true })
-  studentNo: string;
-
-  @Prop({ default: true })
-  isVerified: boolean;
 
   @Prop({
     type: MongooseSchema.Types.ObjectId,

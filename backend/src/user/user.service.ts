@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { UserRepository } from "./user.repository";
 import { GetUserDto } from "./dto/get-user.dto";
 import { CreateUserDto } from "./dto/create-user.dto";
-import { User } from "./schema/user.schema";
+import { UserWithUniversity } from "./user.types";
 
 @Injectable()
 export class UserService {
@@ -13,7 +13,7 @@ export class UserService {
     return users.map((user) => this.mapUserToDto(user));
   }
 
-  async getUserByUuid(id: string): Promise<GetUserDto | null> {
+  async getUserByUuid(id: string): Promise<GetUserDto> {
     const user = await this.userRepository.findOneByUuid(id);
     if (!user) {
       throw new NotFoundException(`사용자 ${id}를 찾을 수 없습니다.`);
@@ -30,14 +30,13 @@ export class UserService {
     return this.mapUserToDto(createdUser);
   }
 
-  private mapUserToDto(user: User): GetUserDto {
+  private mapUserToDto(user: UserWithUniversity): GetUserDto {
     return {
       loginId: user.loginId,
-      displayName: user.displayName,
+      name: user.name,
       universityEmail: user.universityEmail,
-      studentNo: user.studentNo,
-      isVerified: user.isVerified,
-      universityId: user.universityId.toString(),
+      universityId: user.universityId._id.toString(),
+      universityName: user.universityId.name,
     };
   }
 }

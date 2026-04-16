@@ -1,35 +1,21 @@
-import {
-  IsBoolean,
-  IsDateString,
-  IsEmail,
-  IsMongoId,
-  IsString,
-} from "class-validator";
+import { IsEmail, IsMongoId, IsString } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 
-// UserService에서 (CreateUserDto + Auth 모듈에서 해싱된 password) 합쳐서 저장
+// Auth 모듈에서 보내준 CreateUserDto + 해싱된 password를 합쳐서 저장
 export class CreateUserDto {
   @ApiProperty({ description: "로그인 아이디" })
   @IsString()
   loginId: string;
 
-  @ApiProperty({ description: "닉네임" })
+  @ApiProperty({ description: "실명" })
   @IsString()
-  displayName: string;
-
-  @ApiProperty({ description: "학교 이메일" })
-  @IsEmail()
-  universityEmail: string;
-
-  @ApiProperty({ description: "학번" })
-  @IsString()
-  studentNo: string;
-
-  @ApiProperty({ description: "인증 여부" })
-  @IsBoolean()
-  isVerified: boolean;
+  name: string;
 
   @ApiProperty({ description: "소속 대학교 ID" })
   @IsMongoId()
   universityId: string;
+
+  @ApiProperty({ description: "사용자 이메일 (전체)" })
+  @IsEmail()
+  universityEmail: string;
 }
