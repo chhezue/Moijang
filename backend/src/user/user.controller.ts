@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Controller, Get, Param } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { GetUserDto } from "./dto/get-user.dto";
-import { ApiOperation } from "@nestjs/swagger";
+import { ApiOperation, ApiParam } from "@nestjs/swagger";
 
 @Controller("user")
 export class UserController {
@@ -13,10 +13,25 @@ export class UserController {
     return await this.userService.getUsers();
   }
 
-  @ApiOperation({ summary: "id로 유저 조회" })
-  @Get("/:id")
-  async getUserByUuid(@Param("id") id: string): Promise<GetUserDto> {
-    return await this.userService.getUserByUuid(id);
+  @ApiOperation({ summary: "MongoDB ObjectId로 유저 조회" })
+  @Get("id/:mongoId")
+  async getUserById(@Param("mongoId") mongoId: string): Promise<GetUserDto> {
+    return await this.userService.getUserById(mongoId);
+  }
+
+  @ApiOperation({ summary: "loginId로 유저 조회" })
+  @Get("login-id/:loginId")
+  async getUserByLoginId(
+    @Param("loginId") loginId: string,
+  ): Promise<GetUserDto> {
+    return await this.userService.getUserByLoginId(loginId);
+  }
+
+  @ApiOperation({ summary: "대학 이메일로 유저 조회" })
+  @Get("email/:email")
+  async getUserByEmail(@Param("email") email: string): Promise<GetUserDto> {
+    const decoded = decodeURIComponent(email);
+    return await this.userService.getUserByEmail(decoded);
   }
 
   // TODO Add to user update/delete method

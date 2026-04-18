@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { User } from "./schema/user.schema";
+import { User } from "../schema/user.schema";
 
 // 1. 대학교 객체의 모양 정의
 export type PopulatedUniversity = {

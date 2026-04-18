@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { UserRepository } from "./user.repository";
 import { GetUserDto } from "./dto/get-user.dto";
 import { CreateUserDto } from "./dto/create-user.dto";
-import { UserWithUniversity } from "./user.types";
+import { UserWithUniversity } from "./types/user.types";
 
 @Injectable()
 export class UserService {
@@ -13,10 +13,31 @@ export class UserService {
     return users.map((user) => this.mapUserToDto(user));
   }
 
-  async getUserByUuid(id: string): Promise<GetUserDto> {
-    const user = await this.userRepository.findOneByUuid(id);
+  async getUserById(id: string): Promise<GetUserDto> {
+    const user = await this.userRepository.findOneById(id);
     if (!user) {
       throw new NotFoundException(`사용자 ${id}를 찾을 수 없습니다.`);
+    }
+    return this.mapUserToDto(user);
+  }
+
+  async getUserByLoginId(loginId: string): Promise<GetUserDto> {
+    const user = await this.userRepository.findOneByLoginId(loginId);
+    if (!user) {
+      throw new NotFoundException(
+        `loginId가 ${loginId}인 사용자를 찾을 수 없습니다.`,
+      );
+    }
+    return this.mapUserToDto(user);
+  }
+
+  async getUserByEmail(email: string): Promise<GetUserDto> {
+    const normalized = email.trim().toLowerCase();
+    const user = await this.userRepository.findOneByUniversityEmail(normalized);
+    if (!user) {
+      throw new NotFoundException(
+        `해당 대학 이메일로 가입한 사용자를 찾을 수 없습니다.`,
+      );
     }
     return this.mapUserToDto(user);
   }

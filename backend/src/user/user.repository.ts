@@ -3,7 +3,7 @@ import { Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
 import { User } from "./schema/user.schema";
 import { CreateUserDto } from "./dto/create-user.dto";
-import { UserWithUniversity } from "./user.types";
+import { UserWithUniversity } from "./types/user.types";
 
 @Injectable()
 export class UserRepository {
@@ -19,9 +19,25 @@ export class UserRepository {
       .exec()) as unknown as UserWithUniversity[];
   }
 
-  async findOneByUuid(uuid: string): Promise<UserWithUniversity | null> {
+  async findOneById(uuid: string): Promise<UserWithUniversity | null> {
     return (await this.usersModel
       .findById(uuid)
+      .populate({ path: "universityId", select: "name" })
+      .exec()) as unknown as UserWithUniversity | null;
+  }
+
+  async findOneByLoginId(loginId: string): Promise<UserWithUniversity | null> {
+    return (await this.usersModel
+      .findOne({ loginId })
+      .populate({ path: "universityId", select: "name" })
+      .exec()) as unknown as UserWithUniversity | null;
+  }
+
+  async findOneByUniversityEmail(
+    universityEmail: string,
+  ): Promise<UserWithUniversity | null> {
+    return (await this.usersModel
+      .findOne({ universityEmail })
       .populate({ path: "universityId", select: "name" })
       .exec()) as unknown as UserWithUniversity | null;
   }
