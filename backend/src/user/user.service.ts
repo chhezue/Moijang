@@ -38,6 +38,12 @@ export class UserService {
     return await this.userRepository.findOneByLoginIdWithPassword(loginId);
   }
 
+  // 회원가입 시 아이디 중복 확인 (Auth 모듈에서 호출됨)
+  async existsByLoginId(loginId: string): Promise<boolean> {
+    const user = await this.userRepository.findOneByLoginId(loginId);
+    return !!user;
+  }
+
   async getUserByEmail(email: string): Promise<GetUserDto> {
     const normalized = email.trim().toLowerCase();
     const user = await this.userRepository.findOneByUniversityEmail(normalized);

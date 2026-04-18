@@ -6,6 +6,7 @@ import {
   Req,
   Res,
   UseGuards,
+  Param,
 } from "@nestjs/common";
 import { Response, Request } from "express";
 import { AuthService } from "./auth.service";
@@ -15,15 +16,25 @@ import { JwtAuthGuard } from "./guard/auth.guard";
 import { GetUserDto } from "../user/dto/get-user.dto";
 import { SignupDto } from "./dto/signup.dto";
 import { LoginDto } from "./dto/login.dto";
+import { UserService } from "../user/user.service";
 
 @Controller("auth")
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+  ) {}
 
   @ApiOperation({ summary: "회원가입" })
   @Post("signup")
   async signup(@Body() dto: SignupDto): Promise<GetUserDto> {
     return this.authService.signup(dto);
+  }
+
+  @ApiOperation({ summary: "회원가입 시 중복 아이디 검증" })
+  @Get("exist/:loginId")
+  async existsByLoginId(@Param("loginId") loginId: string): Promise<boolean> {
+    return this.userService.existsByLoginId(loginId);
   }
 
   @ApiOperation({ summary: "로그인" })
