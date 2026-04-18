@@ -1,14 +1,29 @@
-import { Controller, Get, Post, Req, Res, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from "@nestjs/common";
 import { Response, Request } from "express";
 import { AuthService } from "./auth.service";
 import { ApiOperation } from "@nestjs/swagger";
 import { UserDecorator } from "../user/decorator/user.decorator";
 import { JwtAuthGuard } from "./guard/auth.guard";
 import { GetUserDto } from "../user/dto/get-user.dto";
+import { SignupDto } from "./dto/signup.dto";
 
 @Controller("auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @ApiOperation({ summary: "회원가입" })
+  @Post("signup")
+  async signup(@Body() dto: SignupDto) {
+    return this.authService.signup(dto);
+  }
 
   @ApiOperation({ summary: "로그아웃" })
   @UseGuards(JwtAuthGuard)

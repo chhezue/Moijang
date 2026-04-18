@@ -1,13 +1,16 @@
 import {
+  BadRequestException,
   Injectable,
-  InternalServerErrorException,
   UnauthorizedException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { JwtPayloadDto } from "./dto/jwt-payload.dto";
 import { Request, Response } from "express";
 import { ConfigService } from "@nestjs/config";
 import { UserService } from "../user/user.service";
+import { SignupDto } from "./dto/signup.dto";
+import { CreateUserDto } from "../user/dto/create-user.dto";
+import * as bcrypt from "bcrypt";
+import { SignupTokenPayload } from "./types/token-payload.type";
 
 @Injectable()
 export class AuthService {
@@ -16,6 +19,52 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly userService: UserService,
   ) {}
+
+  // 회원가입 (이메일/아이디 모두 검증된 이후 실행됨.)
+  async signup(dto: SignupDto) {
+    // 1) 토큰 검증
+    let payload: SignupTokenPayload;
+
+    try {
+      payload = this.jwtService.verify<SignupTokenPayload>(dto.signupToken, {
+        secret: this.configService.get("JWT_SECRET"),
+      });
+    } catch {
+      throw new UnauthorizedException("유효하지 않은 회원가입 토큰입니다.");
+    }
+
+    const { universityId, universityEmail, typ } = payload;
+
+    // 3) 토큰 용도 검증
+    if (typ !== "signup") {
+      throw new UnauthorizedException("잘못된 회원가입 토큰입니다.");
+    }
+
+    // 4) 필수 값 검증
+    if (!universityId || !universityEmail) {
+      throw new BadRequestException(
+        "회원가입 토큰에 필요한 정보가 누락되었습니다.",
+      );
+    }
+
+    // 5) 비밀번호 해싱
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+    // 6) 유저 생성
+    const createUserDto: CreateUserDto = {
+      loginId: dto.loginId,
+      name: dto.name,
+      universityEmail,
+      universityId,
+    };
+
+    const createdUser = await this.userService.createUser(
+      createUserDto,
+      hashedPassword,
+    );
+
+    return createdUser;
+  }
 
   // 생성된 쿠키를 응답의 cookie로 설정
   setTokenCookies(res: Response, accessToken: string, refreshToken: string) {
