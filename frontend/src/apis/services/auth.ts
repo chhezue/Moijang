@@ -1,41 +1,52 @@
 import apiClient from "@/apis/apiClient";
 import type {
   LoginRequest,
-  RegisterRequest,
+  SignupRequest,
+  SignupResponse,
   SendCodeRequest,
-  VerifyCodeRequest,
+  ConfirmCodeRequest,
   UserDto,
+  University,
   CheckUsernameResponse,
-  VerifyCodeResponse,
+  ConfirmCodeResponse,
+  SendCodeResponse
 } from "@/types/auth";
 
 export const login = async (data: LoginRequest): Promise<void> => {
   await apiClient.post("/api/auth/login", data);
 };
 
-export const register = async (data: RegisterRequest): Promise<void> => {
-  await apiClient.post("/api/auth/register", data);
-};
-
-export const checkDuplicateUsername = async (
-  username: string
-): Promise<CheckUsernameResponse> => {
-  const res = await apiClient.get("/api/auth/check-username", {
-    params: { username },
-  });
+export const signup = async (data: SignupRequest): Promise<SignupResponse> => {
+  const res = await apiClient.post("/api/auth/signup", data);
   return res.data;
 };
 
-export const sendVerificationCode = async (
+// id 중복 확인
+// export const checkDuplicateUsername = async (
+//   username: string
+// ): Promise<CheckUsernameResponse> => {
+//   const res = await apiClient.get("/api/auth/check-username", {
+//     params: { username },
+//   });
+//   return res.data;
+// };
+
+export const sendCode = async (
   data: SendCodeRequest
-): Promise<void> => {
-  await apiClient.post("/api/auth/email/send", data);
+): Promise<SendCodeResponse> => {
+  const res = await apiClient.post("/api/university-verification/send-code", data);
+  return res.data;
 };
 
-export const verifyCode = async (
-  data: VerifyCodeRequest
-): Promise<VerifyCodeResponse> => {
-  const res = await apiClient.post("/api/auth/email/verify", data);
+export const confirmCode = async (
+  data: ConfirmCodeRequest
+): Promise<ConfirmCodeResponse> => {
+  const res = await apiClient.post("/api/university-verification/confirm-code", data);
+  return res.data;
+};
+
+export const searchUniversity = async (keyword: string): Promise<University[]> => {
+  const res = await apiClient.get("/api/university", { params: { keyword } });
   return res.data;
 };
 

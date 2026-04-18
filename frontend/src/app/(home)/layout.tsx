@@ -1,4 +1,3 @@
-"use client";
 import React from "react";
 import Header from "@/layouts/header/Header";
 import Providers from "@/redux/Provider";

@@ -4,17 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ea831497-ec27-48ca-8ebb-2bdbf1bf382e" name="변경" comment="Simplify and unify refactor issue templates">
+    <list default="true" id="ea831497-ec27-48ca-8ebb-2bdbf1bf382e" name="변경" comment="#4 login/signup 컴포넌트 추가">
+      <change afterPath="$PROJECT_DIR$/frontend/src/types/auth.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/apis/services/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/apis/services/auth.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/(home)/group-buying/list/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/(home)/group-buying/list/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/(protected)/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/(protected)/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/login/components/loginClient.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/login/components/loginForm.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/login/layout.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/login/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/(home)/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/(home)/layout.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,7 +57,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/chhezue/Moijang.git&quot;,
-    &quot;accountId&quot;: &quot;cd3d3b42-68f4-4e1f-a3b1-5c11439d609e&quot;
+    &quot;accountId&quot;: &quot;df96cf5c-67c8-43f3-b728-b4acec5320a7&quot;
   }
 }</component>
   <component name="ProjectColorInfo">{
@@ -74,39 +68,46 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "frontend/4-login",
-    "git.auto.fetch.suggestion.counter": "1",
-    "javascript.preferred.runtime.type.id": "node",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/sesil/WebstormProjects/Moijang",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.dev.executor": "Run",
-    "npm.make-all-dummy.executor": "Run",
-    "npm.make-products.executor": "Run",
-    "npm.start:dev.executor": "Run",
-    "to.speed.mode.migration.done": "true",
-    "ts.external.directory.path": "/Users/a82109/WebstormProjects/Moijang/backend/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;frontend/4-login&quot;,
+    &quot;git.auto.fetch.suggestion.counter&quot;: &quot;1&quot;,
+    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/sesil/WebstormProjects/Moijang&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;npm.make-all-dummy.executor&quot;: &quot;Run&quot;,
+    &quot;npm.make-products.executor&quot;: &quot;Run&quot;,
+    &quot;npm.start:dev.executor&quot;: &quot;Run&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/a82109/WebstormProjects/Moijang/backend/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
-  <component name="RunManager" selected="npm.dev">
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/frontend/src/types" />
+      <recent name="$PROJECT_DIR$/frontend" />
+      <recent name="$PROJECT_DIR$/backend" />
+    </key>
+  </component>
+  <component name="RunManager" selected="npm.start:dev">
     <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/frontend/package.json" />
       <command value="run" />
@@ -149,8 +150,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.dev" />
         <item itemvalue="npm.start:dev" />
+        <item itemvalue="npm.dev" />
         <item itemvalue="npm.make-products" />
         <item itemvalue="npm.make-all-dummy" />
         <item itemvalue="npm.start:dev" />
@@ -180,7 +181,12 @@
       <workItem from="1775457109962" duration="9694000" />
       <workItem from="1775491641516" duration="15000" />
       <workItem from="1775491662782" duration="1452000" />
-      <workItem from="1775885669602" duration="22633000" />
+      <workItem from="1775885669602" duration="23561000" />
+      <workItem from="1775971958682" duration="17738000" />
+      <workItem from="1776257640809" duration="1559000" />
+      <workItem from="1776260769625" duration="2700000" />
+      <workItem from="1776427751519" duration="1358000" />
+      <workItem from="1776481642473" duration="12538000" />
     </task>
     <task id="LOCAL-00001" summary="Simplify and unify refactor issue templates">
       <option name="closed" value="true" />
@@ -198,7 +204,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775841623665</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="#4 login/signup 컴포넌트 추가">
+      <option name="closed" value="true" />
+      <created>1775911976960</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1775911976960</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -217,6 +231,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Simplify and unify refactor issue templates" />
-    <option name="LAST_COMMIT_MESSAGE" value="Simplify and unify refactor issue templates" />
+    <MESSAGE value="#4 login/signup 컴포넌트 추가" />
+    <option name="LAST_COMMIT_MESSAGE" value="#4 login/signup 컴포넌트 추가" />
   </component>
 </project>
