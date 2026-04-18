@@ -4,19 +4,29 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ea831497-ec27-48ca-8ebb-2bdbf1bf382e" name="변경" comment="Feat[#1] - 토큰 typ 추가 &amp; Guard 설정 추가">
-      <change afterPath="$PROJECT_DIR$/backend/src/types/express.d.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="ea831497-ec27-48ca-8ebb-2bdbf1bf382e" name="변경" comment="Fix[#1] - 대학교 조회 시 페이지네이션 제거">
+      <change afterPath="$PROJECT_DIR$/backend/src/university-verification/dto/confirm-code-response.dto.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/university-verification/dto/confirm-code.dto.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/university-verification/dto/request-code.dto.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/university-verification/dto/send-code-response.dto.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/university-verification/schema/university-verification.schema.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/university-verification/university-verification.controller.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/university-verification/university-verification.module.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/university-verification/university-verification.service.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/next-env.d.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/auth/auth.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/auth/auth.controller.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/auth/auth.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/auth/auth.module.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/auth/auth.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/auth/auth.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/group-buying/guard/group-buying-access.guard.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/group-buying/guard/group-buying-access.guard.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/user/decorator/optional-user.decorator.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/user/decorator/optional-user.decorator.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/user/decorator/user.decorator.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/user/decorator/user.decorator.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/user/user.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/user/user.repository.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/user/user.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/user/user.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/web-push/web-push.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/web-push/web-push.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/script/generate-keys.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/script/make-group-buying.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/script/make-participants.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/script/seed-universities.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/app.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/app.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/participant/participant.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/participant/participant.service.ts" afterDir="false" />
+    </list>
+    <list id="caf3ddb5-a3b2-4ba1-ad19-c8426cf17c3a" name="docs" comment="">
+      <change afterPath="$PROJECT_DIR$/backend/docs/AUTH_IMPROVEMENT_PLAN.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/docs/LOGIN_PROCESS.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/docs/UNIVERSITY_VERIFICATION_REDIS.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -270,7 +280,23 @@
       <option name="project" value="LOCAL" />
       <updated>1776503092777</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Feat[#1] - 토큰 typ 추가 &amp; Guard 설정 추가">
+      <option name="closed" value="true" />
+      <created>1776503169537</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1776503169538</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Fix[#1] - 대학교 조회 시 페이지네이션 제거">
+      <option name="closed" value="true" />
+      <created>1776503989476</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1776503989476</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -297,6 +323,7 @@
     <MESSAGE value="Feat[#1] - 로그인 로직 추가" />
     <MESSAGE value="Chore[#1] - 로그인/회원가입 개선" />
     <MESSAGE value="Feat[#1] - 토큰 typ 추가 &amp; Guard 설정 추가" />
-    <option name="LAST_COMMIT_MESSAGE" value="Feat[#1] - 토큰 typ 추가 &amp; Guard 설정 추가" />
+    <MESSAGE value="Fix[#1] - 대학교 조회 시 페이지네이션 제거" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix[#1] - 대학교 조회 시 페이지네이션 제거" />
   </component>
 </project>

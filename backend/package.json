@@ -17,13 +17,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
-    "make-products": "ts-node -r tsconfig-paths/register script/make-group-buying.ts",
-    "make-participants": "ts-node -r tsconfig-paths/register script/make-participants.ts",
-    "make-all-dummy": "ts-node -r tsconfig-paths/register script/make-all-dummy-data.ts",
-    "make-web-push-key": "ts-node -r tsconfig-paths/register script/generate-keys.ts",
-    "seed-universities": "ts-node -r tsconfig-paths/register script/seed-universities.ts",
-    "reset-universities": "ts-node -r tsconfig-paths/register script/reset-universities-from-csv.ts"
+    "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
