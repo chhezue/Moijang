@@ -7,7 +7,12 @@ import { UniversityRepository } from "./university.repository";
 import { CommonModule } from "../common/common.module";
 
 @Module({
-  imports: [CommonModule /* 기존 모듈들... */],
+  imports: [
+    CommonModule,
+    MongooseModule.forFeature([
+      { name: University.name, schema: UniversitySchema },
+    ]),
+  ],
   controllers: [UniversityController],
   providers: [UniversityService, UniversityRepository],
   exports: [UniversityService, MongooseModule],

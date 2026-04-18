@@ -1,7 +1,6 @@
 import { Controller, Get, Param, Query } from "@nestjs/common";
 import { UniversityService } from "./university.service";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
-import { PageResponseDto } from "../common/dto/page-response.dto";
 import { GetUniversityDto } from "./dto/get-university.dto";
 import { SearchUniversityDto } from "./dto/search-university.dto";
 
@@ -14,7 +13,7 @@ export class UniversityController {
   @Get()
   async getAllUniversities(
     @Query() searchDto: SearchUniversityDto,
-  ): Promise<PageResponseDto<GetUniversityDto>> {
+  ): Promise<GetUniversityDto[]> {
     return await this.universityService.findAll(searchDto);
   }
 

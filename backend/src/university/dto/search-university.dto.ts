@@ -1,10 +1,9 @@
 import { IsOptional, IsString } from "class-validator";
-import { PageOptionDto } from "../../common/dto/page-option.dto";
 import { ApiProperty } from "@nestjs/swagger";
 
-export class SearchUniversityDto extends PageOptionDto {
-  @ApiProperty({ description: "대학교 이름" })
+export class SearchUniversityDto {
+  @ApiProperty({ description: "검색할 대학교 이름", required: false })
   @IsString()
   @IsOptional()
-  keyword?: string;
+  keyword: string;
 }
