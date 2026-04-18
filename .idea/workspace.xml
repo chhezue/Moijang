@@ -4,24 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ea831497-ec27-48ca-8ebb-2bdbf1bf382e" name="변경" comment="Fix[#1] - 대학교 조회 시 페이지네이션 제거">
-      <change afterPath="$PROJECT_DIR$/backend/src/university-verification/dto/confirm-code-response.dto.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/university-verification/dto/confirm-code.dto.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/university-verification/dto/request-code.dto.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/university-verification/dto/send-code-response.dto.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/university-verification/schema/university-verification.schema.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/university-verification/university-verification.controller.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/university-verification/university-verification.module.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/university-verification/university-verification.service.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/next-env.d.ts" afterDir="false" />
+    <list default="true" id="ea831497-ec27-48ca-8ebb-2bdbf1bf382e" name="변경" comment="Chore[#1] - 불필요한 스크립트 삭제">
+      <change afterPath="$PROJECT_DIR$/backend/src/university-verification/types/verification-session.type.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/script/generate-keys.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/script/make-group-buying.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/script/make-participants.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/script/seed-universities.ts" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/app.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/app.module.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/participant/participant.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/participant/participant.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/common/common.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/common/common.module.ts" afterDir="false" />
     </list>
     <list id="caf3ddb5-a3b2-4ba1-ad19-c8426cf17c3a" name="docs" comment="">
       <change afterPath="$PROJECT_DIR$/backend/docs/AUTH_IMPROVEMENT_PLAN.md" afterDir="false" />
@@ -93,39 +82,40 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;backend/1-login-teams-to-university&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/sesil/WebstormProjects/Moijang/backend/src/user/dto&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.standard&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.standard&quot;: &quot;&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
-    &quot;npm.make-all-dummy.executor&quot;: &quot;Run&quot;,
-    &quot;npm.make-products.executor&quot;: &quot;Run&quot;,
-    &quot;npm.merge-school-emails.executor&quot;: &quot;Run&quot;,
-    &quot;npm.reset-universities.executor&quot;: &quot;Run&quot;,
-    &quot;npm.seed-universities.executor&quot;: &quot;Run&quot;,
-    &quot;npm.start:dev.executor&quot;: &quot;Run&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;settings.javascript.linters.eslint&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/Users/sesil/WebstormProjects/Moijang/frontend/node_modules/typescript/lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "backend/1-login-teams-to-university",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/sesil/WebstormProjects/Moijang/backend/src/user/dto",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.standard": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.standard": "",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "npm.dev.executor": "Run",
+    "npm.make-all-dummy.executor": "Run",
+    "npm.make-products.executor": "Run",
+    "npm.merge-school-emails.executor": "Run",
+    "npm.reset-universities.executor": "Run",
+    "npm.seed-universities.executor": "Run",
+    "npm.start:dev.executor": "Run",
+    "prettierjs.PrettierConfiguration.Package": "/Users/sesil/WebstormProjects/Moijang/frontend/node_modules/prettier",
+    "settings.editor.selected.configurable": "settings.javascript.linters.eslint",
+    "to.speed.mode.migration.done": "true",
+    "ts.external.directory.path": "/Users/sesil/WebstormProjects/Moijang/frontend/node_modules/typescript/lib",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/backend/src/user/dto" />
@@ -296,7 +286,23 @@
       <option name="project" value="LOCAL" />
       <updated>1776503989476</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Chore[#1] - 불필요한 스크립트 삭제">
+      <option name="closed" value="true" />
+      <created>1776504773055</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1776504773055</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Chore[#1] - 불필요한 스크립트 삭제">
+      <option name="closed" value="true" />
+      <created>1776504816081</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1776504816081</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -324,6 +330,7 @@
     <MESSAGE value="Chore[#1] - 로그인/회원가입 개선" />
     <MESSAGE value="Feat[#1] - 토큰 typ 추가 &amp; Guard 설정 추가" />
     <MESSAGE value="Fix[#1] - 대학교 조회 시 페이지네이션 제거" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix[#1] - 대학교 조회 시 페이지네이션 제거" />
+    <MESSAGE value="Chore[#1] - 불필요한 스크립트 삭제" />
+    <option name="LAST_COMMIT_MESSAGE" value="Chore[#1] - 불필요한 스크립트 삭제" />
   </component>
 </project>
