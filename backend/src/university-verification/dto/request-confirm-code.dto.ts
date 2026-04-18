@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsMongoId, IsString, IsUUID, Length } from "class-validator";
+import { IsString, IsUUID, Length } from "class-validator";
 
 // send-code 응답의 verificationId + 메일로 받은 코드로 인증
 export class RequestConfirmCodeDto {

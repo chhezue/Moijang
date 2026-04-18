@@ -55,6 +55,13 @@ export class UserService {
     return this.mapUserToDto(user);
   }
 
+  // 이메일로 코드 전송 전 아이디 중복 확인 (Verification 모듈에서 호출됨)
+  async existsByEmail(normalizedEmail: string): Promise<boolean> {
+    const user =
+      await this.userRepository.findOneByUniversityEmail(normalizedEmail);
+    return !!user;
+  }
+
   // 유저 생성 (Auth 모듈에서 호출됨)
   async createUser(
     user: CreateUserDto,
