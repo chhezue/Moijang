@@ -1,7 +1,7 @@
 import { Controller, Get, Param } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { GetUserDto } from "./dto/get-user.dto";
-import { ApiOperation, ApiParam } from "@nestjs/swagger";
+import { ApiOperation } from "@nestjs/swagger";
 
 @Controller("user")
 export class UserController {

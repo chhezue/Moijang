@@ -14,6 +14,7 @@ import { UserDecorator } from "../user/decorator/user.decorator";
 import { JwtAuthGuard } from "./guard/auth.guard";
 import { GetUserDto } from "../user/dto/get-user.dto";
 import { SignupDto } from "./dto/signup.dto";
+import { LoginDto } from "./dto/login.dto";
 
 @Controller("auth")
 export class AuthController {
@@ -23,6 +24,15 @@ export class AuthController {
   @Post("signup")
   async signup(@Body() dto: SignupDto) {
     return this.authService.signup(dto);
+  }
+
+  @ApiOperation({ summary: "로그인" })
+  @Post("login")
+  async login(
+    @Body() dto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return this.authService.login(dto, res);
   }
 
   @ApiOperation({ summary: "로그아웃" })

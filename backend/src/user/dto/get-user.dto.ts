@@ -2,6 +2,10 @@ import { IsEmail, IsMongoId, IsString } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 
 export class GetUserDto {
+  @ApiProperty({ description: "유저의 MongoID" })
+  @IsString()
+  id: string;
+
   @ApiProperty({ description: "로그인 아이디" })
   @IsString()
   loginId: string;

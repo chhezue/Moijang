@@ -8,6 +8,7 @@ import { Request, Response } from "express";
 import { ConfigService } from "@nestjs/config";
 import { UserService } from "../user/user.service";
 import { SignupDto } from "./dto/signup.dto";
+import { LoginDto } from "./dto/login.dto";
 import { CreateUserDto } from "../user/dto/create-user.dto";
 import * as bcrypt from "bcrypt";
 import { SignupTokenPayload } from "./types/token-payload.type";
@@ -35,22 +36,20 @@ export class AuthService {
 
     const { universityId, universityEmail, typ } = payload;
 
-    // 3) 토큰 용도 검증
+    // 2) 토큰 용도 검증
     if (typ !== "signup") {
       throw new UnauthorizedException("잘못된 회원가입 토큰입니다.");
     }
 
-    // 4) 필수 값 검증
+    // 3) 필수 값 검증
     if (!universityId || !universityEmail) {
       throw new BadRequestException(
         "회원가입 토큰에 필요한 정보가 누락되었습니다.",
       );
     }
 
-    // 5) 비밀번호 해싱
+    // 4) 비밀번호 해싱 및 유저 생성
     const hashedPassword = await bcrypt.hash(dto.password, 10);
-
-    // 6) 유저 생성
     const createUserDto: CreateUserDto = {
       loginId: dto.loginId,
       name: dto.name,
@@ -64,6 +63,40 @@ export class AuthService {
     );
 
     return createdUser;
+  }
+
+  async login(dto: LoginDto, res: Response) {
+    // loginId, password 포함
+    const user = await this.userService.getUserByLoginIdWithPassword(
+      dto.loginId,
+    );
+
+    if (!user) {
+      throw new UnauthorizedException(
+        "아이디 또는 비밀번호가 올바르지 않습니다.",
+      );
+    }
+
+    const isMatch = await bcrypt.compare(dto.password, user.password);
+    if (!isMatch) {
+      throw new UnauthorizedException(
+        "아이디 또는 비밀번호가 올바르지 않습니다.",
+      );
+    }
+
+    const userId = user.id;
+    const accessToken = this.jwtService.sign(
+      { sub: userId, name: user.name },
+      { expiresIn: "5m" },
+    );
+    const refreshToken = this.jwtService.sign(
+      { sub: userId, name: user.name },
+      { expiresIn: "14d" },
+    );
+
+    this.setTokenCookies(res, accessToken, refreshToken);
+
+    return this.userService.getUserById(userId);
   }
 
   // 생성된 쿠키를 응답의 cookie로 설정

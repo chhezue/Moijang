@@ -31,6 +31,11 @@ export class UserService {
     return this.mapUserToDto(user);
   }
 
+  // 로그인 시, 비밀번호 매치 확인을 위해 password 포함하여 반환 (Auth 모듈에서 호출됨)
+  async getUserByLoginIdWithPassword(loginId: string) {
+    return await this.userRepository.findOneByLoginIdWithPassword(loginId);
+  }
+
   async getUserByEmail(email: string): Promise<GetUserDto> {
     const normalized = email.trim().toLowerCase();
     const user = await this.userRepository.findOneByUniversityEmail(normalized);
@@ -53,6 +58,7 @@ export class UserService {
 
   private mapUserToDto(user: UserWithUniversity): GetUserDto {
     return {
+      id: user._id.toString(),
       loginId: user.loginId,
       name: user.name,
       universityEmail: user.universityEmail,
