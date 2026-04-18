@@ -5,7 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { ParticipantService } from '../../participant/participant.service';
-import { User } from '../../user/schema/user.schema';
+import { GetUserDto } from '../../user/dto/get-user.dto';
 import { GroupBuyingService } from '../group-buying.service';
 import { ContextRole } from '../const/context-role.const';
 
@@ -19,7 +19,7 @@ export class GroupBuyingAccessGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const contextType = context.getType<'http' | 'ws'>();
 
-    let user: User;
+    let user: GetUserDto;
     let gbId: string;
     let req: any; // http request 객체를 담을 변수
     let client: any; // ws client 객체를 담을 변수

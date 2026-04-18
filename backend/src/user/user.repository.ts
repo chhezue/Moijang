@@ -33,12 +33,14 @@ export class UserRepository {
       .exec()) as unknown as UserWithUniversity | null;
   }
 
-  async findOneByLoginIdWithPassword(loginId: string) {
+  async findOneByLoginIdWithPassword(
+    loginId: string,
+  ): Promise<UserWithUniversity & { password: string } | null> {
     return (await this.usersModel
       .findOne({ loginId })
       .populate({ path: "universityId", select: "name" })
       .select("+password")
-      .exec()) as unknown as UserWithUniversity | null;
+      .exec()) as unknown as UserWithUniversity & { password: string } | null;
   }
 
   async findOneByUniversityEmail(

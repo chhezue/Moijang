@@ -32,7 +32,9 @@ export class UserService {
   }
 
   // 로그인 시, 비밀번호 매치 확인을 위해 password 포함하여 반환 (Auth 모듈에서 호출됨)
-  async getUserByLoginIdWithPassword(loginId: string) {
+  async getUserByLoginIdWithPassword(
+    loginId: string,
+  ): Promise<UserWithUniversity | null> {
     return await this.userRepository.findOneByLoginIdWithPassword(loginId);
   }
 

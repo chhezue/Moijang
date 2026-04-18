@@ -22,7 +22,7 @@ export class AuthController {
 
   @ApiOperation({ summary: "회원가입" })
   @Post("signup")
-  async signup(@Body() dto: SignupDto) {
+  async signup(@Body() dto: SignupDto): Promise<GetUserDto> {
     return this.authService.signup(dto);
   }
 
@@ -31,7 +31,7 @@ export class AuthController {
   async login(
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: Response,
-  ) {
+  ): Promise<GetUserDto> {
     return this.authService.login(dto, res);
   }
 

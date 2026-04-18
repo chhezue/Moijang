@@ -7,13 +7,12 @@ import { UserModule } from "../user/user.module";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { OptionalJwtAuthGuard } from "./guard/optional-auth.guard";
-import { UniversityVerificationModule } from "../university-verification/university-verification.module";
+import { JwtAuthGuard } from "./guard/auth.guard";
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     UserModule,
-    UniversityVerificationModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -23,8 +22,8 @@ import { UniversityVerificationModule } from "../university-verification/univers
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, OptionalJwtAuthGuard],
+  providers: [AuthService, JwtAuthGuard, OptionalJwtAuthGuard],
   controllers: [AuthController],
-  exports: [AuthService, OptionalJwtAuthGuard],
+  exports: [AuthService, JwtAuthGuard, OptionalJwtAuthGuard],
 })
 export class AuthModule {}

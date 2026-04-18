@@ -11,7 +11,12 @@ import { SignupDto } from "./dto/signup.dto";
 import { LoginDto } from "./dto/login.dto";
 import { CreateUserDto } from "../user/dto/create-user.dto";
 import * as bcrypt from "bcrypt";
-import { SignupTokenPayload } from "./types/token-payload.type";
+import {
+  AccessTokenPayload,
+  RefreshTokenPayload,
+  SignupTokenPayload,
+} from "./types/token-payload.type";
+import { GetUserDto } from "../user/dto/get-user.dto";
 
 @Injectable()
 export class AuthService {
@@ -22,7 +27,7 @@ export class AuthService {
   ) {}
 
   // 회원가입 (이메일/아이디 모두 검증된 이후 실행됨.)
-  async signup(dto: SignupDto) {
+  async signup(dto: SignupDto): Promise<GetUserDto> {
     // 1) 토큰 검증
     let payload: SignupTokenPayload;
 
@@ -57,15 +62,10 @@ export class AuthService {
       universityId,
     };
 
-    const createdUser = await this.userService.createUser(
-      createUserDto,
-      hashedPassword,
-    );
-
-    return createdUser;
+    return await this.userService.createUser(createUserDto, hashedPassword);
   }
 
-  async login(dto: LoginDto, res: Response) {
+  async login(dto: LoginDto, res: Response): Promise<GetUserDto> {
     // loginId, password 포함
     const user = await this.userService.getUserByLoginIdWithPassword(
       dto.loginId,
@@ -84,13 +84,23 @@ export class AuthService {
       );
     }
 
+    // res 응답에 쿠키 삽입
     const userId = user.id;
+
     const accessToken = this.jwtService.sign(
-      { sub: userId, name: user.name },
+      {
+        typ: "access",
+        sub: userId,
+        name: user.name,
+      } satisfies AccessTokenPayload,
       { expiresIn: "5m" },
     );
     const refreshToken = this.jwtService.sign(
-      { sub: userId, name: user.name },
+      {
+        typ: "refresh",
+        sub: userId,
+        name: user.name,
+      } satisfies RefreshTokenPayload,
       { expiresIn: "14d" },
     );
 
@@ -129,9 +139,16 @@ export class AuthService {
     try {
       const { accessToken } = req.cookies;
 
-      const decodedAccessToken = this.jwtService.verify(accessToken, {
-        secret: this.configService.get("JWT_SECRET"),
-      });
+      const decodedAccessToken = this.jwtService.verify<AccessTokenPayload>(
+        accessToken,
+        {
+          secret: this.configService.get("JWT_SECRET"),
+        },
+      );
+
+      if (decodedAccessToken.typ !== "access") {
+        throw new UnauthorizedException("유효하지 않은 토큰입니다.");
+      }
 
       // 검증 후 사용자 정보 반환 -> 가드에서 Request 객체에 할당
       return {
@@ -151,17 +168,28 @@ export class AuthService {
         throw new UnauthorizedException("유효하지 않은 토큰입니다.");
       }
 
-      const decodedRefreshToken = this.jwtService.verify(refreshToken, {
-        secret: this.configService.get("JWT_SECRET"),
-      });
+      const decodedRefreshToken = this.jwtService.verify<RefreshTokenPayload>(
+        refreshToken,
+        {
+          secret: this.configService.get("JWT_SECRET"),
+        },
+      );
       if (!decodedRefreshToken) {
+        throw new UnauthorizedException("유효하지 않은 토큰입니다.");
+      }
+
+      if (decodedRefreshToken.typ !== "refresh") {
         throw new UnauthorizedException("유효하지 않은 토큰입니다.");
       }
 
       const userId = decodedRefreshToken.sub;
 
       const accessToken = this.jwtService.sign(
-        { sub: userId, name: decodedRefreshToken.name },
+        {
+          typ: "access",
+          sub: userId,
+          name: decodedRefreshToken.name,
+        } satisfies AccessTokenPayload,
         { expiresIn: "5m" },
       );
 

@@ -28,7 +28,7 @@ export class WebPushController {
   @Post('send-all')
   @UseGuards(JwtAuthGuard)
   async sendNotificationToAll(
-    @UserDecorator('displayName') senderName: string,
+    @UserDecorator('name') senderName: string,
     @Body() payload: PayloadDto,
   ): Promise<any> {
     return await this.webPushService.sendNotificationToAll(senderName, payload);
@@ -38,7 +38,7 @@ export class WebPushController {
   @Post('send/:receiveId')
   @UseGuards(JwtAuthGuard)
   async sendNotification(
-    @UserDecorator('displayName') senderName: string,
+    @UserDecorator('name') senderName: string,
     @Param('receiveId') receiverId: string,
     @Body() payload: PayloadDto,
   ): Promise<any> {
