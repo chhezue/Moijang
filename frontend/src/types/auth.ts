@@ -25,11 +25,9 @@ export interface SendCodeRequest {
 }
 
 export interface ConfirmCodeRequest {
-  verificationToken: string;
+  verificationId: string;
   code: string;
 }
-
-// 아이디 중복 검사
 
 
 // 응답 타입
@@ -49,17 +47,9 @@ export interface SignupResponse {
 }
 
 export interface SendCodeResponse {
-  verificationToken: string; // jwe
-  message: string; // 인증코드 전송 완료
+  verificationId: string;
 }
 
 export interface ConfirmCodeResponse {
   signupToken: string;
 }
-
-// 신원 확인
-export interface CheckUsernameResponse {
-  available: boolean;
-}
-
-// 이메일 중복검사 응답

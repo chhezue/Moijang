@@ -7,7 +7,6 @@ import type {
   ConfirmCodeRequest,
   UserDto,
   University,
-  CheckUsernameResponse,
   ConfirmCodeResponse,
   SendCodeResponse
 } from "@/types/auth";
@@ -22,26 +21,24 @@ export const signup = async (data: SignupRequest): Promise<SignupResponse> => {
 };
 
 // id 중복 확인
-// export const checkDuplicateUsername = async (
-//   username: string
-// ): Promise<CheckUsernameResponse> => {
-//   const res = await apiClient.get("/api/auth/check-username", {
-//     params: { username },
-//   });
-//   return res.data;
-// };
+export const checkLoginId = async (
+  loginId: string
+): Promise<boolean> => {
+  const res = await apiClient.get(`/api/auth/exist/${loginId}`);
+  return res.data;
+};
 
 export const sendCode = async (
   data: SendCodeRequest
 ): Promise<SendCodeResponse> => {
-  const res = await apiClient.post("/api/university-verification/send-code", data);
+  const res = await apiClient.post("/api/verification/send-code", data);
   return res.data;
 };
 
 export const confirmCode = async (
   data: ConfirmCodeRequest
 ): Promise<ConfirmCodeResponse> => {
-  const res = await apiClient.post("/api/university-verification/confirm-code", data);
+  const res = await apiClient.post("/api/verification/confirm-code", data);
   return res.data;
 };
 
