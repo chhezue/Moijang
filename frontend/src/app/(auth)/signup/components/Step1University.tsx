@@ -3,28 +3,8 @@
 import { useState, useEffect } from "react";
 import { Autocomplete, TextField, Box, Typography, CircularProgress } from "@mui/material";
 import { University } from "@/types/auth";
-// import { searchUniversities } from "@/apis/services/auth";
+import { searchUniversity } from "@/apis/services/auth";
 
-const STUB_UNIVERSITIES: University[] = [
-  { id: "1", name: "서울대학교", domain: "snu.ac.kr", campusType: "본교", region: "서울" },
-  { id: "2", name: "연세대학교", domain: "yonsei.ac.kr", campusType: "본교", region: "서울" },
-  { id: "3", name: "고려대학교", domain: "korea.ac.kr", campusType: "본교", region: "서울" },
-  { id: "4", name: "성균관대학교", domain: "skku.edu", campusType: "본교", region: "서울" },
-  { id: "5", name: "한양대학교", domain: "hanyang.ac.kr", campusType: "본교", region: "서울" },
-  { id: "6", name: "한양대학교", domain: "hanyang.ac.kr", campusType: "ERICA", region: "경기" },
-  { id: "7", name: "경희대학교", domain: "khu.ac.kr", campusType: "본교", region: "서울" },
-  { id: "8", name: "경희대학교", domain: "khu.ac.kr", campusType: "국제", region: "경기" },
-  { id: "9", name: "부산대학교", domain: "pusan.ac.kr", campusType: "본교", region: "부산" },
-  { id: "10", name: "KAIST", domain: "kaist.ac.kr", campusType: "본교", region: "대전" },
-];
-
-const searchUniversities = async (keyword: string): Promise<University[]> => {
-  await new Promise((r) => setTimeout(r, 100)); // 네트워크 지연 시뮬레이션
-  if (!keyword.trim()) return STUB_UNIVERSITIES;
-  return STUB_UNIVERSITIES.filter((u) =>
-    u.name.includes(keyword) || u.region.includes(keyword)
-  );
-};
 
 interface Props {
   university: University | null;
@@ -40,7 +20,7 @@ export default function Step1University({ university, onUniversityChange }: Prop
     const timer = setTimeout(async () => {
       setLoading(true);
       try {
-        const results = await searchUniversities(inputValue);
+        const results = await searchUniversity(inputValue);
         setOptions(results);
       } catch {
         setOptions([]);

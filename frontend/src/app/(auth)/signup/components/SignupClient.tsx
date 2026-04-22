@@ -9,8 +9,7 @@ import Step1University from "./Step1University";
 import Step2Email from "./Step2Email";
 import Step3Account from "./Step3Account";
 import StepComplete from "./StepComplete";
-import { checkLoginId } from "@/apis/services/auth";
-// import { sendCode, confirmCode, signup } from "@/apis/services/auth";
+import {sendCode, confirmCode, signup, checkLoginId} from "@/apis/services/auth";
 import { useSnackbar } from "@/providers/SnackbarProvider";
 import { usernameSchema, nameSchema, passwordSchema } from "@/schemas/auth";
 import { University, SignupResponse } from "@/types/auth";
@@ -62,13 +61,11 @@ export default function SignupClient() {
   const handleSendCode = async () => {
     setLoading(true);
     try {
-      // const res = await sendCode({
-      //   universityId: university!.id,
-      //   universityEmail: `${emailLocal}@${university!.domain}`,
-      // });
-      // setVerificationToken(res.verificationToken);
-      setVerificationId("stub-token"); // stub
-      setCodeSent(true);
+      const res = await sendCode({
+        universityId: university!.id,
+        universityEmail: `${emailLocal}@${university!.domain}`,
+      });
+      setVerificationId(res.verificationId);
       showSnackbar("인증코드가 발송되었습니다.", "success", 3000);
     } catch {
       showSnackbar("인증코드 발송에 실패했습니다. 다시 시도해주세요.", "error", 3000);
@@ -81,11 +78,8 @@ export default function SignupClient() {
   const handleConfirmCode = async () => {
     setLoading(true);
     try {
-      // TODO: 백엔드 연결 후 주석 해제
-      // const res = await confirmCode({ verificationId, code });
-      // setSignupToken(res.signupToken);
-      // setEmailConfirmed(true);
-      setSignupToken("stub-signup-token"); // stub
+      const res = await confirmCode({ verificationId, code });
+      setSignupToken(res.signupToken);
       setEmailConfirmed(true);
       showSnackbar("이메일 인증이 완료되었습니다.", "success", 3000);
     } catch {
@@ -99,16 +93,8 @@ export default function SignupClient() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      // TODO: 백엔드 연결 후 주석 해제
-      // const result = await signup({ loginId, password, name, signupToken });
-      // setSignupResult(result);
-      setSignupResult({ // stub
-        loginId,
-        name,
-        universityEmail: `${emailLocal}@${university!.domain}`,
-        universityId: university!.id,
-        universityName: university!.name,
-      });
+      const result = await signup({ loginId, password, name, signupToken });
+      setSignupResult(result);
       setActiveStep(steps.length - 1);
     } catch {
       showSnackbar("회원가입에 실패했습니다. 다시 시도해주세요.", "error", 3000);
@@ -124,8 +110,7 @@ export default function SignupClient() {
 
   const handleCheckLoginId = async () => {
     try {
-      // const available = await checkLoginId(loginId);
-      const available = false
+      const available = await checkLoginId(loginId);
       setLoginIdAvailable(available);
     } catch {
       showSnackbar("중복 확인에 실패했습니다. 다시 시도해주세요.", "error", 3000);
