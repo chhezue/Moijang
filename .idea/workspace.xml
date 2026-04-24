@@ -9,6 +9,8 @@
       <change afterPath="$PROJECT_DIR$/backend/src/university-verification/verification.module.ts" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/src/university-verification/verification.redis.repository.ts" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/src/university-verification/verification.service.ts" afterDir="false" />
+    <list default="true" id="ea831497-ec27-48ca-8ebb-2bdbf1bf382e" name="변경" comment="#4 login/signup 컴포넌트 추가">
+      <change afterPath="$PROJECT_DIR$/frontend/src/types/auth.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package.json" afterDir="false" />
@@ -19,6 +21,8 @@
       <change afterPath="$PROJECT_DIR$/backend/docs/AUTH_IMPROVEMENT_PLAN.md" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/docs/LOGIN_PROCESS.md" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/docs/UNIVERSITY_VERIFICATION_REDIS.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/apis/services/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/apis/services/auth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/(home)/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/(home)/layout.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,6 +32,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
+        <entry key="$PROJECT_DIR$" value="frontend/3-refactor-auth" />
         <entry key="$PROJECT_DIR$" value="backend/2-create-university" />
       </map>
     </option>
@@ -71,7 +76,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/chhezue/Moijang.git&quot;,
-    &quot;accountId&quot;: &quot;cd3d3b42-68f4-4e1f-a3b1-5c11439d609e&quot;
+    &quot;accountId&quot;: &quot;df96cf5c-67c8-43f3-b728-b4acec5320a7&quot;
   }
 }</component>
   <component name="ProblemsViewState">
@@ -117,6 +122,36 @@
     "to.speed.mode.migration.done": "true",
     "ts.external.directory.path": "/Users/sesil/WebstormProjects/Moijang/frontend/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;frontend/4-login&quot;,
+    &quot;git.auto.fetch.suggestion.counter&quot;: &quot;1&quot;,
+    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/sesil/WebstormProjects/Moijang&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;npm.make-all-dummy.executor&quot;: &quot;Run&quot;,
+    &quot;npm.make-products.executor&quot;: &quot;Run&quot;,
+    &quot;npm.start:dev.executor&quot;: &quot;Run&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/a82109/WebstormProjects/Moijang/backend/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }]]></component>
   <component name="RecentsManager">
@@ -127,6 +162,14 @@
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/backend/script" />
+    </key>
+  </component>
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/frontend/src/types" />
+      <recent name="$PROJECT_DIR$/frontend" />
+      <recent name="$PROJECT_DIR$/backend" />
     </key>
   </component>
   <component name="RunManager" selected="npm.start:dev">
@@ -187,13 +230,16 @@
         <item itemvalue="npm.reset-universities" />
         <item itemvalue="npm.merge-school-emails" />
         <item itemvalue="npm.dev" />
+        <item itemvalue="npm.make-products" />
+        <item itemvalue="npm.make-all-dummy" />
+        <item itemvalue="npm.start:dev" />
       </list>
     </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-09060db00ec0-JavaScript-WS-251.28293.17" />
+        <option value="bundled-js-predefined-d6986cc7102b-3bd3a6803838-JavaScript-WS-261.22158.274" />
       </set>
     </attachedChunks>
   </component>
@@ -214,6 +260,13 @@
       <workItem from="1774772334741" duration="2687000" />
       <workItem from="1775457109962" duration="9694000" />
       <workItem from="1775491641516" duration="15000" />
+      <workItem from="1775491662782" duration="1452000" />
+      <workItem from="1775885669602" duration="23561000" />
+      <workItem from="1775971958682" duration="17738000" />
+      <workItem from="1776257640809" duration="1559000" />
+      <workItem from="1776260769625" duration="2700000" />
+      <workItem from="1776427751519" duration="1358000" />
+      <workItem from="1776481642473" duration="12538000" />
       <workItem from="1775491662782" duration="2113000" />
       <workItem from="1775493906051" duration="32172000" />
     </task>
@@ -322,6 +375,23 @@
       <updated>1776508936185</updated>
     </task>
     <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00002" summary="Simplify and unify refactor issue templates">
+      <option name="closed" value="true" />
+      <created>1775841623665</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1775841623665</updated>
+    </task>
+    <task id="LOCAL-00003" summary="#4 login/signup 컴포넌트 추가">
+      <option name="closed" value="true" />
+      <created>1775911976960</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1775911976960</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -353,5 +423,7 @@
     <MESSAGE value="Feat[#1] - Redis 기본 설정 &amp; DTO 추가" />
     <MESSAGE value="Feat[#1] - 회원가입 시 중복 아이디 확인 로직 추가" />
     <option name="LAST_COMMIT_MESSAGE" value="Feat[#1] - 회원가입 시 중복 아이디 확인 로직 추가" />
+    <MESSAGE value="#4 login/signup 컴포넌트 추가" />
+    <option name="LAST_COMMIT_MESSAGE" value="#4 login/signup 컴포넌트 추가" />
   </component>
 </project>
