@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { SET_USER, CLEAR_USER } from "@/redux/slice/commonSlice"; // CLEAR_USER 추가
 import { getMyInfo } from "@/apis/services/auth";
+import { mapUserDtoToIUser } from "@/apis/utils/mapUserDtoToIUser";
 
 export const useAuthSync = () => {
   const dispatch = useDispatch();
@@ -24,7 +25,7 @@ export const useAuthSync = () => {
       try {
         const res = await getMyInfo();
         console.log("getMyInfo OK:", res);
-        dispatch(SET_USER(res));
+        dispatch(SET_USER(mapUserDtoToIUser(res)));
       } catch {
         // API 호출이 실패하면 Redux 스토어의 사용자 정보를 초기화합니다.
         dispatch(CLEAR_USER());

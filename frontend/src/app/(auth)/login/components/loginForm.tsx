@@ -1,11 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Box, TextField, Button, Typography, CircularProgress } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { GradientTitle } from "@/components/GradientTitle";
-// import { login } from "@/apis/services/auth"; // TODO: 백엔드 연결 후 주석 해제
+import { login } from "@/apis/services/auth";
 import { useSnackbar } from "@/providers/SnackbarProvider";
 import { usernameSchema, passwordSchema, getError } from "@/schemas/auth";
 
@@ -21,16 +27,19 @@ export const LoginForm = ({ redirectTo = "/" }: Props) => {
   const [loading, setLoading] = useState(false);
   const [touched, setTouched] = useState({ username: false, password: false });
 
-  const usernameError = touched.username ? getError(usernameSchema, username) : null;
-  const passwordError = touched.password ? getError(passwordSchema, password) : null;
+  const usernameError = touched.username
+    ? getError(usernameSchema, username)
+    : null;
+  const passwordError = touched.password
+    ? getError(passwordSchema, password)
+    : null;
 
   const handleLogin = async () => {
     if (!username || !password) return;
     setLoading(true);
     try {
-      // TODO: 백엔드 연결 후 주석 해제
-      // await login({ username, password });
-      router.push(redirectTo); // stub
+      await login({ loginId: username, password });
+      router.push(redirectTo);
     } catch {
       showSnackbar("아이디 또는 비밀번호가 올바르지 않습니다.", "error", 3000);
     } finally {
@@ -58,7 +67,9 @@ export const LoginForm = ({ redirectTo = "/" }: Props) => {
         MOIJANG
       </GradientTitle>
 
-      <Box sx={{ width: "100%", display: "flex", flexDirection: "column", gap: 2 }}>
+      <Box
+        sx={{ width: "100%", display: "flex", flexDirection: "column", gap: 2 }}
+      >
         <TextField
           label="아이디"
           value={username}
