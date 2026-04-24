@@ -18,7 +18,7 @@ export class OptionalJwtAuthGuard implements CanActivate {
       // 먼저 액세스 토큰 검증 시도
       const { id } = await this.authService.validateAccessToken(request);
 
-      request.user = await this.userService.getUserByUuid(id);
+      request.user = await this.userService.getUserById(id);
       return true;
     } catch {
       // 액세스 토큰이 없거나 유효하지 않은 경우 리프레시 토큰으로 재시도
@@ -28,7 +28,7 @@ export class OptionalJwtAuthGuard implements CanActivate {
           response,
         );
 
-        request.user = await this.userService.getUserByUuid(id);
+        request.user = await this.userService.getUserById(id);
         return true;
       } catch {
         // 인증 실패 시에도 에러를 발생시키지 않고 request.user를 null로 설정

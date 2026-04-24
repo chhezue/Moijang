@@ -93,7 +93,6 @@ dist
 
 # vuepress v2.x temp and cache directory
 .temp
-.cache
 
 # Sveltekit cache directory
 .svelte-kit/
@@ -137,3 +136,20 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# JetBrains / WebStorm (로컬 설정·Shelf·workspace 등)
+.idea/
+
+# IntelliJ module (루트 또는 모듈별)
+*.iml
+
+# Editor / OS misc
+*.swp
+*.swo
+*~

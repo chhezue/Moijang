@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
-import { User } from './schema/user.schema';
-import { UserDto } from './dto/user.dto';
+import { Injectable } from "@nestjs/common";
+import { Model } from "mongoose";
+import { InjectModel } from "@nestjs/mongoose";
+import { User } from "./schema/user.schema";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { UserWithUniversity } from "./types/user.types";
 
 @Injectable()
 export class UserRepository {
@@ -11,21 +12,59 @@ export class UserRepository {
     private usersModel: Model<User>,
   ) {}
 
-  async findAll(): Promise<User[]> {
-    return this.usersModel.find();
+  async findAll(): Promise<UserWithUniversity[]> {
+    return (await this.usersModel
+      .find()
+      .populate({ path: "universityId", select: "name" })
+      .exec()) as unknown as UserWithUniversity[];
   }
 
-  async findOneByUuid(uuid: string): Promise<User> {
-    return this.usersModel.findOne({ id: uuid });
+  async findOneById(uuid: string): Promise<UserWithUniversity | null> {
+    return (await this.usersModel
+      .findById(uuid)
+      .populate({ path: "universityId", select: "name" })
+      .exec()) as unknown as UserWithUniversity | null;
   }
 
-  async upsertOne(user: UserDto): Promise<User> {
-    return await this.usersModel
-      .findOneAndUpdate(
-        { id: user.id },
-        { ...user },
-        { new: true, upsert: true }, // 있으면 내용 업데이트, 없으면 생성
-      )
-      .exec();
+  async findOneByLoginId(loginId: string): Promise<UserWithUniversity | null> {
+    return (await this.usersModel
+      .findOne({ loginId })
+      .populate({ path: "universityId", select: "name" })
+      .exec()) as unknown as UserWithUniversity | null;
+  }
+
+  async findOneByLoginIdWithPassword(
+    loginId: string,
+  ): Promise<UserWithUniversity & { password: string } | null> {
+    return (await this.usersModel
+      .findOne({ loginId })
+      .populate({ path: "universityId", select: "name" })
+      .select("+password")
+      .exec()) as unknown as UserWithUniversity & { password: string } | null;
+  }
+
+  async findOneByUniversityEmail(
+    universityEmail: string,
+  ): Promise<UserWithUniversity | null> {
+    return (await this.usersModel
+      .findOne({ universityEmail })
+      .populate({ path: "universityId", select: "name" })
+      .exec()) as unknown as UserWithUniversity | null;
+  }
+
+  async createOne(
+    user: CreateUserDto,
+    hashPassword: string,
+  ): Promise<UserWithUniversity> {
+    const createdUser = await this.usersModel.create({
+      ...user,
+      password: hashPassword,
+    });
+
+    // 생성된 유저에 대해서도 대학교 이름과 함께 반환
+    return (await createdUser.populate({
+      path: "universityId",
+      select: "name",
+    })) as unknown as UserWithUniversity;
   }
 }

@@ -29,22 +29,17 @@ export interface ConfirmCodeRequest {
   code: string;
 }
 
-
 // 응답 타입
 export interface UserDto {
   id: string;
-  username: string;
-  displayName: string;
-  email: string;
-}
-
-export interface SignupResponse {
   loginId: string;
   name: string;
   universityEmail: string;
   universityId: string;
   universityName: string;
 }
+
+export type SignupResponse = UserDto;
 
 export interface SendCodeResponse {
   verificationId: string;

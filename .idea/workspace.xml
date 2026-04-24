@@ -4,9 +4,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
+    <list default="true" id="ea831497-ec27-48ca-8ebb-2bdbf1bf382e" name="변경" comment="Feat[#1] - 회원가입 시 중복 아이디 확인 로직 추가">
+      <change afterPath="$PROJECT_DIR$/backend/src/university-verification/verification.controller.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/university-verification/verification.module.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/university-verification/verification.redis.repository.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/university-verification/verification.service.ts" afterDir="false" />
     <list default="true" id="ea831497-ec27-48ca-8ebb-2bdbf1bf382e" name="변경" comment="#4 login/signup 컴포넌트 추가">
       <change afterPath="$PROJECT_DIR$/frontend/src/types/auth.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/university-verification/types/verification-session.type.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/university-verification/types/verification-session.type.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/user/user.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/user/user.service.ts" afterDir="false" />
+    </list>
+    <list id="caf3ddb5-a3b2-4ba1-ad19-c8426cf17c3a" name="docs" comment="">
+      <change afterPath="$PROJECT_DIR$/backend/docs/AUTH_IMPROVEMENT_PLAN.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/docs/LOGIN_PROCESS.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/docs/UNIVERSITY_VERIFICATION_REDIS.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/apis/services/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/apis/services/auth.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/app/(home)/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/(home)/layout.tsx" afterDir="false" />
     </list>
@@ -19,6 +33,7 @@
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
         <entry key="$PROJECT_DIR$" value="frontend/3-refactor-auth" />
+        <entry key="$PROJECT_DIR$" value="backend/2-create-university" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -38,12 +53,16 @@
               <option name="branches">
                 <list>
                   <RecentBranch>
-                    <option name="branchName" value="main" />
-                    <option name="lastUsedInstant" value="1775491770" />
+                    <option name="branchName" value="backend/1-login-teams-to-university" />
+                    <option name="lastUsedInstant" value="1775757451" />
                   </RecentBranch>
                   <RecentBranch>
-                    <option name="branchName" value="v2-back" />
-                    <option name="lastUsedInstant" value="1775491703" />
+                    <option name="branchName" value="backend/2-create-university" />
+                    <option name="lastUsedInstant" value="1775494080" />
+                  </RecentBranch>
+                  <RecentBranch>
+                    <option name="branchName" value="main" />
+                    <option name="lastUsedInstant" value="1775491770" />
                   </RecentBranch>
                 </list>
               </option>
@@ -60,6 +79,9 @@
     &quot;accountId&quot;: &quot;df96cf5c-67c8-43f3-b728-b4acec5320a7&quot;
   }
 }</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
 }</component>
@@ -68,6 +90,38 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "backend/1-login-teams-to-university",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/sesil/WebstormProjects/Moijang/backend/src/user/dto",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.standard": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.standard": "",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "npm.dev.executor": "Run",
+    "npm.make-all-dummy.executor": "Run",
+    "npm.make-products.executor": "Run",
+    "npm.merge-school-emails.executor": "Run",
+    "npm.reset-universities.executor": "Run",
+    "npm.seed-universities.executor": "Run",
+    "npm.start:dev.executor": "Run",
+    "prettierjs.PrettierConfiguration.Package": "/Users/sesil/WebstormProjects/Moijang/frontend/node_modules/prettier",
+    "settings.editor.selected.configurable": "settings.javascript.linters.eslint",
+    "to.speed.mode.migration.done": "true",
+    "ts.external.directory.path": "/Users/sesil/WebstormProjects/Moijang/frontend/node_modules/typescript/lib",
+    "vue.rearranger.settings.migration": "true"
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
@@ -99,6 +153,17 @@
     &quot;ts.external.directory.path&quot;: &quot;/Users/a82109/WebstormProjects/Moijang/backend/node_modules/typescript/lib&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/backend/src/user/dto" />
+      <recent name="$PROJECT_DIR$/backend/src/university/dto" />
+      <recent name="$PROJECT_DIR$/backend/src/university" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/backend/script" />
+    </key>
+  </component>
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -118,21 +183,31 @@
       <envs />
       <method v="2" />
     </configuration>
-    <configuration name="make-all-dummy" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+    <configuration name="merge-school-emails" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/backend/package.json" />
       <command value="run" />
       <scripts>
-        <script value="make-all-dummy" />
+        <script value="merge-school-emails" />
       </scripts>
       <node-interpreter value="project" />
       <envs />
       <method v="2" />
     </configuration>
-    <configuration name="make-products" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+    <configuration name="reset-universities" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/backend/package.json" />
       <command value="run" />
       <scripts>
-        <script value="make-products" />
+        <script value="reset-universities" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="seed-universities" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/backend/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="seed-universities" />
       </scripts>
       <node-interpreter value="project" />
       <envs />
@@ -151,6 +226,9 @@
     <recent_temporary>
       <list>
         <item itemvalue="npm.start:dev" />
+        <item itemvalue="npm.seed-universities" />
+        <item itemvalue="npm.reset-universities" />
+        <item itemvalue="npm.merge-school-emails" />
         <item itemvalue="npm.dev" />
         <item itemvalue="npm.make-products" />
         <item itemvalue="npm.make-all-dummy" />
@@ -168,6 +246,8 @@
   <component name="TaskManager">
     <task active="true" id="Default" summary="디폴트 작업">
       <changelist id="ea831497-ec27-48ca-8ebb-2bdbf1bf382e" name="변경" comment="" />
+      <changelist id="" name="ㄴㅇㄹㄴㄹ" comment="" />
+      <changelist id="fa172298-1f0f-4457-bb62-bb22dcf80207" name="[Issue #2] User 스키마 관련" comment="" />
       <created>1763292599535</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -187,6 +267,8 @@
       <workItem from="1776260769625" duration="2700000" />
       <workItem from="1776427751519" duration="1358000" />
       <workItem from="1776481642473" duration="12538000" />
+      <workItem from="1775491662782" duration="2113000" />
+      <workItem from="1775493906051" duration="32172000" />
     </task>
     <task id="LOCAL-00001" summary="Simplify and unify refactor issue templates">
       <option name="closed" value="true" />
@@ -196,6 +278,103 @@
       <option name="project" value="LOCAL" />
       <updated>1775491265282</updated>
     </task>
+    <task id="LOCAL-00002" summary="Feat[#2] - University 스키마 정의">
+      <option name="closed" value="true" />
+      <created>1775644518721</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1775644518721</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Feat[#2] - 실제 대학교 데이터 삽입">
+      <option name="closed" value="true" />
+      <created>1775654246363</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1775654246363</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Feat[#2] - 회원가입용 대학교 조회 로직 구현">
+      <option name="closed" value="true" />
+      <created>1775672078587</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1775672078587</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Feat[#2] - Create User API 구현">
+      <option name="closed" value="true" />
+      <created>1775757182120</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1775757182120</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Chore[#1] - 로그인/회원가입 개선">
+      <option name="closed" value="true" />
+      <created>1776502098559</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1776502098559</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Feat[#1] - 토큰 typ 추가 &amp; Guard 설정 추가">
+      <option name="closed" value="true" />
+      <created>1776503092777</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1776503092777</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Feat[#1] - 토큰 typ 추가 &amp; Guard 설정 추가">
+      <option name="closed" value="true" />
+      <created>1776503169537</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1776503169538</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Fix[#1] - 대학교 조회 시 페이지네이션 제거">
+      <option name="closed" value="true" />
+      <created>1776503989476</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1776503989476</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Chore[#1] - 불필요한 스크립트 삭제">
+      <option name="closed" value="true" />
+      <created>1776504773055</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1776504773055</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Chore[#1] - 불필요한 스크립트 삭제">
+      <option name="closed" value="true" />
+      <created>1776504816081</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1776504816081</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Feat[#1] - Redis 기본 설정 &amp; DTO 추가">
+      <option name="closed" value="true" />
+      <created>1776507340254</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1776507340254</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Feat[#1] - 회원가입 시 중복 아이디 확인 로직 추가">
+      <option name="closed" value="true" />
+      <created>1776508936185</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1776508936185</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <task id="LOCAL-00002" summary="Simplify and unify refactor issue templates">
       <option name="closed" value="true" />
       <created>1775841623665</created>
@@ -231,6 +410,19 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Simplify and unify refactor issue templates" />
+    <MESSAGE value="Feat[#2] - University 스키마 정의" />
+    <MESSAGE value="Feat[#2] - 실제 대학교 데이터 삽입" />
+    <MESSAGE value="Feat[#2] - 회원가입용 대학교 조회 로직 구현" />
+    <MESSAGE value="Feat[#2] - Create User API 구현" />
+    <MESSAGE value="Feat[#1] - 로그인 로직 추가" />
+    <MESSAGE value="Feat[#1] - 로그인 로직 추가" />
+    <MESSAGE value="Chore[#1] - 로그인/회원가입 개선" />
+    <MESSAGE value="Feat[#1] - 토큰 typ 추가 &amp; Guard 설정 추가" />
+    <MESSAGE value="Fix[#1] - 대학교 조회 시 페이지네이션 제거" />
+    <MESSAGE value="Chore[#1] - 불필요한 스크립트 삭제" />
+    <MESSAGE value="Feat[#1] - Redis 기본 설정 &amp; DTO 추가" />
+    <MESSAGE value="Feat[#1] - 회원가입 시 중복 아이디 확인 로직 추가" />
+    <option name="LAST_COMMIT_MESSAGE" value="Feat[#1] - 회원가입 시 중복 아이디 확인 로직 추가" />
     <MESSAGE value="#4 login/signup 컴포넌트 추가" />
     <option name="LAST_COMMIT_MESSAGE" value="#4 login/signup 컴포넌트 추가" />
   </component>
