@@ -66,14 +66,11 @@ export interface PaginationMeta {
   hasNextPage: boolean;
 }
 
-// user 정보
+// user 정보 (group-buying 응답에 embedded되는 유저 객체)
 export interface IUser {
   id: string;
   displayName: string;
-  jobTitle: string;
-  mail: string;
   department: string;
-  userPrincipalName: string;
 }
 
 // participant 정보

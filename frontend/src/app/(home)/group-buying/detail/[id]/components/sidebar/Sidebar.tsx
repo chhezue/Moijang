@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { GroupBuyingItem, IParticipant, IUser } from "@/apis/interfaces";
+import { GroupBuyingItem, IParticipant } from "@/apis/interfaces";
+import { UserDto } from "@/types/auth";
 import { Stack, Divider, Typography, Box } from "@mui/material";
 import ProgressBar from "./ProgressBar";
 import ActionButtons from "./ActionButtons";
@@ -12,7 +13,7 @@ import NoticeBoard from "@/app/(home)/group-buying/detail/[id]/components/sideba
 interface SidebarProps {
   participants: IParticipant[];
   item: GroupBuyingItem;
-  user: IUser | null;
+  user: UserDto | null;
   onOpenModal: (type: ModalType, action?: "join" | "modify") => void;
 }
 

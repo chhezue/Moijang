@@ -6,7 +6,7 @@ import { theme } from "@/styles/theme";
 import { StatusProvider } from "@/providers/StatusProvider";
 import { CategoryProvider } from "@/providers/CategoryProvider";
 import { SnackbarProvider } from "@/providers/SnackbarProvider";
-import { IUser } from "@/apis/interfaces";
+import { UserDto } from "@/types/auth";
 import { useAuthStore } from "@/store/authStore";
 
 export default function Providers({
@@ -14,7 +14,7 @@ export default function Providers({
   initialUser = null,
 }: {
   children: React.ReactNode;
-  initialUser?: IUser | null;
+  initialUser?: UserDto | null;
 }) {
   const setUser = useAuthStore((s) => s.setUser);
   const clearUser = useAuthStore((s) => s.clearUser);

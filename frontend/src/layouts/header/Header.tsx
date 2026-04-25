@@ -133,7 +133,7 @@ const Header: React.FC = () => {
 
         {/* 우측 사용자 메뉴 */}
         <Stack direction="row" alignItems="center" spacing={1.5}>
-          {user && <UserMenu displayName={user.displayName} />}
+          {user && <UserMenu displayName={user.name} />}
 
           {/* 공구 생성 버튼 */}
           <CreateButton />
