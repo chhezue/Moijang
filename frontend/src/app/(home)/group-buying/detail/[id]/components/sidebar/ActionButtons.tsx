@@ -3,7 +3,7 @@
 import React from "react";
 import { Button } from "@mui/material";
 import styled from "styled-components";
-import { GroupBuyingItem, IParticipant, IUser } from "@/apis/interfaces";
+import { GroupBuyingItem, IParticipant, IUser } from "@/types/groupBuying";
 import { ModalType } from "../types";
 
 const ButtonWrap = styled.div`

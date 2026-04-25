@@ -14,7 +14,7 @@ import CategoryTag from "@/components/CategoryTag";
 import { useStatusContext } from "@/providers/StatusProvider";
 import { useCategoryContext } from "@/providers/CategoryProvider";
 import { formatCurrency, calcDday } from "@/utils/formatters";
-import { GroupBuyingItem } from "@/apis/interfaces";
+import { GroupBuyingItem } from "@/types/groupBuying";
 
 export interface ItemOfListProps {
   item: GroupBuyingItem;

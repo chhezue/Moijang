@@ -1,10 +1,7 @@
 import apiServer from "@/apis/apiServer";
 import { withServerCookies } from "@/apis/utils/withServerCookies";
-import {
-  GroupBuyingItem,
-  PaginationMeta,
-  PaginationParams,
-} from "@/apis/interfaces";
+import { GroupBuyingItem } from "@/types/groupBuying";
+import { PaginationMeta, PaginationParams } from "@/types/common";
 
 export const getMyCreateGroupBuying = async (
   params?: PaginationParams

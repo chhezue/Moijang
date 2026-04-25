@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
-import Providers from "@/redux/Provider";
+import Providers from "@/providers/Providers";
 import { getMyInfoServer } from "@/apis/services/auth.server";
 
 export default async function AuthLayout({

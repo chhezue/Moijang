@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import ProtectedClient from "@/app/(protected)/protectedClient";
-import Providers from "@/redux/Provider";
+import Providers from "@/providers/Providers";
 import { getMyInfoServer } from "@/apis/services/auth.server";
 export default async function ProtectedLayout({
   children,

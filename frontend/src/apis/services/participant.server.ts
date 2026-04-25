@@ -1,5 +1,5 @@
 import apiServer from "@/apis/apiServer";
-import { IParticipant } from "@/apis/interfaces";
+import { IParticipant } from "@/types/groupBuying";
 
 export const getParticipantListServer = async (
   gbId: string

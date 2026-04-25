@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { GroupBuyingItem, IParticipant } from "@/apis/interfaces";
+import { GroupBuyingItem, IParticipant } from "@/types/groupBuying";
 import { UserDto } from "@/types/auth";
 import { Stack, Divider, Typography, Box } from "@mui/material";
 import ProgressBar from "./ProgressBar";

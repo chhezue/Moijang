@@ -19,7 +19,7 @@ import {
 import { useSnackbar } from "@/providers/SnackbarProvider";
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
-import { BANK_NAMES, BankName } from "@/apis/interfaces";
+import { BANK_NAMES, BankName } from "@/constants/bank";
 import { theme } from "@/styles/theme";
 
 const Label = styled.label`

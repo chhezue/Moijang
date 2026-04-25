@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Box, Container, Skeleton } from "@mui/material";
-import { GroupBuyingItem, IParticipant } from "@/apis/interfaces";
+import { GroupBuyingItem, IParticipant } from "@/types/groupBuying";
 
 import DetailInfoSection from "./DetailInfoSection";
 import Stepper from "@/components/Stepper";

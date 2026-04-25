@@ -1,11 +1,6 @@
 import api from "@/apis/apiClient";
-import {
-  CreateGroupBuying,
-  GroupBuyingItem,
-  PaginationMeta,
-  PaginationParams,
-  SearchParams,
-} from "../interfaces";
+import { CreateGroupBuying, GroupBuyingItem } from "@/types/groupBuying";
+import { PaginationMeta, PaginationParams, SearchParams } from "@/types/common";
 
 // 전체 목록 반환 (페이지네이션, 검색어 옵션)
 export const getGroupBuying = async (
