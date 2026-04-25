@@ -14,6 +14,7 @@ import { GradientTitle } from "@/components/GradientTitle";
 import { login } from "@/apis/services/auth";
 import { useSnackbar } from "@/providers/SnackbarProvider";
 import { usernameSchema, passwordSchema, getError } from "@/schemas/auth";
+import { useAuthStore } from "@/store/authStore";
 
 interface Props {
   redirectTo?: string;
@@ -22,6 +23,7 @@ interface Props {
 export const LoginForm = ({ redirectTo = "/" }: Props) => {
   const router = useRouter();
   const { showSnackbar } = useSnackbar();
+  const setUser = useAuthStore((s) => s.setUser);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -38,7 +40,8 @@ export const LoginForm = ({ redirectTo = "/" }: Props) => {
     if (!username || !password) return;
     setLoading(true);
     try {
-      await login({ loginId: username, password });
+      const user = await login({ loginId: username, password });
+      setUser(user);
       router.push(redirectTo);
     } catch {
       showSnackbar("아이디 또는 비밀번호가 올바르지 않습니다.", "error", 3000);
