@@ -1,16 +1,13 @@
 "use client";
-import { useSelector } from "react-redux";
 import React, { useEffect, useState } from "react";
 import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
 import { useRouter } from "next/navigation";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import { logout } from "@/apis/services/auth";
-import { CLEAR_USER } from "@/redux/slice/commonSlice";
-import { useDispatch } from "react-redux";
-import { RootState } from "@/redux/store";
 import LoginIcon from "@mui/icons-material/Login";
 import CreateButton from "@/components/CreateButton";
 import UserMenu from "@/components/UserMenu";
+import { useAuthStore } from "@/store/authStore";
 
 const useScrollFlag = (threshold = 8) => {
   const [scrolled, setScrolled] = useState(false);
@@ -48,15 +45,16 @@ function useHeaderStyles() {
 
 const Header: React.FC = () => {
   const router = useRouter();
-  const dispatch = useDispatch();
   const styles = useHeaderStyles();
   const theme = useTheme();
-  const user = useSelector((state: RootState) => state.common.user);
+  const user = useAuthStore((s) => s.user);
+  const clearUser = useAuthStore((s) => s.clearUser);
 
   const onLogout = async () => {
     try {
       await logout();
-      dispatch(CLEAR_USER());
+      clearUser();
+      router.push("/");
     } catch (error) {
       console.error("로그아웃 실패:", error);
     }

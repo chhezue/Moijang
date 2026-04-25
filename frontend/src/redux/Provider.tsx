@@ -1,28 +1,37 @@
 "use client";
 
-import React from "react";
-import { Provider } from "react-redux";
-import store from "./store";
+import React, { useEffect } from "react";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { theme } from "@/styles/theme";
 import { StatusProvider } from "@/providers/StatusProvider";
 import { CategoryProvider } from "@/providers/CategoryProvider";
 import { SnackbarProvider } from "@/providers/SnackbarProvider";
-import AuthInitializer from "@/components/AuthInitializer";
+import { IUser } from "@/apis/interfaces";
+import { useAuthStore } from "@/store/authStore";
 
-export default function Providers({ children }: { children: React.ReactNode }) {
+export default function Providers({
+  children,
+  initialUser = null,
+}: {
+  children: React.ReactNode;
+  initialUser?: IUser | null;
+}) {
+  const setUser = useAuthStore((s) => s.setUser);
+  const clearUser = useAuthStore((s) => s.clearUser);
+
+  useEffect(() => {
+    if (initialUser) setUser(initialUser);
+    else clearUser();
+  }, []);
+
   return (
-    <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <StatusProvider>
-          <CategoryProvider>
-            <SnackbarProvider>
-              <AuthInitializer>{children}</AuthInitializer>
-            </SnackbarProvider>
-          </CategoryProvider>
-        </StatusProvider>
-      </ThemeProvider>
-    </Provider>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <StatusProvider>
+        <CategoryProvider>
+          <SnackbarProvider>{children}</SnackbarProvider>
+        </CategoryProvider>
+      </StatusProvider>
+    </ThemeProvider>
   );
 }

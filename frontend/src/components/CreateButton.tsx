@@ -2,8 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { useSelector } from "react-redux";
-import type { RootState } from "@/redux/store";
+import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
 import {
   IconButton,
@@ -30,7 +29,7 @@ export default function CreateButton({
   size = "small",
 }: Props) {
   const router = useRouter();
-  const user = useSelector((s: RootState) => s.common.user);
+  const user = useAuthStore((s) => s.user);
   const [open, setOpen] = useState(false);
 
   const handleClick = () => {

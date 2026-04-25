@@ -29,8 +29,7 @@ import RequestPaymentModalContent from "@/app/(home)/group-buying/detail/[id]/co
 import EditPriceModalContent from "@/app/(home)/group-buying/detail/[id]/components/modals/EditPriceModalContent";
 import CancelReasonModalContent from "@/app/(home)/group-buying/detail/[id]/components/modals/CancelReasonModalContent";
 import { ShippedModalContent } from "@/app/(home)/group-buying/detail/[id]/components/modals/ShippedModalContent";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import { useAuthStore } from "@/store/authStore";
 import CancelledBanner from "@/app/(home)/group-buying/detail/[id]/components/CancelledBanner";
 import { theme } from "@/styles/theme";
 
@@ -46,7 +45,7 @@ const DetailClientPage: React.FC<ClientPageProps> = ({
   const { showSnackbar } = useSnackbar();
   const { statusList, statusToStepIndex } = useStatusContext();
   const [loading, setLoading] = useState(true);
-  const user = useSelector((state: RootState) => state.common.user);
+  const user = useAuthStore((s) => s.user);
   const router = useRouter();
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [participationAction, setParticipationAction] = useState<
