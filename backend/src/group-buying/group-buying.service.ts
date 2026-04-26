@@ -2,10 +2,10 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
-} from '@nestjs/common';
-import { GroupBuyingRepository } from './group-buying.repository';
-import { CreateGroupBuyingDto } from './dto/create-group-buying.dto';
-import { GroupBuying } from './schema/group-buying.schema';
+} from "@nestjs/common";
+import { GroupBuyingRepository } from "./group-buying.repository";
+import { CreateGroupBuyingDto } from "./dto/create-group-buying.dto";
+import { GroupBuying } from "./schema/group-buying.schema";
 import {
   CANCEL_REASON_LABELS,
   CancelReason,
@@ -14,17 +14,17 @@ import {
   GroupBuyingStatus,
   PRODUCT_CATEGORY_LABELS,
   ProductCategory,
-} from './const/group-buying.const';
-import { UpdateGroupBuyingDto } from './dto/update-group-buying.dto';
-import { SearchGroupBuyingDto } from './dto/search-group-buying.dto';
-import { PageMetaDto, PageResponseDto } from '../common/dto/page-response.dto';
-import { PageOptionDto } from '../common/dto/page-option.dto';
-import { UpdateStatusDto } from './dto/update-status.dto';
-import { DeleteGroupBuyingDto } from './dto/delete-group-buying.dto';
-import { ParticipantService } from '../participant/participant.service';
-import { PayloadDto } from '../web-push/dto/payload.dto';
-import { WebPushService } from '../web-push/web-push.service';
-import mongoose, { PipelineStage, Types } from 'mongoose';
+} from "./const/group-buying.const";
+import { UpdateGroupBuyingDto } from "./dto/update-group-buying.dto";
+import { SearchGroupBuyingDto } from "./dto/search-group-buying.dto";
+import { PageMetaDto, PageResponseDto } from "../common/dto/page-response.dto";
+import { PageOptionDto } from "../common/dto/page-option.dto";
+import { UpdateStatusDto } from "./dto/update-status.dto";
+import { DeleteGroupBuyingDto } from "./dto/delete-group-buying.dto";
+import { ParticipantService } from "../participant/participant.service";
+import { PayloadDto } from "../web-push/dto/payload.dto";
+import { WebPushService } from "../web-push/web-push.service";
+import mongoose, { PipelineStage, Types } from "mongoose";
 
 @Injectable()
 export class GroupBuyingService {
@@ -50,17 +50,9 @@ export class GroupBuyingService {
         GroupBuyingStatus.CONFIRMED,
         GroupBuyingStatus.CANCELLED,
       ],
-      // 모집 완료 -> 입금 진행 중, 품절로 인한 취소
-      [GroupBuyingStatus.CONFIRMED]: [
-        GroupBuyingStatus.PAYMENT_IN_PROGRESS,
-        GroupBuyingStatus.CANCELLED,
-      ],
-      // 입금 진행 중 -> 주문 진행 중, 미입금자 & 품절로 인한 취소
-      [GroupBuyingStatus.PAYMENT_IN_PROGRESS]: [
-        GroupBuyingStatus.ORDER_PENDING,
-        GroupBuyingStatus.CANCELLED,
-      ],
-      // 주문 대기 -> 주문 진행 중, 미입금자 & 품절로 인한 취소
+      // 모집 완료 -> 품절로 인한 취소
+      [GroupBuyingStatus.CONFIRMED]: [GroupBuyingStatus.CANCELLED],
+      // 주문 대기 -> 주문 진행 중, 품절로 인한 취소
       [GroupBuyingStatus.ORDER_PENDING]: [
         GroupBuyingStatus.ORDERED,
         GroupBuyingStatus.CANCELLED,
@@ -85,13 +77,13 @@ export class GroupBuyingService {
     const countQuery = {};
 
     if (keyword) {
-      countQuery['title'] = { $regex: keyword, $options: 'i' };
+      countQuery["title"] = { $regex: keyword, $options: "i" };
     }
     if (category) {
-      countQuery['category'] = category;
+      countQuery["category"] = category;
     }
     if (status) {
-      countQuery['groupBuyingStatus'] = status;
+      countQuery["groupBuyingStatus"] = status;
     }
 
     const totalCount = await this.groupBuyingRepository.count(countQuery);
@@ -102,40 +94,40 @@ export class GroupBuyingService {
       },
       {
         $addFields: {
-          id: '$_id',
+          id: "$_id",
         },
       },
       {
         $lookup: {
-          from: 'participants',
-          let: { groupBuyIdAsString: { $toString: '$_id' } },
+          from: "participants",
+          let: { groupBuyIdAsString: { $toString: "$_id" } },
           pipeline: [
             {
               $match: {
                 $expr: {
-                  $eq: ['$gbId', '$$groupBuyIdAsString'],
+                  $eq: ["$gbId", "$$groupBuyIdAsString"],
                 },
               },
             },
           ],
-          as: 'participantData',
+          as: "participantData",
         },
       },
       {
         $addFields: {
-          currentCount: { $sum: '$participantData.count' },
+          currentCount: { $sum: "$participantData.count" },
         },
       },
       {
         $lookup: {
-          from: 'users',
-          localField: 'leaderId',
-          foreignField: 'id',
-          as: 'leaderId',
+          from: "users",
+          localField: "leaderId",
+          foreignField: "id",
+          as: "leaderId",
         },
       },
       {
-        $unwind: { path: '$leaderId', preserveNullAndEmptyArrays: true },
+        $unwind: { path: "$leaderId", preserveNullAndEmptyArrays: true },
       },
       {
         $sort: {
@@ -182,40 +174,40 @@ export class GroupBuyingService {
       },
       {
         $addFields: {
-          id: '$_id',
+          id: "$_id",
         },
       },
       {
         $lookup: {
-          from: 'participants',
-          let: { groupBuyIdAsString: { $toString: '$_id' } },
+          from: "participants",
+          let: { groupBuyIdAsString: { $toString: "$_id" } },
           pipeline: [
             {
               $match: {
                 $expr: {
-                  $eq: ['$gbId', '$$groupBuyIdAsString'],
+                  $eq: ["$gbId", "$$groupBuyIdAsString"],
                 },
               },
             },
           ],
-          as: 'participantData',
+          as: "participantData",
         },
       },
       {
         $addFields: {
-          currentCount: { $sum: '$participantData.count' },
+          currentCount: { $sum: "$participantData.count" },
         },
       },
       {
         $lookup: {
-          from: 'users',
-          localField: 'leaderId',
-          foreignField: 'id',
-          as: 'leaderId',
+          from: "users",
+          localField: "leaderId",
+          foreignField: "id",
+          as: "leaderId",
         },
       },
       {
-        $unwind: { path: '$leaderId', preserveNullAndEmptyArrays: true },
+        $unwind: { path: "$leaderId", preserveNullAndEmptyArrays: true },
       },
       {
         $sort: {
@@ -259,48 +251,46 @@ export class GroupBuyingService {
     });
     const totalCount = groupbuyingIds.length - myGroupbuying.length;
 
-    const objectIdArray = groupbuyingIds.map((id) => new Types.ObjectId(id));
-
     const pipeline: PipelineStage[] = [
       {
-        $match: { _id: { $in: objectIdArray }, leaderId: { $ne: userId } },
+        $match: { _id: { $in: groupbuyingIds }, leaderId: { $ne: userId } },
       },
       {
         $addFields: {
-          id: '$_id',
+          id: "$_id",
         },
       },
       {
         $lookup: {
-          from: 'participants',
-          let: { groupBuyIdAsString: { $toString: '$_id' } },
+          from: "participants",
+          let: { groupBuyIdAsString: { $toString: "$_id" } },
           pipeline: [
             {
               $match: {
                 $expr: {
-                  $eq: ['$gbId', '$$groupBuyIdAsString'],
+                  $eq: ["$gbId", "$$groupBuyIdAsString"],
                 },
               },
             },
           ],
-          as: 'participantData',
+          as: "participantData",
         },
       },
       {
         $addFields: {
-          currentCount: { $sum: '$participantData.count' },
+          currentCount: { $sum: "$participantData.count" },
         },
       },
       {
         $lookup: {
-          from: 'users',
-          localField: 'leaderId',
-          foreignField: 'id',
-          as: 'leaderId',
+          from: "users",
+          localField: "leaderId",
+          foreignField: "id",
+          as: "leaderId",
         },
       },
       {
-        $unwind: { path: '$leaderId', preserveNullAndEmptyArrays: true },
+        $unwind: { path: "$leaderId", preserveNullAndEmptyArrays: true },
       },
       {
         $sort: {
@@ -339,51 +329,51 @@ export class GroupBuyingService {
       },
       {
         $addFields: {
-          id: '$_id',
+          id: "$_id",
         },
       },
       {
         $lookup: {
-          from: 'participants',
-          let: { groupBuyIdAsString: { $toString: '$_id' } },
+          from: "participants",
+          let: { groupBuyIdAsString: { $toString: "$_id" } },
           pipeline: [
             {
               $match: {
                 $expr: {
-                  $eq: ['$gbId', '$$groupBuyIdAsString'],
+                  $eq: ["$gbId", "$$groupBuyIdAsString"],
                 },
               },
             },
           ],
-          as: 'participantData',
+          as: "participantData",
         },
       },
       {
         $addFields: {
-          currentCount: { $sum: '$participantData.count' },
+          currentCount: { $sum: "$participantData.count" },
         },
       },
       {
         $lookup: {
-          from: 'users',
-          localField: 'leaderId',
-          foreignField: 'id',
-          as: 'leaderId',
+          from: "users",
+          localField: "leaderId",
+          foreignField: "id",
+          as: "leaderId",
         },
       },
       {
-        $unwind: { path: '$leaderId', preserveNullAndEmptyArrays: true },
+        $unwind: { path: "$leaderId", preserveNullAndEmptyArrays: true },
       },
       {
         // 1단계: nonDepositors 배열 (Participant의 _id로 추정)을 사용해 참여자 정보 조회
         $lookup: {
-          from: 'participants',
+          from: "participants",
           let: {
             nonDepositorPIds: {
               $map: {
-                input: '$nonDepositors',
-                as: 'idStr',
-                in: { $toObjectId: '$$idStr' },
+                input: "$nonDepositors",
+                as: "idStr",
+                in: { $toObjectId: "$$idStr" },
               },
             },
           },
@@ -391,37 +381,37 @@ export class GroupBuyingService {
             {
               $match: {
                 $expr: {
-                  $in: ['$_id', '$$nonDepositorPIds'],
+                  $in: ["$_id", "$$nonDepositorPIds"],
                 },
               },
             },
             // 2단계: 1단계에서 찾은 참여자 정보의 userId를 사용해 유저 정보 조회
             {
               $lookup: {
-                from: 'users',
-                localField: 'userId',
-                foreignField: 'id',
-                as: 'userInfo',
+                from: "users",
+                localField: "userId",
+                foreignField: "id",
+                as: "userInfo",
               },
             },
             {
-              $unwind: '$userInfo',
+              $unwind: "$userInfo",
             },
             // 최종적으로 원하는 유저 정보 형태로 교체
             {
-              $replaceRoot: { newRoot: '$userInfo' },
+              $replaceRoot: { newRoot: "$userInfo" },
             },
           ],
-          as: 'nonDepositors',
+          as: "nonDepositors",
         },
       },
       {
         $project: {
           participantData: 0,
-          'leaderId._id': 0,
-          'leaderId.updatedAt': 0,
-          'nonDepositors._id': 0,
-          'nonDepositors.updatedAt': 0,
+          "leaderId._id": 0,
+          "leaderId.updatedAt": 0,
+          "nonDepositors._id": 0,
+          "nonDepositors.updatedAt": 0,
         },
       },
     ];
@@ -459,7 +449,7 @@ export class GroupBuyingService {
         gbId,
         userId,
       );
-      const { count, isPaid } = participantInfo;
+      const { count } = participantInfo;
 
       return {
         ...gb,
@@ -467,7 +457,6 @@ export class GroupBuyingService {
         isParticipant: isParticipant,
         participantInfo: {
           count,
-          isPaid,
         },
       };
     }
@@ -511,12 +500,12 @@ export class GroupBuyingService {
     ];
     if (uncancelableStatuses.includes(gb.groupBuyingStatus)) {
       throw new BadRequestException(
-        '현재 상태에서는 공구를 취소할 수 없습니다.',
+        "현재 상태에서는 공구를 취소할 수 없습니다.",
       );
     }
 
     // 2. 취소 사유에 따른 데이터 준비 (알림 메시지, 미입금자 목록)
-    let notificationBody = '';
+    let notificationBody = "";
     let nonDepositors: string[] = [];
 
     switch (deleteDto.cancelReason) {
@@ -524,22 +513,12 @@ export class GroupBuyingService {
         notificationBody = `[${gb.title}] 총대님이 개인 사정으로 공구를 취소했어요. 자세한 내용은 공지사항을 확인해주세요.`;
         break;
 
-      case CancelReason.PAYMENT_FAILED: // 미입금자 발생
-        if (gb.groupBuyingStatus !== GroupBuyingStatus.ORDER_PENDING) {
-          throw new BadRequestException(
-            '입금 대기 상태의 공구만 미입금을 사유로 취소할 수 있습니다.',
-          );
-        }
-        notificationBody = `[${gb.title}] 미입금자가 발생하여 총대님이 공구를 취소했어요. 곧 환불이 진행될 예정이에요.`;
-        nonDepositors = deleteDto.nonDepositors || []; // 미입금자 userId
-        break;
-
       case CancelReason.PRODUCT_UNAVAILABLE: // 상품 품절 또는 가격 변동
         notificationBody = `[${gb.title}] 상품 품절 또는 가격 변동으로 공구가 취소되었어요. 곧 총대님이 환불을 진행할 예정이에요.`;
         break;
 
       default:
-        throw new BadRequestException('유효하지 않은 취소 사유입니다.');
+        throw new BadRequestException("유효하지 않은 취소 사유입니다.");
     }
 
     const participants: any =
@@ -594,7 +573,7 @@ export class GroupBuyingService {
       gb.groupBuyingStatus !== GroupBuyingStatus.SHIPPED // 픽업 장소, 시간 수정 가능
     ) {
       throw new BadRequestException(
-        '공구 수정은 모집 중/모집 완료/배송 완료 상태일 때만 가능합니다.',
+        "공구 수정은 모집 중/모집 완료/배송 완료 상태일 때만 가능합니다.",
       );
     }
 
@@ -644,13 +623,13 @@ export class GroupBuyingService {
       current === GroupBuyingStatus.CANCELLED
     ) {
       throw new BadRequestException(
-        '현재 상태에서는 더 이상 상태를 변경할 수 없습니다.',
+        "현재 상태에서는 더 이상 상태를 변경할 수 없습니다.",
       );
     }
 
     // 상태 전이 제한
     if (!this.isValidTransition(current, next)) {
-      throw new BadRequestException('올바르지 않은 상태 전이입니다.');
+      throw new BadRequestException("올바르지 않은 상태 전이입니다.");
     }
 
     const participants: any =
@@ -669,21 +648,16 @@ export class GroupBuyingService {
         const { id } = userId;
 
         switch (statusDto.status) {
-          case GroupBuyingStatus.PAYMENT_IN_PROGRESS:
-            const { title, estimatedPrice } = gb;
-            payload.title = '📢 입금 요청 시작';
-            payload.body = `[${title}] 공구의 최종 가격이 [${estimatedPrice}]원으로 확정되었어요. 24시간 내에 입금 후 '입금 완료' 버튼을 눌러주세요.`;
-            break;
           case GroupBuyingStatus.ORDERED:
-            payload.title = '📢 주문 완료';
+            payload.title = "📢 주문 완료";
             payload.body = `[${gb.title}] 총대가 상품 주문을 완료했어요. 배송이 시작되면 다시 알려드릴게요.`;
             break;
           case GroupBuyingStatus.SHIPPED:
-            payload.title = '📢 상품 도착';
+            payload.title = "📢 상품 도착";
             payload.body = `[${gb.title}] 주문하신 상품이 도착했어요. 총대가 작성한 픽업 공지를 확인해주세요.`;
             break;
           case GroupBuyingStatus.CANCELLED:
-            payload.title = '📢 공구 취소';
+            payload.title = "📢 공구 취소";
             payload.body = `[${gb.title}] 총대에 의해 공구가 취소되었어요. 자세한 내용은 공지사항을 확인해주세요.`;
             break;
         }

@@ -1,15 +1,14 @@
-import { Module, forwardRef } from '@nestjs/common';
-import { GroupBuyingService } from './group-buying.service';
-import { GroupBuyingController } from './group-buying.controller';
-import { MongooseModule } from '@nestjs/mongoose';
-import { GroupBuying, GroupBuyingSchema } from './schema/group-buying.schema';
-import { GroupBuyingRepository } from './group-buying.repository';
-import { CommonModule } from '../common/common.module';
-import { ParticipantModule } from '../participant/participant.module';
-import { AuthModule } from '../auth/auth.module';
-import { UserModule } from '../user/user.module';
-import { WebPushModule } from '../web-push/web-push.module';
-import { TasksModule } from './scheduler/task.module';
+import { Module, forwardRef } from "@nestjs/common";
+import { GroupBuyingService } from "./group-buying.service";
+import { GroupBuyingController } from "./group-buying.controller";
+import { MongooseModule } from "@nestjs/mongoose";
+import { GroupBuying, GroupBuyingSchema } from "./schema/group-buying.schema";
+import { GroupBuyingRepository } from "./group-buying.repository";
+import { CommonModule } from "../common/common.module";
+import { ParticipantModule } from "../participant/participant.module";
+import { AuthModule } from "../auth/auth.module";
+import { UserModule } from "../user/user.module";
+import { WebPushModule } from "../web-push/web-push.module";
 
 @Module({
   imports: [
@@ -20,7 +19,6 @@ import { TasksModule } from './scheduler/task.module';
     AuthModule,
     UserModule,
     WebPushModule,
-    TasksModule,
     forwardRef(() => ParticipantModule),
   ],
   controllers: [GroupBuyingController],

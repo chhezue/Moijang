@@ -4,15 +4,24 @@ import {
   GroupBuyingStatus,
   ProductCategory,
 } from "../const/group-buying.const";
-import { Document } from "mongoose";
+import { Document, Schema as MongooseSchema } from "mongoose";
 
 const options: SchemaOptions = {
-  timestamps: true, // 기존에 사용하던 timestamps 옵션
+  timestamps: true,
+  versionKey: false,
   toJSON: {
-    virtuals: true, // virtual 필드(id)를 JSON에 포함
+    virtuals: true,
+    transform: (_doc, ret) => {
+      delete ret._id;
+      return ret;
+    },
   },
   toObject: {
-    virtuals: true, // virtual 필드를 객체에 포함
+    virtuals: true,
+    transform: (_doc, ret) => {
+      delete ret._id;
+      return ret;
+    },
   },
 };
 
@@ -45,7 +54,11 @@ export class GroupBuying extends Document {
   @Prop()
   endDate: Date;
 
-  @Prop({ type: String, ref: "User" })
+  @Prop({
+    type: MongooseSchema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  })
   leaderId: string;
 
   @Prop({
@@ -76,3 +89,6 @@ export class GroupBuying extends Document {
   updatedAt: Date;
 }
 export const GroupBuyingSchema = SchemaFactory.createForClass(GroupBuying);
+GroupBuyingSchema.virtual("id").get(function (this: any) {
+  return this._id?.toString();
+});

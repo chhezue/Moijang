@@ -2,7 +2,7 @@ import { IsNotEmpty, IsNumber, IsString, Min } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateParticipantDto {
-  @ApiProperty({ description: "참여하고 있는 공구 ID" })
+  @ApiProperty({ description: "공구 ID" })
   @IsString()
   @IsNotEmpty()
   gbId: string;

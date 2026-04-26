@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 import {
   FilterQuery,
   Model,
@@ -6,13 +6,13 @@ import {
   QueryOptions,
   RootFilterQuery,
   UpdateQuery,
-} from 'mongoose';
-import { Participant } from './schema/participant.schema';
-import { InjectModel } from '@nestjs/mongoose';
-import { PageOptionDto } from '../common/dto/page-option.dto';
-import { GroupBuying } from '../group-buying/schema/group-buying.schema';
-import { CommonService } from '../common/common.service';
-import { PageResponseDto } from '../common/dto/page-response.dto';
+} from "mongoose";
+import { Participant } from "./schema/participant.schema";
+import { InjectModel } from "@nestjs/mongoose";
+import { PageOptionDto } from "../common/dto/page-option.dto";
+import { GroupBuying } from "../group-buying/schema/group-buying.schema";
+import { CommonService } from "../common/common.service";
+import { PageResponseDto } from "../common/dto/page-response.dto";
 
 @Injectable()
 export class ParticipantRepository {
@@ -30,10 +30,10 @@ export class ParticipantRepository {
 
   async findAll(query: any) {
     return this.participantModel.find(query).populate({
-      path: 'userId',
-      select: 'displayName department',
-      localField: 'userId',
-      foreignField: 'id', // User 모델의 id 필드 (MongoDB의 _id가 아닌)
+      path: "userId",
+      select: "displayName department",
+      localField: "userId",
+      foreignField: "id", // User 모델의 id 필드 (MongoDB의 _id가 아닌)
     });
   }
 
@@ -89,10 +89,10 @@ export class ParticipantRepository {
     };
 
     const populateOptions = {
-      path: 'leaderId', // GroupBuying의 leaderId 필드
-      select: 'displayName department', // User에서 가져올 필드
-      localField: 'leaderId', // GroupBuying의 필드명
-      foreignField: 'id', // User 모델의 id 필드 (MongoDB의 _id가 아닌)
+      path: "leaderId", // GroupBuying의 leaderId 필드
+      select: "displayName department", // User에서 가져올 필드
+      localField: "leaderId", // GroupBuying의 필드명
+      foreignField: "id", // User 모델의 id 필드 (MongoDB의 _id가 아닌)
     };
 
     return this.commonService.findWithPagination(
@@ -101,11 +101,6 @@ export class ParticipantRepository {
       optionDto,
       populateOptions,
     );
-  }
-
-  async checkAllUserPayment(gbId: string) {
-    const exists = await this.participantModel.exists({ gbId, isPaid: false });
-    return !exists;
   }
 
   async getTotalCount(gbId: string): Promise<number> {
@@ -118,7 +113,7 @@ export class ParticipantRepository {
       {
         $group: {
           _id: null, // gbid가 모두 동일하므로 그룹화 기준은 null로 설정
-          totalCount: { $sum: '$count' },
+          totalCount: { $sum: "$count" },
         },
       },
       {
