@@ -115,20 +115,36 @@ const Header: React.FC = () => {
           </Box>
 
           {/* 세련된 워드마크 */}
-          <Typography
-            variant="h5"
-            sx={{
-              fontWeight: 700,
-              fontSize: "1.5rem",
-              letterSpacing: "-0.04em",
-              background: "linear-gradient(135deg, #8B5CF6, #374151)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            MOIJANG
-          </Typography>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 700,
+                fontSize: "1.5rem",
+                letterSpacing: "-0.04em",
+                lineHeight: 1,
+                background: "linear-gradient(135deg, #8B5CF6, #374151)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              MOIJANG
+            </Typography>
+            {user?.universityName && (
+              <Typography
+                sx={{
+                  fontSize: "0.7rem",
+                  fontWeight: 500,
+                  color: theme.palette.text.secondary,
+                  letterSpacing: "0.01em",
+                  lineHeight: 1.4,
+                }}
+              >
+                {user.universityName}
+              </Typography>
+            )}
+          </Box>
         </Box>
 
         {/* 우측 사용자 메뉴 */}
