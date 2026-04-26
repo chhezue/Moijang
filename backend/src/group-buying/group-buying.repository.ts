@@ -1,20 +1,21 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from "@nestjs/common";
 import {
   AggregateOptions,
   FilterQuery,
   Model,
   PipelineStage,
   RootFilterQuery,
-} from 'mongoose';
-import { GroupBuying } from './schema/group-buying.schema';
-import { InjectModel } from '@nestjs/mongoose';
-import { CreateGroupBuyingDto } from './dto/create-group-buying.dto';
-import { UpdateGroupBuyingDto } from './dto/update-group-buying.dto';
-import { SearchGroupBuyingDto } from './dto/search-group-buying.dto';
-import { PageOptionDto } from '../common/dto/page-option.dto';
-import { CancelReason, GroupBuyingStatus } from './const/group-buying.const';
-import { CommonService } from '../common/common.service';
-import { PageResponseDto } from '../common/dto/page-response.dto';
+  Types,
+} from "mongoose";
+import { GroupBuying } from "./schema/group-buying.schema";
+import { InjectModel } from "@nestjs/mongoose";
+import { CreateGroupBuyingDto } from "./dto/create-group-buying.dto";
+import { UpdateGroupBuyingDto } from "./dto/update-group-buying.dto";
+import { SearchGroupBuyingDto } from "./dto/search-group-buying.dto";
+import { PageOptionDto } from "../common/dto/page-option.dto";
+import { CancelReason, GroupBuyingStatus } from "./const/group-buying.const";
+import { CommonService } from "../common/common.service";
+import { PageResponseDto } from "../common/dto/page-response.dto";
 
 @Injectable()
 export class GroupBuyingRepository {
@@ -33,9 +34,10 @@ export class GroupBuyingRepository {
   }
 
   async isLeader(userId: string, gbId: string): Promise<boolean> {
+    const userObjectId = new Types.ObjectId(userId);
     const groupBuying = await this.groupBuyingModel.findOne({
       _id: gbId,
-      leaderId: userId,
+      leaderId: userObjectId,
     });
 
     return !!groupBuying;
@@ -46,10 +48,11 @@ export class GroupBuyingRepository {
     createDto: CreateGroupBuyingDto,
     estimatedPrice: number,
   ): Promise<GroupBuying> {
+    const leaderObjectId = new Types.ObjectId(id);
     return this.groupBuyingModel.create({
       ...createDto,
       estimatedPrice,
-      leaderId: id,
+      leaderId: leaderObjectId,
     });
   }
 
@@ -68,7 +71,6 @@ export class GroupBuyingRepository {
   async findByGbIdAndDelete(
     gbId: string,
     cancelReason: CancelReason,
-    nonDepositors?: string[],
   ): Promise<GroupBuying> {
     return this.groupBuyingModel.findByIdAndUpdate(
       gbId,
@@ -76,7 +78,6 @@ export class GroupBuyingRepository {
         $set: {
           groupBuyingStatus: GroupBuyingStatus.CANCELLED,
           cancelReason,
-          nonDepositors,
         },
       },
       { new: true },
@@ -104,7 +105,7 @@ export class GroupBuyingRepository {
     const gb = await this.groupBuyingModel.findOne({ _id: gbId });
     if (beforeTotalCount + quantityChange > gb.fixedCount) {
       throw new BadRequestException(
-        '모집 인원이 마감되었거나 정원을 초과합니다.',
+        "모집 인원이 마감되었거나 정원을 초과합니다.",
       );
     }
 
@@ -112,20 +113,10 @@ export class GroupBuyingRepository {
   }
 
   async findOneByGbId(gbId: string) {
-    return this.groupBuyingModel
-      .findOne({ _id: gbId })
-      .populate({
-        path: 'leaderId', // GroupBuying의 leaderId 필드
-        select: 'displayName department', // User에서 가져올 필드
-        localField: 'leaderId', // GroupBuying의 필드명
-        foreignField: 'id', // User 모델의 id 필드 (MongoDB의 _id가 아닌)
-      })
-      .populate({
-        path: 'nonDepositors',
-        select: 'displayName department',
-        localField: 'nonDepositors',
-        foreignField: 'id',
-      });
+    return this.groupBuyingModel.findOne({ _id: gbId }).populate({
+      path: "leaderId",
+      select: "displayName department",
+    });
   }
 
   async findAndCount(
@@ -137,8 +128,8 @@ export class GroupBuyingRepository {
     // 키워드 검색: title 또는 description에서 검색 (OR 조건)
     if (searchDto?.keyword) {
       query.$or = [
-        { title: { $regex: searchDto.keyword, $options: 'i' } },
-        { description: { $regex: searchDto.keyword, $options: 'i' } },
+        { title: { $regex: searchDto.keyword, $options: "i" } },
+        { description: { $regex: searchDto.keyword, $options: "i" } },
       ];
     }
 
@@ -153,10 +144,8 @@ export class GroupBuyingRepository {
     }
 
     const populateOptions = {
-      path: 'leaderId', // GroupBuying의 leaderId 필드
-      select: 'displayName department', // User에서 가져올 필드
-      localField: 'leaderId', // GroupBuying의 필드명
-      foreignField: 'id', // User 모델의 id 필드 (MongoDB의 _id가 아닌)
+      path: "leaderId",
+      select: "displayName department",
     };
 
     return this.commonService.findWithPagination(
@@ -171,13 +160,12 @@ export class GroupBuyingRepository {
     userId: string,
     optionDto: PageOptionDto,
   ): Promise<PageResponseDto<GroupBuying>> {
-    const query: FilterQuery<GroupBuying> = { leaderId: userId }; // 필터링 조건 객체 생성
+    const userObjectId = new Types.ObjectId(userId);
+    const query: FilterQuery<GroupBuying> = { leaderId: userObjectId }; // 필터링 조건 객체 생성
 
     const populateOptions = {
-      path: 'leaderId', // GroupBuying의 leaderId 필드
-      select: 'displayName department', // User에서 가져올 필드
-      localField: 'leaderId', // GroupBuying의 필드명
-      foreignField: 'id', // User 모델의 id 필드 (MongoDB의 _id가 아닌)
+      path: "leaderId",
+      select: "displayName department",
     };
 
     return this.commonService.findWithPagination(

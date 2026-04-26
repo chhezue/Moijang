@@ -48,7 +48,7 @@ export class GroupBuying extends Document {
   @Prop()
   shippingFee: number;
 
-  @Prop({ default: Date.now() })
+  @Prop({ default: Date.now })
   startDate: Date;
 
   @Prop()
@@ -59,7 +59,7 @@ export class GroupBuying extends Document {
     ref: "User",
     required: true,
   })
-  leaderId: string;
+  leaderId: MongooseSchema.Types.ObjectId;
 
   @Prop({
     enum: GroupBuyingStatus,

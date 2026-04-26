@@ -5,6 +5,7 @@ import {
   ProjectionType,
   QueryOptions,
   RootFilterQuery,
+  Types,
   UpdateQuery,
 } from "mongoose";
 import { Participant } from "./schema/participant.schema";
@@ -32,8 +33,6 @@ export class ParticipantRepository {
     return this.participantModel.find(query).populate({
       path: "userId",
       select: "displayName department",
-      localField: "userId",
-      foreignField: "id", // User 모델의 id 필드 (MongoDB의 _id가 아닌)
     });
   }
 
@@ -71,9 +70,10 @@ export class ParticipantRepository {
     userId: string,
     optionDto: PageOptionDto,
   ): Promise<PageResponseDto<GroupBuying>> {
+    const userObjectId = new Types.ObjectId(userId);
     // 1. 내가 참여한 모든 groupBuying의 ID 목록 조회
     const participatedRecords = await this.participantModel
-      .find({ userId })
+      .find({ userId: userObjectId })
       .lean();
     const participatedGbIds = participatedRecords.map((p) => p.gbId);
 
@@ -85,14 +85,12 @@ export class ParticipantRepository {
     // 2. 필터링 조건 생성: 참여했고(in) AND 내가 리더가 아닌(ne) 것
     const query: FilterQuery<GroupBuying> = {
       _id: { $in: participatedGbIds },
-      leaderId: { $ne: userId },
+      leaderId: { $ne: userObjectId },
     };
 
     const populateOptions = {
-      path: "leaderId", // GroupBuying의 leaderId 필드
-      select: "displayName department", // User에서 가져올 필드
-      localField: "leaderId", // GroupBuying의 필드명
-      foreignField: "id", // User 모델의 id 필드 (MongoDB의 _id가 아닌)
+      path: "leaderId",
+      select: "displayName department",
     };
 
     return this.commonService.findWithPagination(
@@ -104,10 +102,11 @@ export class ParticipantRepository {
   }
 
   async getTotalCount(gbId: string): Promise<number> {
+    const gbObjectId = new Types.ObjectId(gbId);
     const result = await this.participantModel.aggregate([
       {
         $match: {
-          gbId,
+          gbId: gbObjectId,
         },
       },
       {

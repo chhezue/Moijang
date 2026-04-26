@@ -33,6 +33,7 @@ export class CreateGroupBuyingDto {
 
   @ApiProperty({ description: "상품의 총 금액" })
   @IsNumber()
+  @IsNotEmpty()
   totalPrice: number;
 
   @ApiProperty({ description: "배송비" })

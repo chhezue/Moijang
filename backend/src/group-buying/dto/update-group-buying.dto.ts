@@ -2,7 +2,6 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsDate,
   IsEnum,
-  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
@@ -52,8 +51,8 @@ export class UpdateGroupBuyingDto {
   category?: ProductCategory;
 
   @ApiProperty({ description: "총대 구매 수량" })
+  @IsNumber()
   @IsOptional()
-  @IsNotEmpty()
   leaderCount?: number;
 
   @ApiProperty({ description: "픽업 장소" })

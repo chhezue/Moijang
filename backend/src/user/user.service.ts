@@ -79,6 +79,8 @@ export class UserService {
       universityEmail: user.universityEmail,
       universityId: user.universityId._id.toString(),
       universityName: user.universityId.name,
+      bankName: user.bankName,
+      bankAccount: user.bankAccount,
     };
   }
 }

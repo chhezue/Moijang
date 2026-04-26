@@ -60,6 +60,8 @@ export class AuthService {
       name: dto.name,
       universityEmail,
       universityId,
+      bankName: dto.bankName,
+      bankAccount: dto.bankAccount,
     };
 
     return await this.userService.createUser(createUserDto, hashedPassword);

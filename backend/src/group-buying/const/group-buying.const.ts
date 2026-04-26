@@ -28,10 +28,10 @@ export enum ProductCategory {
   ETC = "ETC", // 기타 중고물품
 }
 
+// TODO 스케줄링 다시 구현
 export enum CancelReason {
   LEADER_CANCELLED = "LEADER_CANCELLED", // 총대 개인 사유
   RECRUITMENT_FAILED = "RECRUITMENT_FAILED", // 모집 인원 미달
-  PAYMENT_FAILED = "PAYMENT_FAILED", // 미입금자 발생
   PRODUCT_UNAVAILABLE = "PRODUCT_UNAVAILABLE", // 상품 품절 또는 가격 변동
   SYSTEM_CANCELLED = "SYSTEM_CANCELLED", // 시스템 자동 취소 (ex: 시간 초과)
 }
@@ -69,7 +69,6 @@ export const PRODUCT_CATEGORY_LABELS = {
 export const CANCEL_REASON_LABELS = {
   [CancelReason.LEADER_CANCELLED]: "총대 개인 사유",
   [CancelReason.RECRUITMENT_FAILED]: "모집 인원 미달",
-  [CancelReason.PAYMENT_FAILED]: "미입금자 발생",
   [CancelReason.PRODUCT_UNAVAILABLE]: "상품 품절 또는 가격 변동",
   [CancelReason.SYSTEM_CANCELLED]: "시스템 자동 취소",
 };

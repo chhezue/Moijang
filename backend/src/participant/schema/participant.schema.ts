@@ -27,7 +27,7 @@ export class Participant extends Document {
     ref: "User",
     required: true,
   })
-  userId: string;
+  userId: MongooseSchema.Types.ObjectId;
 
   @Prop({
     type: MongooseSchema.Types.ObjectId,

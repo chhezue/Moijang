@@ -51,7 +51,10 @@ export class GroupBuyingService {
         GroupBuyingStatus.CANCELLED,
       ],
       // 모집 완료 -> 품절로 인한 취소
-      [GroupBuyingStatus.CONFIRMED]: [GroupBuyingStatus.CANCELLED],
+      [GroupBuyingStatus.CONFIRMED]: [
+        GroupBuyingStatus.CANCELLED,
+        GroupBuyingStatus.ORDER_PENDING,
+      ],
       // 주문 대기 -> 주문 진행 중, 품절로 인한 취소
       [GroupBuyingStatus.ORDER_PENDING]: [
         GroupBuyingStatus.ORDERED,
@@ -100,16 +103,8 @@ export class GroupBuyingService {
       {
         $lookup: {
           from: "participants",
-          let: { groupBuyIdAsString: { $toString: "$_id" } },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $eq: ["$gbId", "$$groupBuyIdAsString"],
-                },
-              },
-            },
-          ],
+          localField: "_id",
+          foreignField: "gbId",
           as: "participantData",
         },
       },
@@ -122,7 +117,7 @@ export class GroupBuyingService {
         $lookup: {
           from: "users",
           localField: "leaderId",
-          foreignField: "id",
+          foreignField: "_id",
           as: "leaderId",
         },
       },
@@ -163,14 +158,15 @@ export class GroupBuyingService {
     optionDto: PageOptionDto,
   ): Promise<PageResponseDto<GroupBuying>> {
     const { page, limit } = optionDto;
+    const userObjectId = new Types.ObjectId(userId);
 
     const totalCount = await this.groupBuyingRepository.count({
-      leaderId: userId,
+      leaderId: userObjectId,
     });
 
     const pipeline: PipelineStage[] = [
       {
-        $match: { leaderId: userId },
+        $match: { leaderId: userObjectId },
       },
       {
         $addFields: {
@@ -180,16 +176,8 @@ export class GroupBuyingService {
       {
         $lookup: {
           from: "participants",
-          let: { groupBuyIdAsString: { $toString: "$_id" } },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $eq: ["$gbId", "$$groupBuyIdAsString"],
-                },
-              },
-            },
-          ],
+          localField: "_id",
+          foreignField: "gbId",
           as: "participantData",
         },
       },
@@ -202,7 +190,7 @@ export class GroupBuyingService {
         $lookup: {
           from: "users",
           localField: "leaderId",
-          foreignField: "id",
+          foreignField: "_id",
           as: "leaderId",
         },
       },
@@ -242,18 +230,22 @@ export class GroupBuyingService {
     optionDto: PageOptionDto,
   ): Promise<PageResponseDto<GroupBuying>> {
     const { page, limit } = optionDto;
+    const userObjectId = new Types.ObjectId(userId);
 
     const groupbuyingIds =
       await this.participantService.getParticipatedGroupBuyingIds(userId);
 
     const myGroupbuying = await this.groupBuyingRepository.find({
-      leaderId: userId,
+      leaderId: userObjectId,
     });
     const totalCount = groupbuyingIds.length - myGroupbuying.length;
 
     const pipeline: PipelineStage[] = [
       {
-        $match: { _id: { $in: groupbuyingIds }, leaderId: { $ne: userId } },
+        $match: {
+          _id: { $in: groupbuyingIds },
+          leaderId: { $ne: userObjectId },
+        },
       },
       {
         $addFields: {
@@ -263,16 +255,8 @@ export class GroupBuyingService {
       {
         $lookup: {
           from: "participants",
-          let: { groupBuyIdAsString: { $toString: "$_id" } },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $eq: ["$gbId", "$$groupBuyIdAsString"],
-                },
-              },
-            },
-          ],
+          localField: "_id",
+          foreignField: "gbId",
           as: "participantData",
         },
       },
@@ -285,7 +269,7 @@ export class GroupBuyingService {
         $lookup: {
           from: "users",
           localField: "leaderId",
-          foreignField: "id",
+          foreignField: "_id",
           as: "leaderId",
         },
       },
@@ -335,16 +319,8 @@ export class GroupBuyingService {
       {
         $lookup: {
           from: "participants",
-          let: { groupBuyIdAsString: { $toString: "$_id" } },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $eq: ["$gbId", "$$groupBuyIdAsString"],
-                },
-              },
-            },
-          ],
+          localField: "_id",
+          foreignField: "gbId",
           as: "participantData",
         },
       },
@@ -357,7 +333,7 @@ export class GroupBuyingService {
         $lookup: {
           from: "users",
           localField: "leaderId",
-          foreignField: "id",
+          foreignField: "_id",
           as: "leaderId",
         },
       },
@@ -365,69 +341,20 @@ export class GroupBuyingService {
         $unwind: { path: "$leaderId", preserveNullAndEmptyArrays: true },
       },
       {
-        // 1단계: nonDepositors 배열 (Participant의 _id로 추정)을 사용해 참여자 정보 조회
-        $lookup: {
-          from: "participants",
-          let: {
-            nonDepositorPIds: {
-              $map: {
-                input: "$nonDepositors",
-                as: "idStr",
-                in: { $toObjectId: "$$idStr" },
-              },
-            },
-          },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $in: ["$_id", "$$nonDepositorPIds"],
-                },
-              },
-            },
-            // 2단계: 1단계에서 찾은 참여자 정보의 userId를 사용해 유저 정보 조회
-            {
-              $lookup: {
-                from: "users",
-                localField: "userId",
-                foreignField: "id",
-                as: "userInfo",
-              },
-            },
-            {
-              $unwind: "$userInfo",
-            },
-            // 최종적으로 원하는 유저 정보 형태로 교체
-            {
-              $replaceRoot: { newRoot: "$userInfo" },
-            },
-          ],
-          as: "nonDepositors",
-        },
-      },
-      {
         $project: {
           participantData: 0,
           "leaderId._id": 0,
           "leaderId.updatedAt": 0,
-          "nonDepositors._id": 0,
-          "nonDepositors.updatedAt": 0,
         },
       },
     ];
 
     const data = await this.groupBuyingRepository.aggregate(pipeline);
-    if (!data) {
+    if (!data.length) {
       throw new NotFoundException(`공구 ${gbId}가 존재하지 않습니다.`);
     }
     const gb = data[0];
 
-    const { count } = await this.participantService.getParticipantById(
-      gbId,
-      gb.leaderId.id,
-    );
-
-    gb.leaderCount = count;
     // 로그인하지 않은 경우
     if (!userId) {
       return { ...gb, isOwner: false, isParticipant: false };
@@ -506,13 +433,13 @@ export class GroupBuyingService {
 
     // 2. 취소 사유에 따른 데이터 준비 (알림 메시지, 미입금자 목록)
     let notificationBody = "";
-    let nonDepositors: string[] = [];
-
     switch (deleteDto.cancelReason) {
       case CancelReason.LEADER_CANCELLED: // 총대 개인 사유
         notificationBody = `[${gb.title}] 총대님이 개인 사정으로 공구를 취소했어요. 자세한 내용은 공지사항을 확인해주세요.`;
         break;
-
+      case CancelReason.RECRUITMENT_FAILED:
+        notificationBody = `[${gb.title}] 모집 인원이 충족되지 않아 총대님이 공구를 취소했어요.`;
+        break;
       case CancelReason.PRODUCT_UNAVAILABLE: // 상품 품절 또는 가격 변동
         notificationBody = `[${gb.title}] 상품 품절 또는 가격 변동으로 공구가 취소되었어요. 곧 총대님이 환불을 진행할 예정이에요.`;
         break;
@@ -540,7 +467,6 @@ export class GroupBuyingService {
     return this.groupBuyingRepository.findByGbIdAndDelete(
       gbId,
       deleteDto.cancelReason,
-      nonDepositors, // nonDepositors가 없는 경우는 빈 배열 전달
     );
   }
 

@@ -9,7 +9,7 @@ import { Participant } from "./schema/participant.schema";
 import { GroupBuyingStatus } from "../group-buying/const/group-buying.const";
 import { GroupBuyingRepository } from "../group-buying/group-buying.repository";
 import { WebPushService } from "../web-push/web-push.service";
-import { PayloadDto } from "../web-push/dto/payload.dto";
+import { Types } from "mongoose";
 
 @Injectable()
 export class ParticipantService {
@@ -20,37 +20,45 @@ export class ParticipantService {
   ) {}
 
   async isParticipant(userId: string, gbId: string): Promise<boolean> {
+    const userObjectId = new Types.ObjectId(userId);
+    const gbObjectId = new Types.ObjectId(gbId);
     const participant = await this.participantRepository.findOne({
-      userId,
-      gbId,
+      userId: userObjectId,
+      gbId: gbObjectId,
     });
 
     return !!participant;
   }
 
   async getParticipants(gbId: string): Promise<Participant[]> {
-    return await this.participantRepository.findAll({ gbId });
+    return await this.participantRepository.findAll({
+      gbId: new Types.ObjectId(gbId),
+    });
   }
 
   async getParticipantById(gbId: string, userId: string): Promise<Participant> {
+    const userObjectId = new Types.ObjectId(userId);
+    const gbObjectId = new Types.ObjectId(gbId);
     return await this.participantRepository.findOne({
-      gbId,
-      userId,
+      gbId: gbObjectId,
+      userId: userObjectId,
     });
   }
 
   async createLeader(gbId: string, count: number, leaderId: string) {
     await this.participantRepository.create({
-      gbId,
+      gbId: new Types.ObjectId(gbId),
       count,
       isPaid: true,
-      userId: leaderId,
+      userId: new Types.ObjectId(leaderId),
     });
   }
 
   async updateLeader(gbId: string, count: number, leaderId: string) {
+    const gbObjectId = new Types.ObjectId(gbId);
+    const leaderObjectId = new Types.ObjectId(leaderId);
     await this.participantRepository.findOneAndUpdate(
-      { gbId, userId: leaderId },
+      { gbId: gbObjectId, userId: leaderObjectId },
       { count: count },
       { new: true },
     );
@@ -60,9 +68,11 @@ export class ParticipantService {
     createDto: CreateParticipantDto,
     userId: string,
   ): Promise<Participant> {
+    const userObjectId = new Types.ObjectId(userId);
+    const gbObjectId = new Types.ObjectId(createDto.gbId);
     const exists = await this.participantRepository.findOne({
-      userId,
-      gbId: createDto.gbId,
+      userId: userObjectId,
+      gbId: gbObjectId,
     });
     // 이미 참여한 공구인지 중복 체크
     if (exists) {
@@ -81,8 +91,9 @@ export class ParticipantService {
 
     // 3. 성공한 경우에만 참여자 정보를 생성합니다.
     const newParticipant = await this.participantRepository.create({
-      userId,
       ...createDto,
+      userId: userObjectId,
+      gbId: gbObjectId,
     });
 
     const totalCount = await this.participantRepository.getTotalCount(
@@ -99,12 +110,12 @@ export class ParticipantService {
         GroupBuyingStatus.CONFIRMED,
       );
 
-      const payload: PayloadDto = {
-        title: "📢 모집 완료 알림",
-        body: `[${groupBuying.title}] 모집이 완료되었어요. 최종 가격을 확정하고 입금 요청을 진행해주세요.`,
-        url: `${process.env.FRONT_URL}/group-buying/detail/${createDto.gbId}`,
-      };
-      await this.webPushService.sendNotification(groupBuying.leaderId, payload);
+      // const payload: PayloadDto = {
+      //   title: "📢 모집 완료 알림",
+      //   body: `[${groupBuying.title}] 모집이 완료되었어요. 최종 가격을 확정하고 입금 요청을 진행해주세요.`,
+      //   url: `${process.env.FRONT_URL}/group-buying/detail/${createDto.gbId}`,
+      // };
+      // await this.webPushService.sendNotification(groupBuying.leaderId, payload);
     }
 
     return newParticipant;
@@ -112,11 +123,13 @@ export class ParticipantService {
 
   // TODO 모집 중일 때만 취소 가능
   async withdrawGroupBuying(gbId: string, userId: string) {
+    const gbObjectId = new Types.ObjectId(gbId);
+    const userObjectId = new Types.ObjectId(userId);
     // 1. 참여자 정보를 먼저 삭제합니다.
     const deletedParticipant =
       await this.participantRepository.findOneAndDelete({
-        gbId,
-        userId,
+        gbId: gbObjectId,
+        userId: userObjectId,
       });
 
     if (!deletedParticipant) {
@@ -129,7 +142,7 @@ export class ParticipantService {
   // 내가 참여한 공구의 id 목록 조회
   async getParticipatedGroupBuyingIds(userId: string) {
     const participatedRecords = await this.participantRepository.find({
-      userId,
+      userId: new Types.ObjectId(userId),
     });
     return participatedRecords.map((p) => p.gbId);
   }
