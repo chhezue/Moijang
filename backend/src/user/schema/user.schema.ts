@@ -40,6 +40,12 @@ export class User extends Document {
     required: true,
   })
   universityId: MongooseSchema.Types.ObjectId;
+
+  @Prop()
+  bankName: string;
+
+  @Prop()
+  bankAccount: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

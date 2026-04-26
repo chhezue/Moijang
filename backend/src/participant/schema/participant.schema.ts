@@ -1,5 +1,5 @@
-import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Prop, Schema, SchemaFactory, SchemaOptions } from "@nestjs/mongoose";
+import { Document } from "mongoose";
 
 const options: SchemaOptions = {
   timestamps: true, // 기존에 사용하던 timestamps 옵션
@@ -13,26 +13,14 @@ const options: SchemaOptions = {
 
 @Schema(options)
 export class Participant extends Document {
-  @Prop({ type: String, ref: 'User' })
+  @Prop({ type: String, ref: "User" })
   userId: string;
 
-  @Prop({ type: String, ref: 'GroupBuying' })
+  @Prop({ type: String, ref: "GroupBuying" })
   gbId: string;
-
-  @Prop({ default: false })
-  isPaid: boolean;
-
-  @Prop()
-  refundAccount: string;
-
-  @Prop()
-  refundBank: string;
 
   @Prop()
   count: number;
-
-  // @Prop()
-  // confirmedPrice: number;
 
   @Prop({ default: () => Date.now() })
   joinedDate: Date;

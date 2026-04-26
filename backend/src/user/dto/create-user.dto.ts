@@ -18,4 +18,12 @@ export class CreateUserDto {
   @ApiProperty({ description: "사용자 이메일 (전체)" })
   @IsEmail()
   universityEmail: string;
+
+  @ApiProperty({ description: "은행" })
+  @IsString()
+  bankName: string;
+
+  @ApiProperty({ description: "계좌" })
+  @IsString()
+  bankAccount: string;
 }
