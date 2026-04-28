@@ -1,41 +1,23 @@
-"use client";
+'use client';
 
-import {
-  Box,
-  Card,
-  CardContent,
-  Stack,
-  Typography,
-  Divider,
-  Skeleton,
-} from "@mui/material";
-import StatusTag from "@/components/StatusTag";
-import CategoryTag from "@/components/CategoryTag";
-import { useStatusContext } from "@/providers/StatusProvider";
-import { useCategoryContext } from "@/providers/CategoryProvider";
-import { formatCurrency, calcDday } from "@/utils/formatters";
-import { GroupBuyingItem } from "@/types/groupBuying";
+import { Box, Card, CardContent, Stack, Typography, Divider, Skeleton } from '@mui/material';
+import StatusTag from '@/components/StatusTag';
+import CategoryTag from '@/components/CategoryTag';
+import { useStatusContext } from '@/providers/StatusProvider';
+import { useCategoryContext } from '@/providers/CategoryProvider';
+import { formatCurrency, calcDday } from '@/utils/formatters';
+import { GroupBuyingItem } from '@/types/groupBuying';
 
 export interface ItemOfListProps {
   item: GroupBuyingItem;
 }
 
 export const ItemOfList = ({ item }: ItemOfListProps) => {
-  const {
-    statusMap,
-    colorMap,
-    isLoading: isStatusLoading,
-  } = useStatusContext();
-  const {
-    categoryMap,
-    categoryIconMap,
-    isLoading: isCategoryLoading,
-  } = useCategoryContext();
+  const { statusMap, colorMap, isLoading: isStatusLoading } = useStatusContext();
+  const { categoryMap, categoryIconMap, isLoading: isCategoryLoading } = useCategoryContext();
 
   const percentage =
-    item.fixedCount > 0
-      ? Math.min((item.currentCount / item.fixedCount) * 100, 100)
-      : 0;
+    item.fixedCount > 0 ? Math.min((item.currentCount / item.fixedCount) * 100, 100) : 0;
 
   if (isStatusLoading || isCategoryLoading) {
     return (
@@ -67,15 +49,14 @@ export const ItemOfList = ({ item }: ItemOfListProps) => {
       variant="outlined"
       // onClick={() => onClick(id)}
       sx={{
-        cursor: "pointer",
+        cursor: 'pointer',
         mb: 2,
         borderRadius: 2,
-        transition:
-          "transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease",
-        "&:hover": {
+        transition: 'transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease',
+        '&:hover': {
           borderColor: (theme) => theme.palette.divider,
           boxShadow: 2,
-          transform: "translateY(-2px)",
+          transform: 'translateY(-2px)',
         },
       }}
     >
@@ -86,10 +67,10 @@ export const ItemOfList = ({ item }: ItemOfListProps) => {
             sx={{
               width: 48,
               height: 48,
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               backgroundColor: (theme) => theme.palette.action.hover,
               color: (theme) => theme.palette.text.secondary,
               flexShrink: 0,
@@ -106,28 +87,23 @@ export const ItemOfList = ({ item }: ItemOfListProps) => {
             <Stack direction="row" spacing={1} alignItems="center">
               <CategoryTag label={label} IconComponent={Icon} />
               <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-              <Typography variant="caption" sx={{ fontSize: "0.85rem" }}>
+              <Typography variant="caption" sx={{ fontSize: '0.85rem' }}>
                 👤
               </Typography>
               <Typography
                 variant="body2"
                 fontWeight={600}
                 color="primary.dark"
-                sx={{ fontSize: "0.75rem" }}
+                sx={{ fontSize: '0.75rem' }}
               >
                 {item.leaderId?.displayName}
               </Typography>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ fontSize: "0.75rem" }}
-              >
-                • {item.leaderId.department}
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
+                • {item.leaderId?.department}
               </Typography>
             </Stack>
             <Typography variant="caption" color="text.disabled">
-              남은 수량 {item.fixedCount - item.currentCount}개 · 달성률{" "}
-              {Math.round(percentage)}%
+              남은 수량 {item.fixedCount - item.currentCount}개 · 달성률 {Math.round(percentage)}%
             </Typography>
           </Stack>
 
@@ -138,11 +114,7 @@ export const ItemOfList = ({ item }: ItemOfListProps) => {
               label={statusMap[item.groupBuyingStatus]}
               color={colorMap[item.groupBuyingStatus]}
             />
-            <Typography
-              variant="subtitle2"
-              color="text.primary"
-              fontWeight={700}
-            >
+            <Typography variant="subtitle2" color="text.primary" fontWeight={700}>
               {formatCurrency(item.estimatedPrice)}
             </Typography>
             <Typography variant="caption" color="text.secondary">
