@@ -24,7 +24,7 @@ export class JwtAuthGuard implements CanActivate {
     try {
       // 먼저 액세스 토큰 검증 시도
       const { id } = await this.authService.validateAccessToken(request);
-      request.user = await this.userService.getUserByUuid(id);
+      request.user = await this.userService.getUserById(id);
 
       return true;
     } catch {
@@ -34,7 +34,7 @@ export class JwtAuthGuard implements CanActivate {
           request,
           response,
         );
-        request.user = await this.userService.getUserByUuid(id);
+        request.user = await this.userService.getUserById(id);
 
         return true;
       } catch {

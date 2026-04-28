@@ -2,17 +2,17 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
-} from '@nestjs/common';
-import { ParticipantRepository } from './participant.repository';
-import { CreateParticipantDto } from './dto/create-participant.dto';
-import { Participant } from './schema/participant.schema';
-import { GroupBuyingStatus } from '../group-buying/const/group-buying.const';
+} from "@nestjs/common";
+import { ParticipantRepository } from "./participant.repository";
+import { CreateParticipantDto } from "./dto/create-participant.dto";
+import { Participant } from "./schema/participant.schema";
+import { GroupBuyingStatus } from "../group-buying/const/group-buying.const";
 
-import { UpdateParticipantDto } from './dto/update-participant.dto';
-import { GroupBuyingRepository } from '../group-buying/group-buying.repository';
-import { WebPushService } from '../web-push/web-push.service';
-import { PayloadDto } from '../web-push/dto/payload.dto';
-import { UserService } from '../user/user.service';
+import { UpdateParticipantDto } from "./dto/update-participant.dto";
+import { GroupBuyingRepository } from "../group-buying/group-buying.repository";
+import { WebPushService } from "../web-push/web-push.service";
+import { PayloadDto } from "../web-push/dto/payload.dto";
+import { UserService } from "../user/user.service";
 
 @Injectable()
 export class ParticipantService {
@@ -70,7 +70,7 @@ export class ParticipantService {
     });
     // 이미 참여한 공구인지 중복 체크
     if (exists) {
-      throw new BadRequestException('이미 참여한 공구입니다.');
+      throw new BadRequestException("이미 참여한 공구입니다.");
     }
 
     const beforeTotalCount = await this.participantRepository.getTotalCount(
@@ -104,7 +104,7 @@ export class ParticipantService {
       );
 
       const payload: PayloadDto = {
-        title: '📢 모집 완료 알림',
+        title: "📢 모집 완료 알림",
         body: `[${groupBuying.title}] 모집이 완료되었어요. 최종 가격을 확정하고 입금 요청을 진행해주세요.`,
         url: `${process.env.FRONT_URL}/group-buying/detail/${createDto.gbId}`,
       };
@@ -123,7 +123,7 @@ export class ParticipantService {
     const gb = await this.groupBuyingRepository.findOneByGbId(gbId);
     if (gb.groupBuyingStatus !== GroupBuyingStatus.RECRUITING) {
       throw new BadRequestException(
-        '참여자 정보 수정은 모집 중 상태일 때만 가능합니다.',
+        "참여자 정보 수정은 모집 중 상태일 때만 가능합니다.",
       );
     }
 
@@ -131,7 +131,7 @@ export class ParticipantService {
       gbId,
       userId,
     });
-    if (!participant) throw new NotFoundException('참여 내역이 없습니다.');
+    if (!participant) throw new NotFoundException("참여 내역이 없습니다.");
 
     // 수량 변화량 계산
     const quantityChange = updateDto.count - participant.count;
@@ -163,8 +163,8 @@ export class ParticipantService {
         GroupBuyingStatus.CONFIRMED,
       );
       const payload: PayloadDto = {
-        title: '📢 모집 완료 알림',
-        body: '모집이 완료되었어요. 최종 가격을 확정하고 입금 요청을 진행해주세요.',
+        title: "📢 모집 완료 알림",
+        body: "모집이 완료되었어요. 최종 가격을 확정하고 입금 요청을 진행해주세요.",
         url: `${process.env.FRONT_URL}/group-buying/detail/${gbId}`,
       };
       await this.webPushService.sendNotification(groupBuying.leaderId, payload);
@@ -182,7 +182,7 @@ export class ParticipantService {
       });
 
     if (!deletedParticipant) {
-      throw new NotFoundException('참여 내역이 없습니다.');
+      throw new NotFoundException("참여 내역이 없습니다.");
     }
 
     return true;
@@ -195,7 +195,7 @@ export class ParticipantService {
       userId,
     });
     if (!participant) {
-      throw new BadRequestException('일치하는 참여 내역을 찾을 수 없습니다.');
+      throw new BadRequestException("일치하는 참여 내역을 찾을 수 없습니다.");
     }
 
     // 해당 공구가 PAYMENT_IN_PROGRESS 상태인지 확인
@@ -205,15 +205,15 @@ export class ParticipantService {
       groupBuying.groupBuyingStatus !== GroupBuyingStatus.PAYMENT_IN_PROGRESS
     ) {
       throw new BadRequestException(
-        '참여자 입금 확정은 입금 진행 중 상태일 때만 가능합니다.',
+        "참여자 입금 확정은 입금 진행 중 상태일 때만 가능합니다.",
       );
     }
 
-    const { displayName } = await this.userService.getUserByUuid(userId);
+    const { name } = await this.userService.getUserById(userId);
 
     const payload: PayloadDto = {
-      title: '📢 입금 완료 알림',
-      body: `[${displayName}]님이 입금을 완료했어요. 확인 후 처리해주세요.`,
+      title: "📢 입금 완료 알림",
+      body: `[${name}]님이 입금을 완료했어요. 확인 후 처리해주세요.`,
       url: `${process.env.FRONT_URL}/group-buying/detail/${gbId}`,
     };
     await this.webPushService.sendNotification(groupBuying.leaderId, payload);
@@ -234,7 +234,7 @@ export class ParticipantService {
       );
 
       const payload: PayloadDto = {
-        title: '📢 전체 입금 완료 알림',
+        title: "📢 전체 입금 완료 알림",
         body: `모든 참여자의 입금이 확인되었어요. 상품을 주문해주세요.`,
         url: `${process.env.FRONT_URL}/group-buying/detail/${gbId}`,
       };
