@@ -14,7 +14,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (config: ConfigService) => ({
-        secret: config.get<string>("JWT_SECRET") || "signup-secret",
+        secret: config.get<string>("JWT_SECRET"),
         signOptions: { expiresIn: "15m" }, // 이메일 인증 토큰은 15분동안 유효함.
       }),
       inject: [ConfigService],

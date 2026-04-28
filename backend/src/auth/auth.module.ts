@@ -16,7 +16,7 @@ import { JwtAuthGuard } from "./guard/auth.guard";
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>("JWT_SECRET") || "fallback-secret",
+        secret: configService.get<string>("JWT_SECRET"),
         signOptions: { expiresIn: "5m" }, // 액세스 토큰 만료 시간 5분
       }),
       inject: [ConfigService],

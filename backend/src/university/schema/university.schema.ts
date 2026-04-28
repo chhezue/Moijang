@@ -1,5 +1,5 @@
-import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Prop, Schema, SchemaFactory, SchemaOptions } from "@nestjs/mongoose";
+import { Document } from "mongoose";
 
 const options: SchemaOptions = {
   timestamps: true,
@@ -22,20 +22,20 @@ const options: SchemaOptions = {
 
 @Schema(options)
 export class University extends Document {
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   name: string;
 
-  @Prop({required: false})
+  @Prop({ required: true })
   domain: string;
 
-  @Prop()
+  @Prop({ required: true })
   campusType: string;
 
-  @Prop()
+  @Prop({ required: true })
   region: string;
 }
 
 export const UniversitySchema = SchemaFactory.createForClass(University);
-UniversitySchema.virtual('id').get(function (this: any) {
+UniversitySchema.virtual("id").get(function (this: any) {
   return this._id?.toString();
 });
