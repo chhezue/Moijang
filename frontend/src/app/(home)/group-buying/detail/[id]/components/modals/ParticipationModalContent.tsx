@@ -17,10 +17,9 @@ import {
   getParticipantInfo,
 } from "@/apis/services/participant";
 import { useSnackbar } from "@/providers/SnackbarProvider";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
-import { BANK_NAMES, BankName } from "@/apis/interfaces";
+import { BANK_NAMES, BankName } from "@/constants/bank";
 import { theme } from "@/styles/theme";
 
 const Label = styled.label`
@@ -52,7 +51,7 @@ const ParticipationModalContent = ({
   const [refundBank, setRefundBank] = useState<BankName | "">("");
   const [refundAccount, setRefundAccount] = useState<string>("");
   const { showSnackbar } = useSnackbar();
-  const user = useSelector((state: RootState) => state.common.user);
+  const user = useAuthStore((s) => s.user);
   const router = useRouter();
 
   // 제목과 설명 텍스트

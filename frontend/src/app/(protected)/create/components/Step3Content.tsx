@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { Controller, useFormContext } from "react-hook-form";
-import { BANK_NAMES } from "@/apis/interfaces";
+import { BANK_NAMES } from "@/constants/bank";
 import { CreateGroupBuyingInput } from "@/schemas/groupBuying";
 
 interface Step3Props {

@@ -1,5 +1,5 @@
 import api from "@/apis/apiClient";
-import { IParticipant } from "../interfaces";
+import { IParticipant } from "@/types/groupBuying";
 
 // 특정 공구의 참여자 목록 조회
 export const getParticipantList = async (

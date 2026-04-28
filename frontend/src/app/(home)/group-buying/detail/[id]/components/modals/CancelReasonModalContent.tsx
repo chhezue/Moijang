@@ -14,7 +14,7 @@ import {
   Checkbox,
   alpha,
 } from "@mui/material";
-import { IParticipant } from "@/apis/interfaces";
+import { IParticipant } from "@/types/groupBuying";
 import { theme } from "@/styles/theme";
 
 // 컨테이너 스타일

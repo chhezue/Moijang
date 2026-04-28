@@ -1,10 +1,8 @@
-// src/components/AuthInitializer.tsx
-
 "use client";
 
 import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthSync } from "@/hooks/useAuthSync";
+import { useAuthStore } from "@/store/authStore";
 
 export default function AuthInitializer({
   children,
@@ -14,13 +12,13 @@ export default function AuthInitializer({
   requireAuth?: boolean;
 }) {
   const router = useRouter();
-  const { user, loading } = useAuthSync();
+  const user = useAuthStore((s) => s.user);
 
   useEffect(() => {
-    if (requireAuth && !loading && !user) {
+    if (requireAuth && !user) {
       router.push("/login");
     }
-  }, [requireAuth, loading, user, router]);
+  }, [requireAuth, user, router]);
 
   return <>{children}</>;
 }

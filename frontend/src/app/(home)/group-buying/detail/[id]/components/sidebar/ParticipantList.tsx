@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { IParticipant } from "@/apis/interfaces";
+import { IParticipant } from "@/types/groupBuying";
 
 interface ParticipantListProps {
   participants: IParticipant[];

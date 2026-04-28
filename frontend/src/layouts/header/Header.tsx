@@ -1,16 +1,13 @@
 "use client";
-import { useSelector } from "react-redux";
 import React, { useEffect, useState } from "react";
 import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
 import { useRouter } from "next/navigation";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import { logout } from "@/apis/services/auth";
-import { CLEAR_USER } from "@/redux/slice/commonSlice";
-import { useDispatch } from "react-redux";
-import { RootState } from "@/redux/store";
 import LoginIcon from "@mui/icons-material/Login";
 import CreateButton from "@/components/CreateButton";
 import UserMenu from "@/components/UserMenu";
+import { useAuthStore } from "@/store/authStore";
 
 const useScrollFlag = (threshold = 8) => {
   const [scrolled, setScrolled] = useState(false);
@@ -48,15 +45,16 @@ function useHeaderStyles() {
 
 const Header: React.FC = () => {
   const router = useRouter();
-  const dispatch = useDispatch();
   const styles = useHeaderStyles();
   const theme = useTheme();
-  const user = useSelector((state: RootState) => state.common.user);
+  const user = useAuthStore((s) => s.user);
+  const clearUser = useAuthStore((s) => s.clearUser);
 
   const onLogout = async () => {
     try {
       await logout();
-      dispatch(CLEAR_USER());
+      clearUser();
+      router.refresh();
     } catch (error) {
       console.error("로그아웃 실패:", error);
     }
@@ -117,25 +115,41 @@ const Header: React.FC = () => {
           </Box>
 
           {/* 세련된 워드마크 */}
-          <Typography
-            variant="h5"
-            sx={{
-              fontWeight: 700,
-              fontSize: "1.5rem",
-              letterSpacing: "-0.04em",
-              background: "linear-gradient(135deg, #8B5CF6, #374151)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            MOIJANG
-          </Typography>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 700,
+                fontSize: "1.5rem",
+                letterSpacing: "-0.04em",
+                lineHeight: 1,
+                background: "linear-gradient(135deg, #8B5CF6, #374151)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              MOIJANG
+            </Typography>
+            {user?.universityName && (
+              <Typography
+                sx={{
+                  fontSize: "0.7rem",
+                  fontWeight: 500,
+                  color: theme.palette.text.secondary,
+                  letterSpacing: "0.01em",
+                  lineHeight: 1.4,
+                }}
+              >
+                {user.universityName}
+              </Typography>
+            )}
+          </Box>
         </Box>
 
         {/* 우측 사용자 메뉴 */}
         <Stack direction="row" alignItems="center" spacing={1.5}>
-          {user && <UserMenu displayName={user.displayName} />}
+          {user && <UserMenu displayName={user.name} />}
 
           {/* 공구 생성 버튼 */}
           <CreateButton />

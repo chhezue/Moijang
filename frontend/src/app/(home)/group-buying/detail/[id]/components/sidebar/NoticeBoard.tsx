@@ -3,7 +3,7 @@
 import React from "react";
 import styled from "styled-components";
 import { Alert } from "@mui/material";
-import { GroupBuyingItem, IParticipant, IUser } from "@/apis/interfaces";
+import { GroupBuyingItem, IParticipant, IUser } from "@/types/groupBuying";
 
 const NoticeWrap = styled.div`
   display: flex;

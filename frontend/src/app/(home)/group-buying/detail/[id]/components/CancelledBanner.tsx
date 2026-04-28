@@ -1,7 +1,7 @@
 "use client";
 
 import { Box, Typography } from "@mui/material";
-import { GroupBuyingItem, IUser } from "@/apis/interfaces";
+import { GroupBuyingItem, IUser } from "@/types/groupBuying";
 
 interface CancelledBannerProps {
   item: GroupBuyingItem;
