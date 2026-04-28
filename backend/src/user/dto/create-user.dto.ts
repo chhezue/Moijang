@@ -1,4 +1,4 @@
-import { IsEmail, IsMongoId, IsString } from "class-validator";
+import { IsEmail, IsMongoId, IsNumber, IsString } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 
 // Auth 모듈에서 보내준 CreateUserDto + 해싱된 password를 합쳐서 저장
@@ -24,6 +24,6 @@ export class CreateUserDto {
   bankName: string;
 
   @ApiProperty({ description: "계좌" })
-  @IsString()
+  @IsNumber()
   bankAccount: string;
 }

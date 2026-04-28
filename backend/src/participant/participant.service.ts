@@ -8,7 +8,6 @@ import { CreateParticipantDto } from "./dto/create-participant.dto";
 import { Participant } from "./schema/participant.schema";
 import { GroupBuyingStatus } from "../group-buying/const/group-buying.const";
 import { GroupBuyingRepository } from "../group-buying/group-buying.repository";
-import { WebPushService } from "../web-push/web-push.service";
 import { Types } from "mongoose";
 
 @Injectable()
@@ -16,7 +15,6 @@ export class ParticipantService {
   constructor(
     private readonly participantRepository: ParticipantRepository,
     private readonly groupBuyingRepository: GroupBuyingRepository,
-    private readonly webPushService: WebPushService,
   ) {}
 
   async isParticipant(userId: string, gbId: string): Promise<boolean> {
