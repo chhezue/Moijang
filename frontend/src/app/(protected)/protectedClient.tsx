@@ -1,16 +1,11 @@
-"use client";
-import Header from "@/layouts/header/Header";
-import AuthInitializer from "@/components/AuthInitializer";
+'use client';
+import Header from '@/layouts/header/Header';
 
-export default function ProtectedClient({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function ProtectedClient({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Header />
-      <AuthInitializer requireAuth>{children}</AuthInitializer>
+      {children}
     </>
   );
 }
