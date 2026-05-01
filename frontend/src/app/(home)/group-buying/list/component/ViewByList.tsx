@@ -6,7 +6,7 @@ import {
 } from "@/app/(home)/group-buying/list/component/ItemOfList";
 import Link from "next/link";
 import React from "react";
-import { GroupBuyingItem } from "@/apis/interfaces";
+import { GroupBuyingItem } from "@/types/groupBuying";
 
 interface ViewByListProps {
   items: GroupBuyingItem[];

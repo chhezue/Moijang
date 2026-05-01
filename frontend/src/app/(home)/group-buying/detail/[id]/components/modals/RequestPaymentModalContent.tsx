@@ -9,7 +9,7 @@ import {
   alpha,
   SxProps,
 } from "@mui/material";
-import { IParticipant, GroupBuyingItem } from "@/apis/interfaces";
+import { IParticipant, GroupBuyingItem } from "@/types/groupBuying";
 import { ModalType } from "@/app/(home)/group-buying/detail/[id]/components/types";
 import { theme } from "@/styles/theme";
 import { Theme } from "@mui/system";

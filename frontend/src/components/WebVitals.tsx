@@ -1,9 +1,10 @@
-"use client";
+'use client'
 
-/**
- * Core Web Vitals 보고용 훅 연결 지점.
- * `next/web-vitals` 미사용 시에도 레이아웃 import가 깨지지 않도록 no-op으로 둡니다.
- */
+import { useReportWebVitals } from 'next/web-vitals'
+
 export function WebVitals() {
-  return null;
+  useReportWebVitals((metric) => {
+    console.log(`[Web Vitals] ${metric.name}: ${Math.round(metric.value)}ms (${metric.rating})`)
+  })
+  return null
 }

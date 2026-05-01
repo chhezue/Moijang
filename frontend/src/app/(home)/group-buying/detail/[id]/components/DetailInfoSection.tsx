@@ -9,7 +9,7 @@ import {
   Skeleton,
 } from "@mui/material";
 import StatusTag from "@/components/StatusTag";
-import { GroupBuyingItem } from "@/apis/interfaces";
+import { GroupBuyingItem } from "@/types/groupBuying";
 import { useStatusContext } from "@/providers/StatusProvider";
 import CategoryTag from "@/components/CategoryTag";
 import { useCategoryContext } from "@/providers/CategoryProvider";

@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { BANK_NAMES, BankName } from "@/apis/interfaces";
+import { BANK_NAMES, BankName } from "@/constants/bank";
 import {
   updateGroupBuyingSchema,
   UpdateGroupBuyingInput,
