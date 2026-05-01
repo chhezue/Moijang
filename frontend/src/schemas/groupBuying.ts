@@ -6,10 +6,7 @@ today.setHours(0, 0, 0, 0);
 // 생성용 스키마
 export const createGroupBuyingSchema = z
   .object({
-    title: z
-      .string()
-      .min(1, "제목을 입력해주세요.")
-      .max(20, "제목은 20자 이하로 입력해주세요."),
+    title: z.string().min(1, "제목을 입력해주세요.").max(20, "제목은 20자 이하로 입력해주세요."),
     productUrl: z.string().url("유효한 URL을 입력해주세요."),
     description: z
       .string()
@@ -34,16 +31,13 @@ export const createGroupBuyingSchema = z
         },
         {
           message: "마감일은 오늘 또는 이후여야 합니다.",
-        }
+        },
       )
       .transform((value) => {
         return `${value}`;
       }),
     category: z.string().min(1, "카테고리를 선택하세요."),
-    leaderCount: z.coerce
-      .number()
-      .int()
-      .min(1, "최소 1개 이상 입력해야 합니다"),
+    leaderCount: z.coerce.number().int().min(1, "최소 1개 이상 입력해야 합니다"),
   })
   .refine((data) => data.leaderCount < data.fixedCount, {
     message: "목표 수량 미만까지만 가능합니다",
@@ -54,15 +48,7 @@ export type CreateGroupBuyingInput = z.input<typeof createGroupBuyingSchema>;
 export type CreateGroupBuyingOutput = z.output<typeof createGroupBuyingSchema>;
 
 export const STEP_FIELDS: Record<number, (keyof CreateGroupBuyingInput)[]> = {
-  0: [
-    "title",
-    "productUrl",
-    "category",
-    "description",
-    "totalPrice",
-    "fixedCount",
-    "shippingFee",
-  ],
+  0: ["title", "productUrl", "category", "description", "totalPrice", "fixedCount", "shippingFee"],
   1: ["endDate", "leaderCount"],
   2: ["bank", "account"],
 };
@@ -76,7 +62,7 @@ export type UpdateGroupBuyingOutput = z.output<typeof updateGroupBuyingSchema>;
 export const makeUpdateGroupBuyingSchema = (
   fixedCount: number,
   currentCount: number,
-  prevLeaderCount: number
+  prevLeaderCount: number,
 ) =>
   updateGroupBuyingSchema.refine(
     (data) => {
@@ -94,5 +80,5 @@ export const makeUpdateGroupBuyingSchema = (
           ? "목표 수량 미만만 가능합니다."
           : "목표 수량을 초과할 수 없습니다.",
       path: ["leaderCount"],
-    }
+    },
   );

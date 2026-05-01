@@ -23,10 +23,7 @@ export class OptionalJwtAuthGuard implements CanActivate {
     } catch {
       // 액세스 토큰이 없거나 유효하지 않은 경우 리프레시 토큰으로 재시도
       try {
-        const { id } = await this.authService.validateRefreshToken(
-          request,
-          response,
-        );
+        const { id } = await this.authService.validateRefreshToken(request, response);
 
         request.user = await this.userService.getUserById(id);
         return true;

@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { WebPushService } from './web-push.service';
-import { CreateSubscriptionDto, SubscriptionDto } from './dto/subscription.dto';
+import { SubscriptionDto } from './dto/subscription.dto';
 import { ConfigService } from '@nestjs/config';
 import { PayloadDto } from './dto/payload.dto';
 import { UserDecorator } from '../user/decorator/user.decorator';
@@ -42,11 +42,7 @@ export class WebPushController {
     @Param('receiveId') receiverId: string,
     @Body() payload: PayloadDto,
   ): Promise<any> {
-    return await this.webPushService.sendNotification(
-      receiverId,
-      payload,
-      senderName,
-    );
+    return await this.webPushService.sendNotification(receiverId, payload, senderName);
   }
 
   // VAPID 공개 키를 클라이언트에게 제공

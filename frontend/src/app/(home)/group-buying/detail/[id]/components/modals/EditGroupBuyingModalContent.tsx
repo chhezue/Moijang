@@ -37,24 +37,15 @@ interface Props {
   onlyPrice?: boolean;
 }
 
-const EditGroupBuyingModalContent = ({
-  item,
-  close,
-  onlyPrice = false,
-}: Props) => {
+const EditGroupBuyingModalContent = ({ item, close, onlyPrice = false }: Props) => {
   const { showSnackbar } = useSnackbar();
   const { isLoading, categoryList, categoryIconMap } = useCategoryContext();
   const router = useRouter();
   console.log(item);
 
   const schema = useMemo(
-    () =>
-      makeUpdateGroupBuyingSchema(
-        item.fixedCount,
-        item.currentCount,
-        item.leaderCount
-      ),
-    [item]
+    () => makeUpdateGroupBuyingSchema(item.fixedCount, item.currentCount, item.leaderCount),
+    [item],
   );
 
   const {
@@ -92,9 +83,7 @@ const EditGroupBuyingModalContent = ({
   }, [price, shipping, qty]);
 
   const estimatedPriceText =
-    estimatedPrice == null
-      ? "—"
-      : `${new Intl.NumberFormat("ko-KR").format(estimatedPrice)}원`;
+    estimatedPrice == null ? "—" : `${new Intl.NumberFormat("ko-KR").format(estimatedPrice)}원`;
 
   const onSubmit = async (data: UpdateGroupBuyingInput) => {
     try {
@@ -361,9 +350,7 @@ const EditGroupBuyingModalContent = ({
                 }}
               >
                 💡 산정된 1개당 가격 = <strong>{estimatedPriceText}</strong>
-                <span style={{ fontSize: "0.75rem", opacity: 0.8 }}>
-                  (수정 불가, 자동 계산)
-                </span>
+                <span style={{ fontSize: "0.75rem", opacity: 0.8 }}>(수정 불가, 자동 계산)</span>
               </Typography>
             </Box>
           </Grid>
@@ -434,9 +421,7 @@ const EditGroupBuyingModalContent = ({
                   label="나의 구매 수량"
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
-                  onChange={(e) =>
-                    field.onChange(e.target.value.replace(/[^\d]/g, ""))
-                  }
+                  onChange={(e) => field.onChange(e.target.value.replace(/[^\d]/g, ""))}
                   sx={{
                     "& .MuiInputLabel-root": { fontSize: "0.85rem" },
                     "& .MuiInputBase-input": { fontSize: "0.85rem" },

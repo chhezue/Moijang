@@ -10,9 +10,7 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: Subscription.name, schema: SubscriptionSchema },
-    ]),
+    MongooseModule.forFeature([{ name: Subscription.name, schema: SubscriptionSchema }]),
     UserModule,
     AuthModule,
     ConfigModule,

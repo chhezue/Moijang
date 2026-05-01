@@ -1,9 +1,4 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
 import { ParticipantService } from '../../participant/participant.service';
 import { GetUserDto } from '../../user/dto/get-user.dto';
 import { GroupBuyingService } from '../group-buying.service';
@@ -50,10 +45,7 @@ export class GroupBuyingAccessGuard implements CanActivate {
     }
 
     // 해당 공구의 참여자인지 확인
-    const isParticipant = await this.participantService.isParticipant(
-      user.id,
-      gbId,
-    );
+    const isParticipant = await this.participantService.isParticipant(user.id, gbId);
     console.log('isParticipant', isParticipant);
     if (isParticipant) {
       if (req) req.contextualRole = ContextRole.PARTICIPANT;

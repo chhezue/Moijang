@@ -1,17 +1,17 @@
 export interface AccessTokenPayload {
-  typ: "access";
+  typ: 'access';
   sub: string;
   name: string;
 }
 
 export interface RefreshTokenPayload {
-  typ: "refresh";
+  typ: 'refresh';
   sub: string;
   name: string;
 }
 
 export interface SignupTokenPayload {
-  typ: "signup";
+  typ: 'signup';
   universityId: string;
   universityEmail: string;
 }

@@ -4,9 +4,7 @@ import React from "react";
 import { Box } from "@mui/material";
 import TabMenu from "@/components/TabMenu";
 
-export default function MyGroupLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function MyGroupLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <Box
       sx={{

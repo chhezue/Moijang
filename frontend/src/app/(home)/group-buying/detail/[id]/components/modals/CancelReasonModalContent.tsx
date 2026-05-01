@@ -27,10 +27,7 @@ const Wrapper = styled.div`
 `;
 
 // 취소 사유 enum 값 + UI 설정
-const CancelReasonConfig: Record<
-  string,
-  { label: string; needParticipant?: boolean }
-> = {
+const CancelReasonConfig: Record<string, { label: string; needParticipant?: boolean }> = {
   PAYMENT_FAILED: {
     label: "팀원 중 입금하지 않은 사람이 있어요.",
     needParticipant: true,
@@ -55,9 +52,7 @@ const CancelReasonModalContent = ({
   visibleReasons = Object.keys(CancelReasonConfig),
 }: Props) => {
   const [selectedReason, setSelectedReason] = useState<string>("");
-  const [selectedParticipantList, setSelectedParticipantList] = useState<
-    string[]
-  >([]);
+  const [selectedParticipantList, setSelectedParticipantList] = useState<string[]>([]);
   const [isAgreed, setIsAgreed] = useState(false);
 
   const handleConfirm = () => {
@@ -72,10 +67,7 @@ const CancelReasonModalContent = ({
           🚫 취소 사유를 선택해주세요.
         </Typography>
 
-        <RadioGroup
-          value={selectedReason}
-          onChange={(e) => setSelectedReason(e.target.value)}
-        >
+        <RadioGroup value={selectedReason} onChange={(e) => setSelectedReason(e.target.value)}>
           {visibleReasons.map((reason) => {
             const config = CancelReasonConfig[reason];
             if (!config) return null;
@@ -126,16 +118,10 @@ const CancelReasonModalContent = ({
                       size="small"
                       fullWidth
                       value={selectedParticipantList}
-                      onChange={(e) =>
-                        setSelectedParticipantList(e.target.value as string[])
-                      }
+                      onChange={(e) => setSelectedParticipantList(e.target.value as string[])}
                       renderValue={(selected) =>
                         (selected as string[])
-                          .map(
-                            (id) =>
-                              participants.find((p) => p.id === id)?.userId
-                                .displayName
-                          )
+                          .map((id) => participants.find((p) => p.id === id)?.userId.displayName)
                           .join(", ")
                       }
                       sx={{
@@ -149,10 +135,7 @@ const CancelReasonModalContent = ({
                             checked={selectedParticipantList.indexOf(p.id) > -1}
                             size="small"
                           />
-                          <Typography
-                            variant="body2"
-                            sx={{ fontSize: "0.8rem" }}
-                          >
+                          <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
                             {p.userId.displayName}
                           </Typography>
                         </MenuItem>

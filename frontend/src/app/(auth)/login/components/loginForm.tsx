@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Box, TextField, Button, Typography, CircularProgress } from '@mui/material';
-import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { GradientTitle } from '@/components/GradientTitle';
-import { login } from '@/apis/services/auth';
-import { useSnackbar } from '@/providers/SnackbarProvider';
-import { usernameSchema, passwordSchema, getError } from '@/schemas/auth';
-import { useAuthStore } from '@/store/authStore';
+import { useState, useEffect } from "react";
+import { Box, TextField, Button, Typography, CircularProgress } from "@mui/material";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { GradientTitle } from "@/components/GradientTitle";
+import { login } from "@/apis/services/auth";
+import { useSnackbar } from "@/providers/SnackbarProvider";
+import { usernameSchema, passwordSchema, getError } from "@/schemas/auth";
+import { useAuthStore } from "@/store/authStore";
 
 export const LoginForm = () => {
   const router = useRouter();
@@ -16,16 +16,16 @@ export const LoginForm = () => {
   const { showSnackbar } = useSnackbar();
   const setUser = useAuthStore((s) => s.setUser);
 
-  const redirectTo = searchParams.get('redirect') ?? '/';
+  const redirectTo = searchParams.get("redirect") ?? "/";
 
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [touched, setTouched] = useState({ username: false, password: false });
 
   useEffect(() => {
-    if (searchParams.get('error') === 'login_failed') {
-      showSnackbar('로그인에 실패하였습니다', 'error', 3000);
+    if (searchParams.get("error") === "login_failed") {
+      showSnackbar("로그인에 실패하였습니다", "error", 3000);
     }
   }, []);
 
@@ -40,7 +40,7 @@ export const LoginForm = () => {
       setUser(user);
       router.push(redirectTo);
     } catch {
-      showSnackbar('아이디 또는 비밀번호가 올바르지 않습니다.', 'error', 3000);
+      showSnackbar("아이디 또는 비밀번호가 올바르지 않습니다.", "error", 3000);
     } finally {
       setLoading(false);
     }
@@ -51,23 +51,23 @@ export const LoginForm = () => {
       <Box
         sx={{
           width: 400,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
           gap: 3,
           p: 4,
           borderRadius: 3,
-          boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
-          border: '1px solid',
-          borderColor: 'divider',
-          bgcolor: 'background.paper',
+          boxShadow: "0 4px 24px rgba(0,0,0,0.08)",
+          border: "1px solid",
+          borderColor: "divider",
+          bgcolor: "background.paper",
         }}
       >
         <GradientTitle size="3rem" center>
           MOIJANG
         </GradientTitle>
 
-        <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box sx={{ width: "100%", display: "flex", flexDirection: "column", gap: 2 }}>
           <TextField
             label="아이디"
             value={username}
@@ -77,7 +77,7 @@ export const LoginForm = () => {
             autoComplete="username"
             disabled={loading}
             error={!!usernameError}
-            helperText={usernameError ?? ' '}
+            helperText={usernameError ?? " "}
           />
           <TextField
             label="비밀번호"
@@ -89,8 +89,8 @@ export const LoginForm = () => {
             autoComplete="current-password"
             disabled={loading}
             error={!!passwordError}
-            helperText={passwordError ?? ' '}
-            onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+            helperText={passwordError ?? " "}
+            onKeyDown={(e) => e.key === "Enter" && handleLogin()}
           />
         </Box>
 
@@ -101,12 +101,12 @@ export const LoginForm = () => {
           onClick={handleLogin}
           disabled={!username || !password || loading}
         >
-          {loading ? <CircularProgress size={24} color="inherit" /> : '로그인'}
+          {loading ? <CircularProgress size={24} color="inherit" /> : "로그인"}
         </Button>
 
         <Typography variant="body2" color="text.secondary">
-          계정이 없으신가요?{' '}
-          <Link href="/signup" style={{ color: '#8B5CF6', fontWeight: 600 }}>
+          계정이 없으신가요?{" "}
+          <Link href="/signup" style={{ color: "#8B5CF6", fontWeight: 600 }}>
             회원가입
           </Link>
         </Typography>

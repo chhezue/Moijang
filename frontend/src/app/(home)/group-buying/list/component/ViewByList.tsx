@@ -1,9 +1,6 @@
 // "use client";
 
-import {
-  ItemOfList,
-  ItemOfListProps,
-} from "@/app/(home)/group-buying/list/component/ItemOfList";
+import { ItemOfList, ItemOfListProps } from "@/app/(home)/group-buying/list/component/ItemOfList";
 import Link from "next/link";
 import React from "react";
 import { GroupBuyingItem } from "@/types/groupBuying";

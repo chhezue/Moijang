@@ -1,10 +1,4 @@
-import {
-  IsArray,
-  IsEnum,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsArray, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { CancelReason } from '../const/group-buying.const';
 import { ApiProperty } from '@nestjs/swagger';
 

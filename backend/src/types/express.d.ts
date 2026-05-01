@@ -1,4 +1,4 @@
-import type { GetUserDto } from "../user/dto/get-user.dto";
+import type { GetUserDto } from '../user/dto/get-user.dto';
 
 declare global {
   namespace Express {

@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import React, { useEffect } from 'react';
-import { ThemeProvider, CssBaseline } from '@mui/material';
-import { theme } from '@/styles/theme';
-import { StatusProvider } from '@/providers/StatusProvider';
-import { CategoryProvider } from '@/providers/CategoryProvider';
-import { SnackbarProvider } from '@/providers/SnackbarProvider';
-import { UserDto } from '@/types/auth';
-import { useAuthStore } from '@/store/authStore';
+import React, { useEffect } from "react";
+import { ThemeProvider, CssBaseline } from "@mui/material";
+import { theme } from "@/styles/theme";
+import { StatusProvider } from "@/providers/StatusProvider";
+import { CategoryProvider } from "@/providers/CategoryProvider";
+import { SnackbarProvider } from "@/providers/SnackbarProvider";
+import { UserDto } from "@/types/auth";
+import { useAuthStore } from "@/store/authStore";
 
 export default function Providers({
   children,

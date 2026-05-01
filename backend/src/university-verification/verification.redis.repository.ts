@@ -1,9 +1,6 @@
-import { Injectable } from "@nestjs/common";
-import { RedisService } from "../common/redis/redis.service";
-import {
-  UpdateVerificationSession,
-  VerificationSession,
-} from "./types/verification-session.type";
+import { Injectable } from '@nestjs/common';
+import { RedisService } from '../common/redis/redis.service';
+import { UpdateVerificationSession, VerificationSession } from './types/verification-session.type';
 
 // 학교 이메일 인증 세션용 Redis 접근
 @Injectable()
@@ -19,11 +16,7 @@ export class VerificationRedisRepository {
   }
 
   // verificationId를 기준으로 Redis에 인증 세션을 저장 (send-code에서 호출)
-  async setSession(
-    id: string,
-    data: VerificationSession,
-    ttlSeconds: number,
-  ): Promise<void> {
+  async setSession(id: string, data: VerificationSession, ttlSeconds: number): Promise<void> {
     const client = this.getClient();
     const key = this.getKey(id);
 
@@ -55,15 +48,12 @@ export class VerificationRedisRepository {
       universityEmail: data.universityEmail,
       codeHash: data.codeHash,
       attemptCount: Number(data.attemptCount),
-      status: data.status as "PENDING" | "LOCKED",
+      status: data.status as 'PENDING' | 'LOCKED',
     };
   }
 
   // 인증 세션 업데이트 (attemptCount 증가, status 변경)
-  async updateSession(
-    id: string,
-    data: UpdateVerificationSession,
-  ): Promise<void> {
+  async updateSession(id: string, data: UpdateVerificationSession): Promise<void> {
     const client = this.getClient();
     const key = this.getKey(id);
 

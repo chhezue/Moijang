@@ -15,11 +15,7 @@ export class CommonService {
     const take = optionDto.limit;
     const skip = (optionDto.page - 1) * optionDto.limit;
 
-    let query = model
-      .find(where)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(take);
+    let query = model.find(where).sort({ createdAt: -1 }).skip(skip).limit(take);
 
     if (populateOptions) {
       query = query.populate(populateOptions);

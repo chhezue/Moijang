@@ -44,10 +44,7 @@ export class TaskService {
 
     const groupBuys = await this.groupBuyingModel.find({
       groupBuyingStatus: {
-        $in: [
-          GroupBuyingStatus.RECRUITING,
-          GroupBuyingStatus.PAYMENT_IN_PROGRESS,
-        ],
+        $in: [GroupBuyingStatus.RECRUITING, GroupBuyingStatus.PAYMENT_IN_PROGRESS],
       },
     });
 
@@ -59,9 +56,7 @@ export class TaskService {
       groupBuys.map(async (gb) => {
         if (gb.groupBuyingStatus === GroupBuyingStatus.RECRUITING) {
           await this.cancelExpiredGroupBuying(gb, now);
-        } else if (
-          gb.groupBuyingStatus === GroupBuyingStatus.PAYMENT_IN_PROGRESS
-        ) {
+        } else if (gb.groupBuyingStatus === GroupBuyingStatus.PAYMENT_IN_PROGRESS) {
           const isCancelled = await this.cancelUnpaidGroupBuying(gb, now);
           if (!isCancelled) {
             await this.sendDepositReminder(gb, now);
@@ -95,13 +90,8 @@ export class TaskService {
   /**
    * [역할 1] 모집 마감 & 목표 미달성 공구를 찾아 취소합니다.
    */
-  private async cancelExpiredGroupBuying(
-    gb: GroupBuying,
-    now: Date,
-  ): Promise<void> {
-    const totalCount = await this.participantService.getTotalCount(
-      gb._id.toString(),
-    );
+  private async cancelExpiredGroupBuying(gb: GroupBuying, now: Date): Promise<void> {
+    const totalCount = await this.participantService.getTotalCount(gb._id.toString());
     if (gb.endDate < now && totalCount < gb.fixedCount) {
       await this.groupBuyingModel.updateOne(
         { _id: gb._id },
@@ -116,19 +106,14 @@ export class TaskService {
         `\x1b[31m❌ [${gb.title}] 공구가 목표 미달성으로 취소 처리되었습니다.\x1b[0m`,
       );
 
-      const participants = await this.participantModel
-        .find({ gbId: gb._id })
-        .lean();
+      const participants = await this.participantModel.find({ gbId: gb._id }).lean();
       const notificationPromises = participants.map((p) => {
         const payload: PayloadDto = {
           title: '📢 공구 자동 취소 알림',
           body: `[${gb.title}] 모집이 마감되었지만 목표 수량을 채우지 못해 공구가 취소되었어요.`,
           url: `${process.env.FRONT_URL}/group-buying/detail/${gb._id}`,
         };
-        return this.webPushService.sendNotification(
-          p.userId.toString(),
-          payload,
-        );
+        return this.webPushService.sendNotification(p.userId.toString(), payload);
       });
       await Promise.all(notificationPromises);
     }
@@ -137,10 +122,7 @@ export class TaskService {
   /**
    * [역할 2] 미입금자가 발생한 공구를 찾아 취소합니다. (입금 기한: 24시간)
    */
-  private async cancelUnpaidGroupBuying(
-    gb: GroupBuying,
-    now: Date,
-  ): Promise<boolean> {
+  private async cancelUnpaidGroupBuying(gb: GroupBuying, now: Date): Promise<boolean> {
     const DEPOSIT_TIME_LIMIT_MS = 24 * 60 * 60 * 1000; // 24시간
     const deadline = new Date(gb.updatedAt.getTime() + DEPOSIT_TIME_LIMIT_MS);
 
@@ -163,19 +145,14 @@ export class TaskService {
           `\x1b[33m⚠️  [${gb.title}] 공구가 미입금으로 인해 취소 처리되었습니다.\x1b[0m`,
         );
 
-        const participants = await this.participantModel
-          .find({ gbId: gb._id })
-          .lean();
+        const participants = await this.participantModel.find({ gbId: gb._id }).lean();
         const notificationPromises = participants.map((p) => {
           const payload: PayloadDto = {
             title: '📢 공구 자동 취소 알림',
             body: `[${gb.title}] 미입금자가 발생하여 공구가 자동으로 취소되었어요. 곧 총대님이 환불을 진행할 예정이에요.`,
             url: `${process.env.FRONT_URL}/group-buying/detail/${gb._id}`,
           };
-          return this.webPushService.sendNotification(
-            p.userId.toString(),
-            payload,
-          );
+          return this.webPushService.sendNotification(p.userId.toString(), payload);
         });
         await Promise.all(notificationPromises);
         return true;
@@ -194,11 +171,7 @@ export class TaskService {
     const deadline = new Date(gb.updatedAt.getTime() + DEPOSIT_TIME_LIMIT_MS);
     const hoursLeft = (deadline.getTime() - now.getTime()) / (1000 * 60 * 60);
 
-    if (
-      hoursLeft > 0 &&
-      hoursLeft <= REMINDER_THRESHOLD_HOURS &&
-      !gb.isReminderSent
-    ) {
+    if (hoursLeft > 0 && hoursLeft <= REMINDER_THRESHOLD_HOURS && !gb.isReminderSent) {
       const unpaidParticipants = await this.participantModel
         .find({ gbId: gb._id, isPaid: false })
         .lean();
@@ -212,10 +185,7 @@ export class TaskService {
             )}시간 남았어요. 서둘러주세요!`,
             url: `${process.env.FRONT_URL}/group-buying/detail/${gb._id}`,
           };
-          return this.webPushService.sendNotification(
-            p.userId.toString(),
-            payload,
-          );
+          return this.webPushService.sendNotification(p.userId.toString(), payload);
         });
 
         await Promise.all(notificationPromises);
@@ -224,10 +194,7 @@ export class TaskService {
         );
       }
 
-      await this.groupBuyingModel.updateOne(
-        { _id: gb._id },
-        { $set: { isReminderSent: true } },
-      );
+      await this.groupBuyingModel.updateOne({ _id: gb._id }, { $set: { isReminderSent: true } });
     }
   }
 }

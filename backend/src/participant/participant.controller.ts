@@ -7,7 +7,6 @@ import {
   Param,
   Patch,
   Post,
-  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ParticipantService } from './participant.service';
@@ -75,11 +74,7 @@ export class ParticipantController {
     @UserDecorator('id') userId: string, // 수정할 참여자 정보
     @Body() updateDto: UpdateParticipantDto, // 업데이트할 내용
   ): Promise<Participant> {
-    return await this.participantService.updateParticipant(
-      gbId,
-      userId,
-      updateDto,
-    );
+    return await this.participantService.updateParticipant(gbId, userId, updateDto);
   }
 
   @ApiOperation({ summary: '참여자가 자신의 입금 확인' })

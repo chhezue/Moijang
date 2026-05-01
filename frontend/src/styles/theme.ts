@@ -105,8 +105,7 @@ export const theme = createTheme({
 
   // Typography
   typography: {
-    fontFamily:
-      "'Inter', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    fontFamily: "'Inter', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
     h1: {
       fontSize: "clamp(2.25rem, 1.9rem + 1.75vw, 3rem)",
       fontWeight: 800,

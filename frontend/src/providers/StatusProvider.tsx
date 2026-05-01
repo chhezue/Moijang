@@ -14,8 +14,7 @@ interface StatusContextType {
 const StatusContext = createContext<StatusContextType | undefined>(undefined);
 
 export const StatusProvider = ({ children }: { children: React.ReactNode }) => {
-  const { isLoading, statusMap, colorMap, statusList, statusToStepIndex } =
-    useGroupBuyingStatus();
+  const { isLoading, statusMap, colorMap, statusList, statusToStepIndex } = useGroupBuyingStatus();
 
   return (
     <StatusContext.Provider

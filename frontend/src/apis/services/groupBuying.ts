@@ -1,10 +1,10 @@
 import api from "@/apis/apiClient";
 import { CreateGroupBuying, GroupBuyingItem } from "@/types/groupBuying";
-import { PaginationMeta, PaginationParams, SearchParams } from "@/types/common";
+import { PaginationMeta, SearchParams } from "@/types/common";
 
 // 전체 목록 반환 (페이지네이션, 검색어 옵션)
 export const getGroupBuying = async (
-  params?: SearchParams
+  params?: SearchParams,
 ): Promise<{ items: GroupBuyingItem[]; meta: PaginationMeta }> => {
   const res = await api.get("/api/group-buying", { params });
   return {
@@ -14,9 +14,7 @@ export const getGroupBuying = async (
 };
 
 // id로 item 반환 (csr 용)
-export const getGroupBuyingById = async (
-  id: string
-): Promise<GroupBuyingItem> => {
+export const getGroupBuyingById = async (id: string): Promise<GroupBuyingItem> => {
   const res = await api.get(`/api/group-buying/${id}`);
   return res.data;
 };
@@ -30,7 +28,7 @@ export const createGroupBuying = async (data: CreateGroupBuying) => {
 // 수정하기
 export const updateGroupBuying = async (
   id: string,
-  data: Partial<GroupBuyingItem> // Partial 로 부분 업데이트 허용
+  data: Partial<GroupBuyingItem>, // Partial 로 부분 업데이트 허용
 ) => {
   const res = await api.patch(`/api/group-buying/${id}`, data);
   return res.data;
@@ -40,7 +38,7 @@ export const updateGroupBuying = async (
 export const cancelGroupBuying = async (
   gbId: string,
   cancelReason: string,
-  nonDepositors?: string[]
+  nonDepositors?: string[],
 ) => {
   try {
     const { data } = await api.patch(`/api/group-buying/cancel/${gbId}`, {

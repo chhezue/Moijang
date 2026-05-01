@@ -3,7 +3,8 @@
 import { ViewByList } from "@/app/(home)/group-buying/list/component/ViewByList";
 import { PaginationWrapper } from "@/app/(home)/group-buying/list/component/PaginationWrapper";
 import { Box } from "@mui/material";
-import { GroupBuyingItem } from "@/types/groupBuying"; import { PaginationMeta } from "@/types/common";
+import { GroupBuyingItem } from "@/types/groupBuying";
+import { PaginationMeta } from "@/types/common";
 
 interface MyCreateClientProps {
   items: GroupBuyingItem[];

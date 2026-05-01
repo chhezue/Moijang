@@ -16,9 +16,7 @@ const colorPalette = [
 export function useGroupBuyingStatus() {
   const [isLoading, setIsLoading] = useState(true);
 
-  const [statusList, setStatusList] = useState<
-    { key: string; label: string }[]
-  >([]);
+  const [statusList, setStatusList] = useState<{ key: string; label: string }[]>([]);
 
   useEffect(() => {
     api.get("/api/group-buying/enums").then((res) => {

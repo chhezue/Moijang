@@ -37,9 +37,7 @@ const DEFAULT_ICON = BsBoxSeam;
 
 export function useGroupBuyingCategory() {
   const [isLoading, setIsLoading] = useState(true);
-  const [categoryList, setCategoryList] = useState<
-    { key: string; label: string }[]
-  >([]);
+  const [categoryList, setCategoryList] = useState<{ key: string; label: string }[]>([]);
 
   useEffect(() => {
     api

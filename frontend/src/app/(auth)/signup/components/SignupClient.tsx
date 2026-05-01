@@ -1,13 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Box,
-  Button,
-  Paper,
-  Typography,
-  CircularProgress,
-} from "@mui/material";
+import { Box, Button, Paper, Typography, CircularProgress } from "@mui/material";
 import Link from "next/link";
 import { GradientTitle } from "@/components/GradientTitle";
 import Stepper from "@/components/Stepper";
@@ -15,12 +9,7 @@ import Step1University from "./Step1University";
 import Step2Email from "./Step2Email";
 import Step3Account from "./Step3Account";
 import StepComplete from "./StepComplete";
-import {
-  sendCode,
-  confirmCode,
-  signup,
-  checkLoginId,
-} from "@/apis/services/auth";
+import { sendCode, confirmCode, signup, checkLoginId } from "@/apis/services/auth";
 import { useSnackbar } from "@/providers/SnackbarProvider";
 import { usernameSchema, nameSchema, passwordSchema } from "@/schemas/auth";
 import { University, SignupResponse } from "@/types/auth";
@@ -52,9 +41,7 @@ export default function SignupClient() {
 
   // Step 3
   const [loginId, setLoginId] = useState("");
-  const [loginIdAvailable, setLoginIdAvailable] = useState<boolean | null>(
-    null,
-  );
+  const [loginIdAvailable, setLoginIdAvailable] = useState<boolean | null>(null);
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
@@ -82,11 +69,7 @@ export default function SignupClient() {
       setCodeSent(true);
       showSnackbar("인증코드가 발송되었습니다.", "success", 3000);
     } catch {
-      showSnackbar(
-        "인증코드 발송에 실패했습니다. 다시 시도해주세요.",
-        "error",
-        3000,
-      );
+      showSnackbar("인증코드 발송에 실패했습니다. 다시 시도해주세요.", "error", 3000);
     } finally {
       setLoading(false);
     }
@@ -115,11 +98,7 @@ export default function SignupClient() {
       setSignupResult(result);
       setActiveStep(steps.length - 1);
     } catch {
-      showSnackbar(
-        "회원가입에 실패했습니다. 다시 시도해주세요.",
-        "error",
-        3000,
-      );
+      showSnackbar("회원가입에 실패했습니다. 다시 시도해주세요.", "error", 3000);
     } finally {
       setLoading(false);
     }
@@ -135,11 +114,7 @@ export default function SignupClient() {
       const available = await checkLoginId(loginId);
       setLoginIdAvailable(available);
     } catch {
-      showSnackbar(
-        "중복 확인에 실패했습니다. 다시 시도해주세요.",
-        "error",
-        3000,
-      );
+      showSnackbar("중복 확인에 실패했습니다. 다시 시도해주세요.", "error", 3000);
     }
   };
 
@@ -179,10 +154,7 @@ export default function SignupClient() {
 
         <Box sx={{ minHeight: 160 }}>
           {activeStep === 0 && (
-            <Step1University
-              university={university}
-              onUniversityChange={handleUniversityChange}
-            />
+            <Step1University university={university} onUniversityChange={handleUniversityChange} />
           )}
           {activeStep === 1 && (
             <Step2Email
@@ -211,9 +183,7 @@ export default function SignupClient() {
               onPasswordConfirmChange={setPasswordConfirm}
             />
           )}
-          {activeStep === 3 && signupResult && (
-            <StepComplete result={signupResult} />
-          )}
+          {activeStep === 3 && signupResult && <StepComplete result={signupResult} />}
         </Box>
 
         {activeStep < steps.length - 1 && (
@@ -227,11 +197,7 @@ export default function SignupClient() {
             <Button disabled={activeStep === 0 || loading} onClick={handleBack}>
               이전
             </Button>
-            <Button
-              variant="contained"
-              onClick={handleNext}
-              disabled={isNextDisabled()}
-            >
+            <Button variant="contained" onClick={handleNext} disabled={isNextDisabled()}>
               {loading ? (
                 <CircularProgress size={20} color="inherit" />
               ) : activeStep === steps.length - 2 ? (
