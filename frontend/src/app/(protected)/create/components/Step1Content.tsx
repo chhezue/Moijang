@@ -37,9 +37,7 @@ export default function Step1Content() {
   }, [price, shipping, qty]);
 
   const unitPriceText =
-    unitPrice == null
-      ? "—"
-      : `${new Intl.NumberFormat("ko-KR").format(Math.ceil(unitPrice))}원`;
+    unitPrice == null ? "—" : `${new Intl.NumberFormat("ko-KR").format(Math.ceil(unitPrice))}원`;
 
   return (
     <Box>
@@ -170,9 +168,7 @@ export default function Step1Content() {
                 label="총 상품 가격 (원)"
                 error={!!fieldState.error}
                 helperText={fieldState.error?.message}
-                onChange={(e) =>
-                  field.onChange(e.target.value.replace(/[^\d]/g, ""))
-                }
+                onChange={(e) => field.onChange(e.target.value.replace(/[^\d]/g, ""))}
               />
             )}
           />
@@ -191,9 +187,7 @@ export default function Step1Content() {
                 label="목표 총 수량"
                 error={!!fieldState.error}
                 helperText={fieldState.error?.message}
-                onChange={(e) =>
-                  field.onChange(e.target.value.replace(/[^\d]/g, ""))
-                }
+                onChange={(e) => field.onChange(e.target.value.replace(/[^\d]/g, ""))}
               />
             )}
           />
@@ -212,9 +206,7 @@ export default function Step1Content() {
                 label="배송비 (원)"
                 error={!!fieldState.error}
                 helperText={fieldState.error?.message}
-                onChange={(e) =>
-                  field.onChange(e.target.value.replace(/[^\d]/g, ""))
-                }
+                onChange={(e) => field.onChange(e.target.value.replace(/[^\d]/g, ""))}
               />
             )}
           />
@@ -223,8 +215,7 @@ export default function Step1Content() {
         {/* 안내 + 계산 */}
         <Grid size={12}>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            한 개당 가격은 <b>(총 상품 가격 + 배송비) ÷ 목표 총 수량</b>으로
-            계산돼요.
+            한 개당 가격은 <b>(총 상품 가격 + 배송비) ÷ 목표 총 수량</b>으로 계산돼요.
           </Typography>
           <Typography variant="body2" sx={{ mt: 0.5 }}>
             산정된 한 개당 가격:

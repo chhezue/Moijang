@@ -9,22 +9,13 @@ interface ProgressBarProps {
   unit?: string;
 }
 
-const ProgressBar: React.FC<ProgressBarProps> = ({
-  current,
-  total,
-  unit = "개",
-}) => {
+const ProgressBar: React.FC<ProgressBarProps> = ({ current, total, unit = "개" }) => {
   const percentage = total > 0 ? Math.min((current / total) * 100, 100) : 0;
   const isComplete = percentage >= 100;
 
   return (
     <Box>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={1}
-      >
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
         <Typography variant="body2" color="text.secondary" fontWeight={500}>
           달성률
         </Typography>

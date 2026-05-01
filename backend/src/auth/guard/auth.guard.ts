@@ -1,9 +1,4 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from '../auth.service';
 import { Request, Response } from 'express';
 import { UserService } from '../../user/user.service';
@@ -30,18 +25,13 @@ export class JwtAuthGuard implements CanActivate {
     } catch {
       // 액세스 토큰이 만료되었거나 유효하지 않은 경우 리프레시 토큰으로 재시도
       try {
-        const { id } = await this.authService.validateRefreshToken(
-          request,
-          response,
-        );
+        const { id } = await this.authService.validateRefreshToken(request, response);
         request.user = await this.userService.getUserById(id);
 
         return true;
       } catch {
         // 리프레시 토큰도 유효하지 않은 경우 인증 실패
-        throw new UnauthorizedException(
-          '인증이 필요합니다. 다시 로그인해 주세요.',
-        );
+        throw new UnauthorizedException('인증이 필요합니다. 다시 로그인해 주세요.');
       }
     }
   }

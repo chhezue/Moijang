@@ -2,15 +2,7 @@
 import React, { useEffect, useState } from "react";
 import TextInput from "@/components/TextInput";
 import styled from "styled-components";
-import {
-  Button,
-  FormControl,
-  MenuItem,
-  Select,
-  Box,
-  Typography,
-  alpha,
-} from "@mui/material";
+import { Button, FormControl, MenuItem, Select, Box, Typography, alpha } from "@mui/material";
 import {
   joinParticipant,
   modifyParticipant,
@@ -39,13 +31,7 @@ interface Props {
   remainingCount: number;
   isLeader?: boolean;
 }
-const ParticipationModalContent = ({
-  gbId,
-  close,
-  action,
-  isLeader,
-  remainingCount,
-}: Props) => {
+const ParticipationModalContent = ({ gbId, close, action, isLeader, remainingCount }: Props) => {
   const [count, setCount] = useState<number>(1);
   const [originalCount, setOriginalCount] = useState<number>(0);
   const [refundBank, setRefundBank] = useState<BankName | "">("");

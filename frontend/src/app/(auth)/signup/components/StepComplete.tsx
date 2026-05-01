@@ -23,13 +23,7 @@ export default function StepComplete({ result }: Props) {
         </Typography>
       </Box>
 
-      <Button
-        component={Link}
-        href="/login"
-        variant="contained"
-        fullWidth
-        sx={{ mt: 1 }}
-      >
+      <Button component={Link} href="/login" variant="contained" fullWidth sx={{ mt: 1 }}>
         로그인 하러 가기
       </Button>
     </Box>

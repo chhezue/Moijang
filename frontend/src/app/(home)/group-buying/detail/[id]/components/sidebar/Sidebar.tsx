@@ -17,12 +17,7 @@ interface SidebarProps {
   onOpenModal: (type: ModalType, action?: "join" | "modify") => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({
-  participants,
-  item,
-  onOpenModal,
-  user,
-}) => {
+const Sidebar: React.FC<SidebarProps> = ({ participants, item, onOpenModal, user }) => {
   return (
     <Stack spacing={3}>
       {/* 달성률 섹션 (간단하니까 Sidebar 안에 둠) */}
@@ -31,11 +26,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           참여 현황
         </Typography>
         <Box mt={2}>
-          <ProgressBar
-            current={item.currentCount}
-            total={item.fixedCount}
-            unit="개"
-          />
+          <ProgressBar current={item.currentCount} total={item.fixedCount} unit="개" />
         </Box>
       </Box>
 
@@ -44,9 +35,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       {/* 공지창 + 버튼 섹션 */}
       {!user ? (
         <Box>
-          <Typography color="text.secondary">
-            로그인 후 공구에 참여해 보세요!
-          </Typography>
+          <Typography color="text.secondary">로그인 후 공구에 참여해 보세요!</Typography>
         </Box>
       ) : (
         <>

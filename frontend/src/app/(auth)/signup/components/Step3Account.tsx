@@ -59,11 +59,15 @@ export default function Step3Account({
         <TextField
           label="아이디"
           value={loginId}
-          onChange={(e) => { onLoginIdChange(e.target.value); }}
+          onChange={(e) => {
+            onLoginIdChange(e.target.value);
+          }}
           fullWidth
           autoComplete="username"
           error={!!loginIdError || loginIdAvailable === false}
-          FormHelperTextProps={{ sx: { color: loginIdAvailable === true ? "success.main" : undefined } }}
+          FormHelperTextProps={{
+            sx: { color: loginIdAvailable === true ? "success.main" : undefined },
+          }}
           helperText={loginIdHelperText}
         />
         <Button

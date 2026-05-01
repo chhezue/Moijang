@@ -1,11 +1,7 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from "@nestjs/common";
-import { GroupBuyingRepository } from "./group-buying.repository";
-import { CreateGroupBuyingDto } from "./dto/create-group-buying.dto";
-import { GroupBuying } from "./schema/group-buying.schema";
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { GroupBuyingRepository } from './group-buying.repository';
+import { CreateGroupBuyingDto } from './dto/create-group-buying.dto';
+import { GroupBuying } from './schema/group-buying.schema';
 import {
   CANCEL_REASON_LABELS,
   CancelReason,
@@ -14,17 +10,17 @@ import {
   GroupBuyingStatus,
   PRODUCT_CATEGORY_LABELS,
   ProductCategory,
-} from "./const/group-buying.const";
-import { UpdateGroupBuyingDto } from "./dto/update-group-buying.dto";
-import { SearchGroupBuyingDto } from "./dto/search-group-buying.dto";
-import { PageMetaDto, PageResponseDto } from "../common/dto/page-response.dto";
-import { PageOptionDto } from "../common/dto/page-option.dto";
-import { UpdateStatusDto } from "./dto/update-status.dto";
-import { DeleteGroupBuyingDto } from "./dto/delete-group-buying.dto";
-import { ParticipantService } from "../participant/participant.service";
-import { PayloadDto } from "../web-push/dto/payload.dto";
-import { WebPushService } from "../web-push/web-push.service";
-import mongoose, { PipelineStage, Types } from "mongoose";
+} from './const/group-buying.const';
+import { UpdateGroupBuyingDto } from './dto/update-group-buying.dto';
+import { SearchGroupBuyingDto } from './dto/search-group-buying.dto';
+import { PageMetaDto, PageResponseDto } from '../common/dto/page-response.dto';
+import { PageOptionDto } from '../common/dto/page-option.dto';
+import { UpdateStatusDto } from './dto/update-status.dto';
+import { DeleteGroupBuyingDto } from './dto/delete-group-buying.dto';
+import { ParticipantService } from '../participant/participant.service';
+import { PayloadDto } from '../web-push/dto/payload.dto';
+import { WebPushService } from '../web-push/web-push.service';
+import mongoose, { PipelineStage, Types } from 'mongoose';
 
 @Injectable()
 export class GroupBuyingService {
@@ -39,32 +35,17 @@ export class GroupBuyingService {
   }
 
   // 상태 전이 검증 함수
-  private isValidTransition(
-    current: GroupBuyingStatus,
-    next: GroupBuyingStatus,
-  ): boolean {
+  private isValidTransition(current: GroupBuyingStatus, next: GroupBuyingStatus): boolean {
     // key는 반드시 GroupBuyingStatus 중 하나, 각 value는 GroupBuyingStatus 배열 타입
     const allowedTransition: Record<GroupBuyingStatus, GroupBuyingStatus[]> = {
       // 모집 중 -> 모집 완료, 취소
-      [GroupBuyingStatus.RECRUITING]: [
-        GroupBuyingStatus.CONFIRMED,
-        GroupBuyingStatus.CANCELLED,
-      ],
+      [GroupBuyingStatus.RECRUITING]: [GroupBuyingStatus.CONFIRMED, GroupBuyingStatus.CANCELLED],
       // 모집 완료 -> 품절로 인한 취소
-      [GroupBuyingStatus.CONFIRMED]: [
-        GroupBuyingStatus.CANCELLED,
-        GroupBuyingStatus.ORDER_PENDING,
-      ],
+      [GroupBuyingStatus.CONFIRMED]: [GroupBuyingStatus.CANCELLED, GroupBuyingStatus.ORDER_PENDING],
       // 주문 대기 -> 주문 진행 중, 품절로 인한 취소
-      [GroupBuyingStatus.ORDER_PENDING]: [
-        GroupBuyingStatus.ORDERED,
-        GroupBuyingStatus.CANCELLED,
-      ],
+      [GroupBuyingStatus.ORDER_PENDING]: [GroupBuyingStatus.ORDERED, GroupBuyingStatus.CANCELLED],
       // 주문 진행 중 -> 배송 완료, 품절로 인한 취소
-      [GroupBuyingStatus.ORDERED]: [
-        GroupBuyingStatus.SHIPPED,
-        GroupBuyingStatus.CANCELLED,
-      ],
+      [GroupBuyingStatus.ORDERED]: [GroupBuyingStatus.SHIPPED, GroupBuyingStatus.CANCELLED],
       [GroupBuyingStatus.SHIPPED]: [GroupBuyingStatus.COMPLETED],
       [GroupBuyingStatus.CANCELLED]: [],
       [GroupBuyingStatus.COMPLETED]: [],
@@ -80,13 +61,13 @@ export class GroupBuyingService {
     const countQuery = {};
 
     if (keyword) {
-      countQuery["title"] = { $regex: keyword, $options: "i" };
+      countQuery['title'] = { $regex: keyword, $options: 'i' };
     }
     if (category) {
-      countQuery["category"] = category;
+      countQuery['category'] = category;
     }
     if (status) {
-      countQuery["groupBuyingStatus"] = status;
+      countQuery['groupBuyingStatus'] = status;
     }
 
     const totalCount = await this.groupBuyingRepository.count(countQuery);
@@ -97,32 +78,32 @@ export class GroupBuyingService {
       },
       {
         $addFields: {
-          id: "$_id",
+          id: '$_id',
         },
       },
       {
         $lookup: {
-          from: "participants",
-          localField: "_id",
-          foreignField: "gbId",
-          as: "participantData",
+          from: 'participants',
+          localField: '_id',
+          foreignField: 'gbId',
+          as: 'participantData',
         },
       },
       {
         $addFields: {
-          currentCount: { $sum: "$participantData.count" },
+          currentCount: { $sum: '$participantData.count' },
         },
       },
       {
         $lookup: {
-          from: "users",
-          localField: "leaderId",
-          foreignField: "_id",
-          as: "leaderId",
+          from: 'users',
+          localField: 'leaderId',
+          foreignField: '_id',
+          as: 'leaderId',
         },
       },
       {
-        $unwind: { path: "$leaderId", preserveNullAndEmptyArrays: true },
+        $unwind: { path: '$leaderId', preserveNullAndEmptyArrays: true },
       },
       {
         $sort: {
@@ -170,32 +151,32 @@ export class GroupBuyingService {
       },
       {
         $addFields: {
-          id: "$_id",
+          id: '$_id',
         },
       },
       {
         $lookup: {
-          from: "participants",
-          localField: "_id",
-          foreignField: "gbId",
-          as: "participantData",
+          from: 'participants',
+          localField: '_id',
+          foreignField: 'gbId',
+          as: 'participantData',
         },
       },
       {
         $addFields: {
-          currentCount: { $sum: "$participantData.count" },
+          currentCount: { $sum: '$participantData.count' },
         },
       },
       {
         $lookup: {
-          from: "users",
-          localField: "leaderId",
-          foreignField: "_id",
-          as: "leaderId",
+          from: 'users',
+          localField: 'leaderId',
+          foreignField: '_id',
+          as: 'leaderId',
         },
       },
       {
-        $unwind: { path: "$leaderId", preserveNullAndEmptyArrays: true },
+        $unwind: { path: '$leaderId', preserveNullAndEmptyArrays: true },
       },
       {
         $sort: {
@@ -232,8 +213,7 @@ export class GroupBuyingService {
     const { page, limit } = optionDto;
     const userObjectId = new Types.ObjectId(userId);
 
-    const groupbuyingIds =
-      await this.participantService.getParticipatedGroupBuyingIds(userId);
+    const groupbuyingIds = await this.participantService.getParticipatedGroupBuyingIds(userId);
 
     const myGroupbuying = await this.groupBuyingRepository.find({
       leaderId: userObjectId,
@@ -249,32 +229,32 @@ export class GroupBuyingService {
       },
       {
         $addFields: {
-          id: "$_id",
+          id: '$_id',
         },
       },
       {
         $lookup: {
-          from: "participants",
-          localField: "_id",
-          foreignField: "gbId",
-          as: "participantData",
+          from: 'participants',
+          localField: '_id',
+          foreignField: 'gbId',
+          as: 'participantData',
         },
       },
       {
         $addFields: {
-          currentCount: { $sum: "$participantData.count" },
+          currentCount: { $sum: '$participantData.count' },
         },
       },
       {
         $lookup: {
-          from: "users",
-          localField: "leaderId",
-          foreignField: "_id",
-          as: "leaderId",
+          from: 'users',
+          localField: 'leaderId',
+          foreignField: '_id',
+          as: 'leaderId',
         },
       },
       {
-        $unwind: { path: "$leaderId", preserveNullAndEmptyArrays: true },
+        $unwind: { path: '$leaderId', preserveNullAndEmptyArrays: true },
       },
       {
         $sort: {
@@ -313,38 +293,38 @@ export class GroupBuyingService {
       },
       {
         $addFields: {
-          id: "$_id",
+          id: '$_id',
         },
       },
       {
         $lookup: {
-          from: "participants",
-          localField: "_id",
-          foreignField: "gbId",
-          as: "participantData",
+          from: 'participants',
+          localField: '_id',
+          foreignField: 'gbId',
+          as: 'participantData',
         },
       },
       {
         $addFields: {
-          currentCount: { $sum: "$participantData.count" },
+          currentCount: { $sum: '$participantData.count' },
         },
       },
       {
         $lookup: {
-          from: "users",
-          localField: "leaderId",
-          foreignField: "_id",
-          as: "leaderId",
+          from: 'users',
+          localField: 'leaderId',
+          foreignField: '_id',
+          as: 'leaderId',
         },
       },
       {
-        $unwind: { path: "$leaderId", preserveNullAndEmptyArrays: true },
+        $unwind: { path: '$leaderId', preserveNullAndEmptyArrays: true },
       },
       {
         $project: {
           participantData: 0,
-          "leaderId._id": 0,
-          "leaderId.updatedAt": 0,
+          'leaderId._id': 0,
+          'leaderId.updatedAt': 0,
         },
       },
     ];
@@ -367,15 +347,9 @@ export class GroupBuyingService {
     }
 
     // 로그인한 경우: 참여자인지 확인
-    const isParticipant = await this.participantService.isParticipant(
-      userId,
-      gbId,
-    );
+    const isParticipant = await this.participantService.isParticipant(userId, gbId);
     if (isParticipant) {
-      const participantInfo = await this.participantService.getParticipantById(
-        gbId,
-        userId,
-      );
+      const participantInfo = await this.participantService.getParticipantById(gbId, userId);
       const { count } = participantInfo;
 
       return {
@@ -391,20 +365,13 @@ export class GroupBuyingService {
     return { ...gb, isOwner: false, isParticipant: false }; // 공구 참여 가능
   }
 
-  async createGroupBuying(
-    id: string,
-    createDto: CreateGroupBuyingDto,
-  ): Promise<GroupBuying> {
+  async createGroupBuying(id: string, createDto: CreateGroupBuyingDto): Promise<GroupBuying> {
     const { fixedCount, totalPrice, shippingFee, leaderCount } = createDto;
     const estimatedPriceWithDecimal = (totalPrice + shippingFee) / fixedCount;
     const estimatedPrice = Math.ceil(estimatedPriceWithDecimal);
 
-    const result = await this.groupBuyingRepository.create(
-      id,
-      createDto,
-      estimatedPrice,
-    );
-    const _id: string = result._id as string;
+    const result = await this.groupBuyingRepository.create(id, createDto, estimatedPrice);
+    const _id = String(result._id);
     await this.participantService.createLeader(_id, leaderCount, id);
 
     return result;
@@ -426,13 +393,11 @@ export class GroupBuyingService {
       GroupBuyingStatus.CANCELLED,
     ];
     if (uncancelableStatuses.includes(gb.groupBuyingStatus)) {
-      throw new BadRequestException(
-        "현재 상태에서는 공구를 취소할 수 없습니다.",
-      );
+      throw new BadRequestException('현재 상태에서는 공구를 취소할 수 없습니다.');
     }
 
     // 2. 취소 사유에 따른 데이터 준비 (알림 메시지, 미입금자 목록)
-    let notificationBody = "";
+    let notificationBody = '';
     switch (deleteDto.cancelReason) {
       case CancelReason.LEADER_CANCELLED: // 총대 개인 사유
         notificationBody = `[${gb.title}] 총대님이 개인 사정으로 공구를 취소했어요. 자세한 내용은 공지사항을 확인해주세요.`;
@@ -445,11 +410,10 @@ export class GroupBuyingService {
         break;
 
       default:
-        throw new BadRequestException("유효하지 않은 취소 사유입니다.");
+        throw new BadRequestException('유효하지 않은 취소 사유입니다.');
     }
 
-    const participants: any =
-      await this.participantService.getParticipants(gbId);
+    const participants: any = await this.participantService.getParticipants(gbId);
     if (participants.length > 0 && notificationBody) {
       const payload: PayloadDto = {
         title: `❌ 공구 취소`,
@@ -464,10 +428,7 @@ export class GroupBuyingService {
       await Promise.all(notificationPromises);
     }
 
-    return this.groupBuyingRepository.findByGbIdAndDelete(
-      gbId,
-      deleteDto.cancelReason,
-    );
+    return this.groupBuyingRepository.findByGbIdAndDelete(gbId, deleteDto.cancelReason);
   }
 
   async updateGroupBuying(
@@ -489,8 +450,7 @@ export class GroupBuyingService {
       shippingFee = updateDto.shippingFee ?? gb.shippingFee;
     }
 
-    const estimatedPriceWithDecimal =
-      (totalPrice + shippingFee) / gb.fixedCount;
+    const estimatedPriceWithDecimal = (totalPrice + shippingFee) / gb.fixedCount;
     const estimatedPrice = Math.ceil(estimatedPriceWithDecimal);
 
     if (
@@ -499,7 +459,7 @@ export class GroupBuyingService {
       gb.groupBuyingStatus !== GroupBuyingStatus.SHIPPED // 픽업 장소, 시간 수정 가능
     ) {
       throw new BadRequestException(
-        "공구 수정은 모집 중/모집 완료/배송 완료 상태일 때만 가능합니다.",
+        '공구 수정은 모집 중/모집 완료/배송 완료 상태일 때만 가능합니다.',
       );
     }
 
@@ -512,24 +472,14 @@ export class GroupBuyingService {
 
     // 리더의 참여 수량이 변경되었으면 호출
     if (updateDto.leaderCount) {
-      await this.participantService.updateLeader(
-        gbId,
-        updateDto.leaderCount,
-        userId,
-      );
+      await this.participantService.updateLeader(gbId, updateDto.leaderCount, userId);
     }
 
     const totalCount = await this.participantService.getTotalCount(gbId);
 
     // 모집 개수가 다 찼고 아직 모집 중 상태라면 즉시 확정으로 변경
-    if (
-      totalCount >= gb.fixedCount &&
-      gb.groupBuyingStatus === GroupBuyingStatus.RECRUITING
-    ) {
-      await this.groupBuyingRepository.updateStatus(
-        gbId,
-        GroupBuyingStatus.CONFIRMED,
-      );
+    if (totalCount >= gb.fixedCount && gb.groupBuyingStatus === GroupBuyingStatus.RECRUITING) {
+      await this.groupBuyingRepository.updateStatus(gbId, GroupBuyingStatus.CONFIRMED);
     }
 
     return result;
@@ -544,22 +494,16 @@ export class GroupBuyingService {
     const current = gb.groupBuyingStatus;
     const next = statusDto.status;
 
-    if (
-      current === GroupBuyingStatus.COMPLETED ||
-      current === GroupBuyingStatus.CANCELLED
-    ) {
-      throw new BadRequestException(
-        "현재 상태에서는 더 이상 상태를 변경할 수 없습니다.",
-      );
+    if (current === GroupBuyingStatus.COMPLETED || current === GroupBuyingStatus.CANCELLED) {
+      throw new BadRequestException('현재 상태에서는 더 이상 상태를 변경할 수 없습니다.');
     }
 
     // 상태 전이 제한
     if (!this.isValidTransition(current, next)) {
-      throw new BadRequestException("올바르지 않은 상태 전이입니다.");
+      throw new BadRequestException('올바르지 않은 상태 전이입니다.');
     }
 
-    const participants: any =
-      await this.participantService.getParticipants(gbId);
+    const participants: any = await this.participantService.getParticipants(gbId);
 
     const payload: PayloadDto = {
       title: ``,
@@ -575,15 +519,15 @@ export class GroupBuyingService {
 
         switch (statusDto.status) {
           case GroupBuyingStatus.ORDERED:
-            payload.title = "📢 주문 완료";
+            payload.title = '📢 주문 완료';
             payload.body = `[${gb.title}] 총대가 상품 주문을 완료했어요. 배송이 시작되면 다시 알려드릴게요.`;
             break;
           case GroupBuyingStatus.SHIPPED:
-            payload.title = "📢 상품 도착";
+            payload.title = '📢 상품 도착';
             payload.body = `[${gb.title}] 주문하신 상품이 도착했어요. 총대가 작성한 픽업 공지를 확인해주세요.`;
             break;
           case GroupBuyingStatus.CANCELLED:
-            payload.title = "📢 공구 취소";
+            payload.title = '📢 공구 취소';
             payload.body = `[${gb.title}] 총대에 의해 공구가 취소되었어요. 자세한 내용은 공지사항을 확인해주세요.`;
             break;
         }
@@ -597,10 +541,7 @@ export class GroupBuyingService {
       }
     }
 
-    return await this.groupBuyingRepository.updateStatus(
-      gbId,
-      statusDto.status,
-    );
+    return await this.groupBuyingRepository.updateStatus(gbId, statusDto.status);
   }
 
   // 각 enum 값에 대한 한글 텍스트 매핑 객체를 프론트엔드에 반환

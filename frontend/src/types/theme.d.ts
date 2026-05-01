@@ -1,4 +1,4 @@
-아; // src/styles/theme.d.ts
+// src/styles/theme.d.ts
 import "@mui/material/styles";
 
 declare module "@mui/material/styles" {

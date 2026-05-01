@@ -14,12 +14,7 @@ interface TabMenuProps {
   basePath?: string;
 }
 
-export default function TabMenu({
-  tabs,
-  basePath,
-  activeTab,
-  onTabChange,
-}: TabMenuProps) {
+export default function TabMenu({ tabs, basePath, activeTab, onTabChange }: TabMenuProps) {
   const pathname = usePathname();
   const router = useRouter();
 

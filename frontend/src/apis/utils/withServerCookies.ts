@@ -9,8 +9,6 @@ export function withServerCookies() {
   if (!a && !r) return {};
 
   return {
-    Cookie: [a && `accessToken=${a}`, r && `refreshToken=${r}`]
-      .filter(Boolean)
-      .join("; "),
+    Cookie: [a && `accessToken=${a}`, r && `refreshToken=${r}`].filter(Boolean).join("; "),
   };
 }

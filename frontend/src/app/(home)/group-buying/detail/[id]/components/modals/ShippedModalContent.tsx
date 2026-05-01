@@ -1,14 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Box,
-  Button,
-  TextField,
-  Stack,
-  alpha,
-  Typography,
-} from "@mui/material";
+import { Box, Button, TextField, Stack, alpha, Typography } from "@mui/material";
 import { theme } from "@/styles/theme";
 
 interface ShippedModalContentProps {
@@ -38,9 +31,7 @@ export const ShippedModalContent: React.FC<ShippedModalContentProps> = ({
           borderRadius: 1,
         }}
       >
-        <Box
-          sx={{ fontSize: "0.9rem", color: "text.secondary", lineHeight: 1.4 }}
-        >
+        <Box sx={{ fontSize: "0.9rem", color: "text.secondary", lineHeight: 1.4 }}>
           <Typography
             variant="subtitle1"
             fontWeight={600}

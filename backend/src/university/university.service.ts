@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { UniversityRepository } from "./university.repository";
-import { GetUniversityDto } from "./dto/get-university.dto";
-import { SearchUniversityDto } from "./dto/search-university.dto";
-import { University } from "./schema/university.schema";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { UniversityRepository } from './university.repository';
+import { GetUniversityDto } from './dto/get-university.dto';
+import { SearchUniversityDto } from './dto/search-university.dto';
+import { University } from './schema/university.schema';
 
 @Injectable()
 export class UniversityService {

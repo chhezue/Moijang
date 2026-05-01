@@ -92,8 +92,7 @@ export default function Step3Content({ agree, setAgree }: Step3Props) {
         </Typography>
         <Typography variant="body2" component="ul" sx={{ pl: 2, m: 0 }}>
           <li style={{ marginBottom: "4px" }}>
-            공동구매 주최자는 참여자들의 입금 내역을 성실히 확인하고 관리할
-            책임이 있습니다.
+            공동구매 주최자는 참여자들의 입금 내역을 성실히 확인하고 관리할 책임이 있습니다.
           </li>
           <li style={{ marginBottom: "4px" }}>
             문제 발생 시(품절, 배송지연 등) 즉시 참여자들에게 공지해야 합니다.
@@ -106,12 +105,7 @@ export default function Step3Content({ agree, setAgree }: Step3Props) {
 
       {/* 동의 체크 */}
       <FormControlLabel
-        control={
-          <Checkbox
-            checked={agree}
-            onChange={(e) => setAgree(e.target.checked)}
-          />
-        }
+        control={<Checkbox checked={agree} onChange={(e) => setAgree(e.target.checked)} />}
         label="위 주의사항을 모두 확인하였으며, 이에 동의합니다."
         sx={{ mt: 2 }}
       />

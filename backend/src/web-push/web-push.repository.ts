@@ -11,9 +11,7 @@ export class WebPushRepository {
     private subscriptionsModel: Model<Subscription>,
   ) {}
 
-  async findOne(
-    query: RootFilterQuery<Subscription>,
-  ): Promise<Subscription | null> {
+  async findOne(query: RootFilterQuery<Subscription>): Promise<Subscription | null> {
     return this.subscriptionsModel.findOne(query).lean();
   }
 

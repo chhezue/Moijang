@@ -1,5 +1,5 @@
-import { Prop, Schema, SchemaFactory, SchemaOptions } from "@nestjs/mongoose";
-import { Document } from "mongoose";
+import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
 const options: SchemaOptions = {
   timestamps: true,
@@ -36,6 +36,6 @@ export class University extends Document {
 }
 
 export const UniversitySchema = SchemaFactory.createForClass(University);
-UniversitySchema.virtual("id").get(function (this: any) {
+UniversitySchema.virtual('id').get(function (this: any) {
   return this._id?.toString();
 });

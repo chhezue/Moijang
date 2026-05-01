@@ -19,20 +19,12 @@ interface SnackbarState {
 
 // Context가 제공할 값의 인터페이스 (스낵바를 띄우는 함수)
 interface SnackbarContextValue {
-  showSnackbar: (
-    message: string,
-    severity?: AlertColor,
-    duration?: number | null
-  ) => void;
+  showSnackbar: (message: string, severity?: AlertColor, duration?: number | null) => void;
 }
 
-const SnackbarContext = createContext<SnackbarContextValue | undefined>(
-  undefined
-);
+const SnackbarContext = createContext<SnackbarContextValue | undefined>(undefined);
 
-export const SnackbarProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+export const SnackbarProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [snackbar, setSnackbar] = useState<SnackbarState>({
     open: false,
     message: "",
@@ -41,26 +33,19 @@ export const SnackbarProvider: React.FC<{ children: ReactNode }> = ({
   });
 
   const showSnackbar = useCallback(
-    (
-      message: string,
-      severity: AlertColor = "success",
-      duration: number | null = 4000
-    ) => {
+    (message: string, severity: AlertColor = "success", duration: number | null = 4000) => {
       setSnackbar({ open: true, message, severity, duration });
     },
-    []
+    [],
   );
   // 3. 스낵바 닫기 함수 (useCallback으로 메모이제이션)
-  const handleClose = useCallback(
-    (event?: SyntheticEvent | Event, reason?: string) => {
-      if (reason === "clickaway") {
-        return;
-      }
-      // setSnackbar을 호출하여 open 상태를 false로 변경 -> 스낵바 닫기
-      setSnackbar((prev) => ({ ...prev, open: false }));
-    },
-    []
-  );
+  const handleClose = useCallback((event?: SyntheticEvent | Event, reason?: string) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    // setSnackbar을 호출하여 open 상태를 false로 변경 -> 스낵바 닫기
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  }, []);
   return (
     <SnackbarContext.Provider value={{ showSnackbar }}>
       {children}

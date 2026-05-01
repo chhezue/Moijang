@@ -2,9 +2,7 @@ import api from "@/apis/apiClient";
 import { IParticipant } from "@/types/groupBuying";
 
 // 특정 공구의 참여자 목록 조회
-export const getParticipantList = async (
-  gbId: string
-): Promise<{ items: IParticipant[] }> => {
+export const getParticipantList = async (gbId: string): Promise<{ items: IParticipant[] }> => {
   const res = await api.get(`/api/participant/${gbId}`);
 
   // 백엔드에서 배열을 직접 반환하므로 res.data를 사용
@@ -23,17 +21,13 @@ export const joinParticipant = async ({
   refundBank: string;
   count: number;
 }) => {
-  try {
-    const { data } = await api.post(`/api/participant`, {
-      gbId,
-      refundBank,
-      refundAccount,
-      count,
-    });
-    return data;
-  } catch (e) {
-    throw e;
-  }
+  const { data } = await api.post(`/api/participant`, {
+    gbId,
+    refundBank,
+    refundAccount,
+    count,
+  });
+  return data;
 };
 
 export const modifyParticipant = async ({
@@ -47,31 +41,17 @@ export const modifyParticipant = async ({
   refundBank: string;
   count: number;
 }) => {
-  try {
-    const { data } = await api.patch(`/api/participant/${gbId}`, {
-      refundBank,
-      refundAccount,
-      count,
-    });
-    return data;
-  } catch (e) {
-    throw e;
-  }
+  const { data } = await api.patch(`/api/participant/${gbId}`, {
+    refundBank,
+    refundAccount,
+    count,
+  });
+  return data;
 };
 
-export const getParticipantInfo = async ({
-  gbId,
-  id,
-}: {
-  gbId: string;
-  id: string;
-}) => {
-  try {
-    const { data } = await api.get(`/api/participant/${gbId}/${id}`);
-    return data;
-  } catch (e) {
-    throw e;
-  }
+export const getParticipantInfo = async ({ gbId, id }: { gbId: string; id: string }) => {
+  const { data } = await api.get(`/api/participant/${gbId}/${id}`);
+  return data;
 };
 
 export const cancelParticipant = async (gbId: number | string) => {

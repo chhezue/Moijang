@@ -24,11 +24,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ item, onOpenModal }) => {
   return (
     <ButtonWrap>
       {!isOwner && !isParticipant && (
-        <Button
-          variant="contained"
-          fullWidth
-          onClick={() => onOpenModal("participation", "join")}
-        >
+        <Button variant="contained" fullWidth onClick={() => onOpenModal("participation", "join")}>
           공동구매 참여하기
         </Button>
       )}
@@ -93,11 +89,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ item, onOpenModal }) => {
           )}
 
           {groupBuyingStatus === "CONFIRMED" && (
-            <Button
-              variant="contained"
-              onClick={() => onOpenModal("requestPayment")}
-              fullWidth
-            >
+            <Button variant="contained" onClick={() => onOpenModal("requestPayment")} fullWidth>
               결제 요청 보내기
             </Button>
           )}

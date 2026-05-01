@@ -1,7 +1,7 @@
-import { Global, Module } from "@nestjs/common";
-import { ConfigModule, ConfigService } from "@nestjs/config";
-import { RedisModule as IoRedisModule } from "@nestjs-modules/ioredis";
-import { RedisService } from "./redis.service";
+import { Global, Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { RedisModule as IoRedisModule } from '@nestjs-modules/ioredis';
+import { RedisService } from './redis.service';
 
 /**
  * ioredis 연결 등록 + RedisService 제공.
@@ -13,9 +13,8 @@ import { RedisService } from "./redis.service";
     IoRedisModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({
-        type: "single" as const,
-        url:
-          config.get<string>("REDIS_URL") ?? "redis://127.0.0.1:6379",
+        type: 'single' as const,
+        url: config.get<string>('REDIS_URL') ?? 'redis://127.0.0.1:6379',
       }),
       inject: [ConfigService],
     }),

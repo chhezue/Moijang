@@ -4,7 +4,7 @@ import { GroupBuyingItem } from "@/types/groupBuying";
 import { PaginationMeta, PaginationParams } from "@/types/common";
 
 export const getMyCreateGroupBuying = async (
-  params?: PaginationParams
+  params?: PaginationParams,
 ): Promise<{
   items: GroupBuyingItem[];
   meta: PaginationMeta;
@@ -23,7 +23,7 @@ export const getMyCreateGroupBuying = async (
 };
 
 export const getMyParticipant = async (
-  params?: PaginationParams
+  params?: PaginationParams,
 ): Promise<{ items: GroupBuyingItem[]; meta: PaginationMeta }> => {
   const res = await apiServer.get(`/api/group-buying/my-participant`, {
     params,
@@ -36,9 +36,7 @@ export const getMyParticipant = async (
   };
 };
 
-export const getGroupBuyingByIdServer = async (
-  id: string
-): Promise<GroupBuyingItem> => {
+export const getGroupBuyingByIdServer = async (id: string): Promise<GroupBuyingItem> => {
   const res = await apiServer.get(`/api/group-buying/${id}`, {
     headers: withServerCookies(),
   });

@@ -10,17 +10,10 @@ interface CategoryContextType {
   categoryList: { key: string; label: string }[];
 }
 
-const CategoryContext = createContext<CategoryContextType | undefined>(
-  undefined
-);
+const CategoryContext = createContext<CategoryContextType | undefined>(undefined);
 
-export const CategoryProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
-  const { isLoading, categoryMap, categoryIconMap, categoryList } =
-    useGroupBuyingCategory();
+export const CategoryProvider = ({ children }: { children: React.ReactNode }) => {
+  const { isLoading, categoryMap, categoryIconMap, categoryList } = useGroupBuyingCategory();
 
   return (
     <CategoryContext.Provider
@@ -39,9 +32,7 @@ export const CategoryProvider = ({
 export const useCategoryContext = () => {
   const context = useContext(CategoryContext);
   if (!context) {
-    throw new Error(
-      "useCategoryContext must be used within a CategoryProvider."
-    );
+    throw new Error("useCategoryContext must be used within a CategoryProvider.");
   }
   return context;
 };
