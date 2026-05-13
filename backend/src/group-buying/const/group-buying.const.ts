@@ -1,8 +1,7 @@
-// PG 결제로 인해 PAYMENT_IN_PROGRESS 삭제
+// PG 결제로 인해 PAYMENT_IN_PROGRESS, ORDER_PENDING 삭제
 export enum GroupBuyingStatus {
   RECRUITING = 'RECRUITING', // 모집 중
   CONFIRMED = 'CONFIRMED', // 모집 완료
-  ORDER_PENDING = 'ORDER_PENDING', // 주문 대기
   ORDERED = 'ORDERED', // 주문 진행 중
   SHIPPED = 'SHIPPED', // 배송 완료
   CANCELLED = 'CANCELLED', // 공구 취소
@@ -40,7 +39,6 @@ export enum CancelReason {
 export const GROUP_BUYING_STATUS_LABELS = {
   [GroupBuyingStatus.RECRUITING]: '모집 중',
   [GroupBuyingStatus.CONFIRMED]: '모집 완료',
-  [GroupBuyingStatus.ORDER_PENDING]: '주문 대기',
   [GroupBuyingStatus.ORDERED]: '주문 진행 중',
   [GroupBuyingStatus.SHIPPED]: '배송 완료',
   [GroupBuyingStatus.CANCELLED]: '공구 취소',

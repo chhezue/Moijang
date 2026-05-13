@@ -40,10 +40,8 @@ export class GroupBuyingService {
     const allowedTransition: Record<GroupBuyingStatus, GroupBuyingStatus[]> = {
       // 모집 중 -> 모집 완료, 취소
       [GroupBuyingStatus.RECRUITING]: [GroupBuyingStatus.CONFIRMED, GroupBuyingStatus.CANCELLED],
-      // 모집 완료 -> 품절로 인한 취소
-      [GroupBuyingStatus.CONFIRMED]: [GroupBuyingStatus.CANCELLED, GroupBuyingStatus.ORDER_PENDING],
-      // 주문 대기 -> 주문 진행 중, 품절로 인한 취소
-      [GroupBuyingStatus.ORDER_PENDING]: [GroupBuyingStatus.ORDERED, GroupBuyingStatus.CANCELLED],
+      // 모집 완료 -> 주문 진행 중, 품절로 인한 취소
+      [GroupBuyingStatus.CONFIRMED]: [GroupBuyingStatus.ORDERED, GroupBuyingStatus.CANCELLED],
       // 주문 진행 중 -> 배송 완료, 품절로 인한 취소
       [GroupBuyingStatus.ORDERED]: [GroupBuyingStatus.SHIPPED, GroupBuyingStatus.CANCELLED],
       [GroupBuyingStatus.SHIPPED]: [GroupBuyingStatus.COMPLETED],
