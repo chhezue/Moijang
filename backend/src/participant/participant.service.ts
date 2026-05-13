@@ -1,14 +1,10 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from "@nestjs/common";
-import { ParticipantRepository } from "./participant.repository";
-import { CreateParticipantDto } from "./dto/create-participant.dto";
-import { Participant } from "./schema/participant.schema";
-import { GroupBuyingStatus } from "../group-buying/const/group-buying.const";
-import { GroupBuyingRepository } from "../group-buying/group-buying.repository";
-import { Types } from "mongoose";
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { ParticipantRepository } from './participant.repository';
+import { CreateParticipantDto } from './dto/create-participant.dto';
+import { Participant } from './schema/participant.schema';
+import { GroupBuyingStatus } from '../group-buying/const/group-buying.const';
+import { GroupBuyingRepository } from '../group-buying/group-buying.repository';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class ParticipantService {
@@ -47,7 +43,6 @@ export class ParticipantService {
     await this.participantRepository.create({
       gbId: new Types.ObjectId(gbId),
       count,
-      isPaid: true,
       userId: new Types.ObjectId(leaderId),
     });
   }
@@ -62,10 +57,7 @@ export class ParticipantService {
     );
   }
 
-  async joinGroupBuying(
-    createDto: CreateParticipantDto,
-    userId: string,
-  ): Promise<Participant> {
+  async joinGroupBuying(createDto: CreateParticipantDto, userId: string): Promise<Participant> {
     const userObjectId = new Types.ObjectId(userId);
     const gbObjectId = new Types.ObjectId(createDto.gbId);
     const exists = await this.participantRepository.findOne({
@@ -74,12 +66,10 @@ export class ParticipantService {
     });
     // 이미 참여한 공구인지 중복 체크
     if (exists) {
-      throw new BadRequestException("이미 참여한 공구입니다.");
+      throw new BadRequestException('이미 참여한 공구입니다.');
     }
 
-    const beforeTotalCount = await this.participantRepository.getTotalCount(
-      createDto.gbId,
-    );
+    const beforeTotalCount = await this.participantRepository.getTotalCount(createDto.gbId);
 
     const groupBuying = await this.groupBuyingRepository.getCurrentCount(
       createDto.gbId,
@@ -94,19 +84,14 @@ export class ParticipantService {
       gbId: gbObjectId,
     });
 
-    const totalCount = await this.participantRepository.getTotalCount(
-      createDto.gbId,
-    );
+    const totalCount = await this.participantRepository.getTotalCount(createDto.gbId);
 
     // 모집 개수가 다 찼고 아직 모집 중 상태라면 즉시 확정으로 변경
     if (
       totalCount >= groupBuying.fixedCount &&
       groupBuying.groupBuyingStatus === GroupBuyingStatus.RECRUITING
     ) {
-      await this.groupBuyingRepository.updateStatus(
-        createDto.gbId,
-        GroupBuyingStatus.CONFIRMED,
-      );
+      await this.groupBuyingRepository.updateStatus(createDto.gbId, GroupBuyingStatus.CONFIRMED);
 
       // const payload: PayloadDto = {
       //   title: "📢 모집 완료 알림",
@@ -124,14 +109,13 @@ export class ParticipantService {
     const gbObjectId = new Types.ObjectId(gbId);
     const userObjectId = new Types.ObjectId(userId);
     // 1. 참여자 정보를 먼저 삭제합니다.
-    const deletedParticipant =
-      await this.participantRepository.findOneAndDelete({
-        gbId: gbObjectId,
-        userId: userObjectId,
-      });
+    const deletedParticipant = await this.participantRepository.findOneAndDelete({
+      gbId: gbObjectId,
+      userId: userObjectId,
+    });
 
     if (!deletedParticipant) {
-      throw new NotFoundException("참여 내역이 없습니다.");
+      throw new NotFoundException('참여 내역이 없습니다.');
     }
 
     return true;
