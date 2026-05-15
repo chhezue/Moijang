@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { ParticipantRepository } from './participant.repository';
+import { ParticipantRepository } from './persistence/participant.repository';
 import { CreateParticipantDto } from './dto/create-participant.dto';
 import { Participant } from './schema/participant.schema';
 import { GroupBuyingStatus } from '../group-buying/const/group-buying.const';
@@ -12,32 +12,6 @@ export class ParticipantService {
     private readonly participantRepository: ParticipantRepository,
     private readonly groupBuyingRepository: GroupBuyingRepository,
   ) {}
-
-  async isParticipant(userId: string, gbId: string): Promise<boolean> {
-    const userObjectId = new Types.ObjectId(userId);
-    const gbObjectId = new Types.ObjectId(gbId);
-    const participant = await this.participantRepository.findOne({
-      userId: userObjectId,
-      gbId: gbObjectId,
-    });
-
-    return !!participant;
-  }
-
-  async getParticipants(gbId: string): Promise<Participant[]> {
-    return await this.participantRepository.findAll({
-      gbId: new Types.ObjectId(gbId),
-    });
-  }
-
-  async getParticipantById(gbId: string, userId: string): Promise<Participant> {
-    const userObjectId = new Types.ObjectId(userId);
-    const gbObjectId = new Types.ObjectId(gbId);
-    return await this.participantRepository.findOne({
-      gbId: gbObjectId,
-      userId: userObjectId,
-    });
-  }
 
   async createLeader(gbId: string, count: number, leaderId: string) {
     await this.participantRepository.create({
@@ -119,17 +93,5 @@ export class ParticipantService {
     }
 
     return true;
-  }
-
-  // 내가 참여한 공구의 id 목록 조회
-  async getParticipatedGroupBuyingIds(userId: string) {
-    const participatedRecords = await this.participantRepository.find({
-      userId: new Types.ObjectId(userId),
-    });
-    return participatedRecords.map((p) => p.gbId);
-  }
-
-  async getTotalCount(gbId: string) {
-    return this.participantRepository.getTotalCount(gbId);
   }
 }

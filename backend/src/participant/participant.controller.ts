@@ -16,14 +16,15 @@ import { UserDecorator } from '../user/decorator/user.decorator';
 import { ContextRoleDecorator } from '../group-buying/decorator/context-role.decorator';
 import { ContextRole } from '../group-buying/const/context-role.const';
 import { GroupBuyingAccessGuard } from '../group-buying/guard/group-buying-access.guard';
-/*import { PageOptionDto } from '../common/dto/page-option.dto';
-import { PageResponseDto } from '../common/dto/page-response.dto';
-import { GroupBuying } from '../group-buying/schema/group-buying.schema';*/
 import { JwtAuthGuard } from '../auth/guard/auth.guard';
+import { ParticipantQueryService } from './query/participant-query.service';
 
 @Controller('participant')
 export class ParticipantController {
-  constructor(private readonly participantService: ParticipantService) {}
+  constructor(
+    private readonly participantService: ParticipantService,
+    private readonly participantQueryService: ParticipantQueryService,
+  ) {}
 
   /*@ApiOperation({ summary: '내가 참여 중인 공구 목록 조회' })
   @UseGuards(JwtAuthGuard)
@@ -41,7 +42,7 @@ export class ParticipantController {
   @ApiOperation({ summary: '특정 공구의 참여자 목록 조회' })
   @Get('/:gbId')
   async getParticipants(@Param('gbId') gbId: string): Promise<Participant[]> {
-    return await this.participantService.getParticipants(gbId);
+    return await this.participantQueryService.getParticipants(gbId);
   }
 
   @ApiOperation({ summary: '특정 공구의 참여자 상세 조회' })
@@ -51,7 +52,7 @@ export class ParticipantController {
     @Param('gbId') gbId: string,
     @UserDecorator('id') userId: string,
   ): Promise<Participant> {
-    return await this.participantService.getParticipantById(gbId, userId);
+    return await this.participantQueryService.getDetailParticipant(gbId, userId);
   }
 
   @ApiOperation({ summary: '공구 참여' })
