@@ -12,6 +12,7 @@ import { VerificationModule } from './university-verification/verification.modul
 import { CommonModule } from './common/common.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { WebPushModule } from './web-push/web-push.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { WebPushModule } from './web-push/web-push.module';
     WebPushModule,
     UniversityModule,
     VerificationModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
