@@ -1,10 +1,6 @@
-import { Prop, Schema, SchemaFactory, SchemaOptions } from "@nestjs/mongoose";
-import {
-  CancelReason,
-  GroupBuyingStatus,
-  ProductCategory,
-} from "../const/group-buying.const";
-import { Document, Schema as MongooseSchema } from "mongoose";
+import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
+import { CancelReason, GroupBuyingStatus, ProductCategory } from '../const/group-buying.const';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 
 const options: SchemaOptions = {
   timestamps: true,
@@ -40,6 +36,9 @@ export class GroupBuying extends Document {
   fixedCount: number;
 
   @Prop()
+  leaderCount: number;
+
+  @Prop()
   totalPrice: number;
 
   @Prop()
@@ -56,7 +55,7 @@ export class GroupBuying extends Document {
 
   @Prop({
     type: MongooseSchema.Types.ObjectId,
-    ref: "User",
+    ref: 'User',
     required: true,
   })
   leaderId: MongooseSchema.Types.ObjectId;
@@ -89,6 +88,6 @@ export class GroupBuying extends Document {
   updatedAt: Date;
 }
 export const GroupBuyingSchema = SchemaFactory.createForClass(GroupBuying);
-GroupBuyingSchema.virtual("id").get(function (this: any) {
+GroupBuyingSchema.virtual('id').get(function (this: any) {
   return this._id?.toString();
 });

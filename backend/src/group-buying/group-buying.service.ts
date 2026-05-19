@@ -17,16 +17,16 @@ import { PageMetaDto, PageResponseDto } from '../common/dto/page-response.dto';
 import { PageOptionDto } from '../common/dto/page-option.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
 import { DeleteGroupBuyingDto } from './dto/delete-group-buying.dto';
-import { ParticipantService } from '../participant/participant.service';
 import { PayloadDto } from '../web-push/dto/payload.dto';
 import { WebPushService } from '../web-push/web-push.service';
 import mongoose, { PipelineStage, Types } from 'mongoose';
+import { ParticipantQueryService } from '../participant/query/participant-query.service';
 
 @Injectable()
 export class GroupBuyingService {
   constructor(
     private readonly groupBuyingRepository: GroupBuyingRepository,
-    private readonly participantService: ParticipantService,
+    private readonly participantQueryService: ParticipantQueryService,
     private readonly webPushService: WebPushService,
   ) {}
 
@@ -50,6 +50,27 @@ export class GroupBuyingService {
     };
 
     return allowedTransition[current].includes(next);
+  }
+
+  // '현재 공구의 참여자 수'를 반환하기 위해 참여자와 총대 수를 더하는 pipeline 단계 헬퍼 함수
+  private participantCountLookupStages(): PipelineStage[] {
+    return [
+      {
+        $lookup: {
+          from: 'participants',
+          localField: '_id',
+          foreignField: 'gbId',
+          as: 'participantData',
+        },
+      },
+      {
+        $addFields: {
+          currentCount: {
+            $add: [{ $sum: '$participantData.count' }, { $ifNull: ['$leaderCount', 0] }],
+          },
+        },
+      },
+    ];
   }
 
   async getAllGroupBuyings(searchDto: SearchGroupBuyingDto) {
@@ -79,19 +100,7 @@ export class GroupBuyingService {
           id: '$_id',
         },
       },
-      {
-        $lookup: {
-          from: 'participants',
-          localField: '_id',
-          foreignField: 'gbId',
-          as: 'participantData',
-        },
-      },
-      {
-        $addFields: {
-          currentCount: { $sum: '$participantData.count' },
-        },
-      },
+      ...this.participantCountLookupStages(),
       {
         $lookup: {
           from: 'users',
@@ -152,19 +161,7 @@ export class GroupBuyingService {
           id: '$_id',
         },
       },
-      {
-        $lookup: {
-          from: 'participants',
-          localField: '_id',
-          foreignField: 'gbId',
-          as: 'participantData',
-        },
-      },
-      {
-        $addFields: {
-          currentCount: { $sum: '$participantData.count' },
-        },
-      },
+      ...this.participantCountLookupStages(),
       {
         $lookup: {
           from: 'users',
@@ -211,17 +208,14 @@ export class GroupBuyingService {
     const { page, limit } = optionDto;
     const userObjectId = new Types.ObjectId(userId);
 
-    const groupbuyingIds = await this.participantService.getParticipatedGroupBuyingIds(userId);
-
-    const myGroupbuying = await this.groupBuyingRepository.find({
-      leaderId: userObjectId,
-    });
-    const totalCount = groupbuyingIds.length - myGroupbuying.length;
+    const joinedIds = await this.participantQueryService.getJoinedGroupBuyingIds(userId);
+    const myGbs = await this.groupBuyingRepository.find({ leaderId: userObjectId });
+    const totalCount = joinedIds.length - myGbs.length;
 
     const pipeline: PipelineStage[] = [
       {
         $match: {
-          _id: { $in: groupbuyingIds },
+          _id: { $in: joinedIds },
           leaderId: { $ne: userObjectId },
         },
       },
@@ -230,19 +224,7 @@ export class GroupBuyingService {
           id: '$_id',
         },
       },
-      {
-        $lookup: {
-          from: 'participants',
-          localField: '_id',
-          foreignField: 'gbId',
-          as: 'participantData',
-        },
-      },
-      {
-        $addFields: {
-          currentCount: { $sum: '$participantData.count' },
-        },
-      },
+      ...this.participantCountLookupStages(),
       {
         $lookup: {
           from: 'users',
@@ -285,7 +267,7 @@ export class GroupBuyingService {
   async getGroupBuyingById(gbId: string, userId?: string): Promise<any> {
     const objectIdGbId = new mongoose.Types.ObjectId(gbId);
 
-    const pipeline = [
+    const pipeline: PipelineStage[] = [
       {
         $match: { _id: objectIdGbId },
       },
@@ -294,19 +276,7 @@ export class GroupBuyingService {
           id: '$_id',
         },
       },
-      {
-        $lookup: {
-          from: 'participants',
-          localField: '_id',
-          foreignField: 'gbId',
-          as: 'participantData',
-        },
-      },
-      {
-        $addFields: {
-          currentCount: { $sum: '$participantData.count' },
-        },
-      },
+      ...this.participantCountLookupStages(),
       {
         $lookup: {
           from: 'users',
@@ -345,9 +315,9 @@ export class GroupBuyingService {
     }
 
     // 로그인한 경우: 참여자인지 확인
-    const isParticipant = await this.participantService.isParticipant(userId, gbId);
+    const isParticipant = await this.participantQueryService.isParticipant(userId, gbId);
     if (isParticipant) {
-      const participantInfo = await this.participantService.getParticipantById(gbId, userId);
+      const participantInfo = await this.participantQueryService.getDetailParticipant(gbId, userId);
       const { count } = participantInfo;
 
       return {
@@ -364,15 +334,11 @@ export class GroupBuyingService {
   }
 
   async createGroupBuying(id: string, createDto: CreateGroupBuyingDto): Promise<GroupBuying> {
-    const { fixedCount, totalPrice, shippingFee, leaderCount } = createDto;
+    const { fixedCount, totalPrice, shippingFee } = createDto;
     const estimatedPriceWithDecimal = (totalPrice + shippingFee) / fixedCount;
     const estimatedPrice = Math.ceil(estimatedPriceWithDecimal);
 
-    const result = await this.groupBuyingRepository.create(id, createDto, estimatedPrice);
-    const _id = String(result._id);
-    await this.participantService.createLeader(_id, leaderCount, id);
-
-    return result;
+    return await this.groupBuyingRepository.create(id, createDto, estimatedPrice);
   }
 
   async deleteGroupBuying(
@@ -411,7 +377,7 @@ export class GroupBuyingService {
         throw new BadRequestException('유효하지 않은 취소 사유입니다.');
     }
 
-    const participants: any = await this.participantService.getParticipants(gbId);
+    const participants: any = await this.participantQueryService.getParticipants(gbId);
     if (participants.length > 0 && notificationBody) {
       const payload: PayloadDto = {
         title: `❌ 공구 취소`,
@@ -468,14 +434,9 @@ export class GroupBuyingService {
       estimatedPrice,
     );
 
-    // 리더의 참여 수량이 변경되었으면 호출
-    if (updateDto.leaderCount) {
-      await this.participantService.updateLeader(gbId, updateDto.leaderCount, userId);
-    }
-
-    const totalCount = await this.participantService.getTotalCount(gbId);
-
     // 모집 개수가 다 찼고 아직 모집 중 상태라면 즉시 확정으로 변경
+    // TODO 초과해서 구매하는 경우 예외 처리
+    const totalCount = await this.participantQueryService.getParticipantCount(gbId);
     if (totalCount >= gb.fixedCount && gb.groupBuyingStatus === GroupBuyingStatus.RECRUITING) {
       await this.groupBuyingRepository.updateStatus(gbId, GroupBuyingStatus.CONFIRMED);
     }
@@ -501,7 +462,7 @@ export class GroupBuyingService {
       throw new BadRequestException('올바르지 않은 상태 전이입니다.');
     }
 
-    const participants: any = await this.participantService.getParticipants(gbId);
+    const participants: any = await this.participantQueryService.getParticipants(gbId);
 
     const payload: PayloadDto = {
       title: ``,
@@ -540,6 +501,13 @@ export class GroupBuyingService {
     }
 
     return await this.groupBuyingRepository.updateStatus(gbId, statusDto.status);
+  }
+
+  // 현재 공구의 참여자 수 반환 (참여자, 총대 포함)
+  private async getEffectiveCurrentCount(gbId: string): Promise<number> {
+    const participantTotal = await this.participantQueryService.getParticipantCount(gbId);
+    const gb = await this.groupBuyingRepository.findOneByGbId(gbId); // 또는 leaderCount만 조회
+    return participantTotal + (gb?.leaderCount ?? 0);
   }
 
   // 각 enum 값에 대한 한글 텍스트 매핑 객체를 프론트엔드에 반환

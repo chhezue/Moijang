@@ -13,32 +13,15 @@ export class ParticipantService {
     private readonly groupBuyingRepository: GroupBuyingRepository,
   ) {}
 
-  async createLeader(gbId: string, count: number, leaderId: string) {
-    await this.participantRepository.create({
-      gbId: new Types.ObjectId(gbId),
-      count,
-      userId: new Types.ObjectId(leaderId),
-    });
-  }
-
-  async updateLeader(gbId: string, count: number, leaderId: string) {
-    const gbObjectId = new Types.ObjectId(gbId);
-    const leaderObjectId = new Types.ObjectId(leaderId);
-    await this.participantRepository.findOneAndUpdate(
-      { gbId: gbObjectId, userId: leaderObjectId },
-      { count: count },
-      { new: true },
-    );
-  }
-
   async joinGroupBuying(createDto: CreateParticipantDto, userId: string): Promise<Participant> {
     const userObjectId = new Types.ObjectId(userId);
     const gbObjectId = new Types.ObjectId(createDto.gbId);
+
+    // 이미 참여한 공구인지 중복 체크
     const exists = await this.participantRepository.findOne({
       userId: userObjectId,
       gbId: gbObjectId,
     });
-    // 이미 참여한 공구인지 중복 체크
     if (exists) {
       throw new BadRequestException('이미 참여한 공구입니다.');
     }

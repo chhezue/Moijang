@@ -1,7 +1,6 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ParticipantService } from './participant.service';
 import { ParticipantController } from './participant.controller';
-import { GroupBuyingModule } from '../group-buying/group-buying.module';
 import { GroupBuyingAccessGuard } from '../group-buying/guard/group-buying-access.guard';
 import { CommonModule } from '../common/common.module';
 import { UserModule } from '../user/user.module';
@@ -14,7 +13,6 @@ import { ParticipantQueryModule } from './query/participant-query.module';
   imports: [
     ParticipantPersistenceModule,
     ParticipantQueryModule,
-    forwardRef(() => GroupBuyingModule),
     CommonModule,
     UserModule,
     AuthModule,
