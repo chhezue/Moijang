@@ -2,14 +2,15 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { ParticipantRepository } from './persistence/participant.repository';
 import { CreateParticipantDto } from './dto/create-participant.dto';
 import { Participant } from './schema/participant.schema';
-import { GroupBuyingStatus } from '../group-buying/const/group-buying.const';
 import { Types } from 'mongoose';
 import { GroupBuyingQueryService } from '../group-buying/query/group-buying-query.service';
+import { GroupBuyingRecruitmentService } from '../group-buying/command/group-buying-recruitment.service';
 
 @Injectable()
 export class ParticipantService {
   constructor(
     private readonly groupBuyingQueryService: GroupBuyingQueryService,
+    private readonly groupBuyingRecruitmentService: GroupBuyingRecruitmentService,
     private readonly participantRepository: ParticipantRepository,
   ) {}
 
@@ -48,19 +49,7 @@ export class ParticipantService {
     });
 
     // 4) 모집 개수를 모두 만족했고, 현재 RECRUITING 상태라면 즉시 CONFIRMED 상태로 변경
-    const newCurrentCount = await this.groupBuyingQueryService.getEffectiveCurrentCount(
-      createDto.gbId,
-    ); // 총대 포함 현재 수량
-    if (newCurrentCount >= gb.fixedCount && gb.groupBuyingStatus === GroupBuyingStatus.RECRUITING) {
-      // TODO 리포지토리 참조 문제 해결
-      // await this.groupBuyingRepository.updateStatus(createDto.gbId, GroupBuyingStatus.CONFIRMED);
-      // const payload: PayloadDto = {
-      //   title: "📢 모집 완료 알림",
-      //   body: `[${groupBuying.title}] 모집이 완료되었어요. 최종 가격을 확정하고 입금 요청을 진행해주세요.`,
-      //   url: `${process.env.FRONT_URL}/group-buying/detail/${createDto.gbId}`,
-      // };
-      // await this.webPushService.sendNotification(groupBuying.leaderId, payload);
-    }
+    await this.groupBuyingRecruitmentService.tryConfirmRecruitmentIfFull(createDto.gbId);
 
     return newParticipant;
   }

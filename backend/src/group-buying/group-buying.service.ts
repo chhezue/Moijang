@@ -18,12 +18,14 @@ import { PayloadDto } from '../web-push/dto/payload.dto';
 import { WebPushService } from '../web-push/web-push.service';
 import { ParticipantQueryService } from '../participant/query/participant-query.service';
 import { GroupBuyingQueryService } from './query/group-buying-query.service';
+import { GroupBuyingRecruitmentService } from './command/group-buying-recruitment.service';
 
 @Injectable()
 export class GroupBuyingService {
   constructor(
     private readonly groupBuyingRepository: GroupBuyingRepository,
     private readonly groupBuyingQueryService: GroupBuyingQueryService,
+    private readonly groupBuyingRecruitmentService: GroupBuyingRecruitmentService,
     private readonly participantQueryService: ParticipantQueryService,
     private readonly webPushService: WebPushService,
   ) {}
@@ -154,14 +156,8 @@ export class GroupBuyingService {
       estimatedPrice,
     );
 
-    // 모집 개수가 다 찼고 아직 모집 중 상태라면 즉시 확정으로 변경
-    const effectiveCurrentCount = await this.groupBuyingQueryService.getEffectiveCurrentCount(gbId);
-    if (
-      effectiveCurrentCount >= gb.fixedCount &&
-      gb.groupBuyingStatus === GroupBuyingStatus.RECRUITING
-    ) {
-      await this.groupBuyingRepository.updateStatus(gbId, GroupBuyingStatus.CONFIRMED);
-    }
+    // 모집 개수를 모두 만족했고, 현재 RECRUITING 상태라면 즉시 CONFIRMED 상태로 변경
+    await this.groupBuyingRecruitmentService.tryConfirmRecruitmentIfFull(gbId);
 
     return result;
   }
