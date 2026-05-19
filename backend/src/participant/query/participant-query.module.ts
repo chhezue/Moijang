@@ -11,6 +11,6 @@ import { ParticipantQueryService } from './participant-query.service';
   // 2. 조회 로직이 담긴 전용 서비스를 등록합니다.
   providers: [ParticipantQueryService],
   // 3. 외부(GroupBuying 등)에서 조회 기능을 쓸 수 있게 내보냅니다.
-  exports: [ParticipantQueryService],
+  exports: [ParticipantQueryService, ParticipantPersistenceModule],
 })
 export class ParticipantQueryModule {}

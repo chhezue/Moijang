@@ -47,43 +47,8 @@ export class ParticipantRepository {
     return this.participantModel.find(query, projection, option);
   }
 
-  // TODO 추후 GroupBuying 내로 옮겨야 함.
-  // async findAndCountParticipants(
-  //   userId: string,
-  //   optionDto: PageOptionDto,
-  // ): Promise<PageResponseDto<GroupBuying>> {
-  //   const userObjectId = new Types.ObjectId(userId);
-  //   // 1. 내가 참여한 모든 groupBuying의 ID 목록 조회
-  //   const participatedRecords = await this.participantModel
-  //     .find({ userId: userObjectId })
-  //     .lean();
-  //   const participatedGbIds = participatedRecords.map((p) => p.gbId);
-  //
-  //   // 참여한 공구가 없으면 null 반환
-  //   if (participatedGbIds.length === 0) {
-  //     return null;
-  //   }
-  //
-  //   // 2. 필터링 조건 생성: 참여했고(in) AND 내가 리더가 아닌(ne) 것
-  //   const query: FilterQuery<GroupBuying> = {
-  //     _id: { $in: participatedGbIds },
-  //     leaderId: { $ne: userObjectId },
-  //   };
-  //
-  //   const populateOptions = {
-  //     path: "leaderId",
-  //     select: "displayName department",
-  //   };
-  //
-  //   return this.commonService.findWithPagination(
-  //     this.groupBuyingModel,
-  //     query,
-  //     optionDto,
-  //     populateOptions,
-  //   );
-  // }
-
-  async getTotalCount(gbId: string): Promise<number> {
+  // 일반 참여자 합 (총대 제외)
+  async getParticipantCount(gbId: string): Promise<number> {
     const gbObjectId = new Types.ObjectId(gbId);
     const result = await this.participantModel.aggregate([
       {

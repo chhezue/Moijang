@@ -26,19 +26,6 @@ export class ParticipantController {
     private readonly participantQueryService: ParticipantQueryService,
   ) {}
 
-  /*@ApiOperation({ summary: '내가 참여 중인 공구 목록 조회' })
-  @UseGuards(JwtAuthGuard)
-  @Get('/my-participant')
-  async getParticipatedGroupBuyings(
-    @UserDecorator('id') userId: string,
-    @Query() optionDto: PageOptionDto,
-  ): Promise<PageResponseDto<GroupBuying>> {
-    return await this.participantService.getParticipatedGroupBuyings(
-      userId,
-      optionDto,
-    );
-  }*/
-
   @ApiOperation({ summary: '특정 공구의 참여자 목록 조회' })
   @Get('/:gbId')
   async getParticipants(@Param('gbId') gbId: string): Promise<Participant[]> {

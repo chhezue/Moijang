@@ -37,9 +37,9 @@ export class ParticipantQueryService {
     });
   }
 
-  // 해당 공구의 참여자 수 반환
+  // 일반 참여자 합 (총대 제외)
   async getParticipantCount(gbId: string): Promise<number> {
-    return await this.participantRepository.getTotalCount(gbId);
+    return await this.participantRepository.getParticipantCount(gbId);
   }
 
   // 내가 참여한 공구 목록의 id 배열 반환

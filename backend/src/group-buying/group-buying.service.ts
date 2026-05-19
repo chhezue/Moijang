@@ -12,27 +12,21 @@ import {
   ProductCategory,
 } from './const/group-buying.const';
 import { UpdateGroupBuyingDto } from './dto/update-group-buying.dto';
-import { SearchGroupBuyingDto } from './dto/search-group-buying.dto';
-import { PageMetaDto, PageResponseDto } from '../common/dto/page-response.dto';
-import { PageOptionDto } from '../common/dto/page-option.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
 import { DeleteGroupBuyingDto } from './dto/delete-group-buying.dto';
 import { PayloadDto } from '../web-push/dto/payload.dto';
 import { WebPushService } from '../web-push/web-push.service';
-import mongoose, { PipelineStage, Types } from 'mongoose';
 import { ParticipantQueryService } from '../participant/query/participant-query.service';
+import { GroupBuyingQueryService } from './query/group-buying-query.service';
 
 @Injectable()
 export class GroupBuyingService {
   constructor(
     private readonly groupBuyingRepository: GroupBuyingRepository,
+    private readonly groupBuyingQueryService: GroupBuyingQueryService,
     private readonly participantQueryService: ParticipantQueryService,
     private readonly webPushService: WebPushService,
   ) {}
-
-  async isLeader(userId: string, gbId: string): Promise<boolean> {
-    return await this.groupBuyingRepository.isLeader(userId, gbId);
-  }
 
   // 상태 전이 검증 함수
   private isValidTransition(current: GroupBuyingStatus, next: GroupBuyingStatus): boolean {
@@ -49,288 +43,7 @@ export class GroupBuyingService {
       [GroupBuyingStatus.COMPLETED]: [],
     };
 
-    return allowedTransition[current].includes(next);
-  }
-
-  // '현재 공구의 참여자 수'를 반환하기 위해 참여자와 총대 수를 더하는 pipeline 단계 헬퍼 함수
-  private participantCountLookupStages(): PipelineStage[] {
-    return [
-      {
-        $lookup: {
-          from: 'participants',
-          localField: '_id',
-          foreignField: 'gbId',
-          as: 'participantData',
-        },
-      },
-      {
-        $addFields: {
-          currentCount: {
-            $add: [{ $sum: '$participantData.count' }, { $ifNull: ['$leaderCount', 0] }],
-          },
-        },
-      },
-    ];
-  }
-
-  async getAllGroupBuyings(searchDto: SearchGroupBuyingDto) {
-    // total count
-    const { keyword, category, status, page = 1, limit = 10 } = searchDto;
-
-    const countQuery = {};
-
-    if (keyword) {
-      countQuery['title'] = { $regex: keyword, $options: 'i' };
-    }
-    if (category) {
-      countQuery['category'] = category;
-    }
-    if (status) {
-      countQuery['groupBuyingStatus'] = status;
-    }
-
-    const totalCount = await this.groupBuyingRepository.count(countQuery);
-
-    const pipeline: PipelineStage[] = [
-      {
-        $match: countQuery,
-      },
-      {
-        $addFields: {
-          id: '$_id',
-        },
-      },
-      ...this.participantCountLookupStages(),
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'leaderId',
-          foreignField: '_id',
-          as: 'leaderId',
-        },
-      },
-      {
-        $unwind: { path: '$leaderId', preserveNullAndEmptyArrays: true },
-      },
-      {
-        $sort: {
-          createdAt: -1, // 예시: 최신순으로 정렬
-        },
-      },
-      {
-        $skip: (page - 1) * limit,
-      },
-      {
-        $limit: limit,
-      },
-      {
-        $project: {
-          participantData: 0,
-        },
-      },
-    ];
-    const list = await this.groupBuyingRepository.aggregate(pipeline);
-    const pageMetaDto = new PageMetaDto({
-      pageOptionDto: { page, limit },
-      totalItems: totalCount,
-    });
-
-    return {
-      data: list,
-      meta: pageMetaDto,
-    };
-  }
-
-  async getCreatedGroupBuyings(
-    userId: string,
-    optionDto: PageOptionDto,
-  ): Promise<PageResponseDto<GroupBuying>> {
-    const { page, limit } = optionDto;
-    const userObjectId = new Types.ObjectId(userId);
-
-    const totalCount = await this.groupBuyingRepository.count({
-      leaderId: userObjectId,
-    });
-
-    const pipeline: PipelineStage[] = [
-      {
-        $match: { leaderId: userObjectId },
-      },
-      {
-        $addFields: {
-          id: '$_id',
-        },
-      },
-      ...this.participantCountLookupStages(),
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'leaderId',
-          foreignField: '_id',
-          as: 'leaderId',
-        },
-      },
-      {
-        $unwind: { path: '$leaderId', preserveNullAndEmptyArrays: true },
-      },
-      {
-        $sort: {
-          createdAt: -1, // 예시: 최신순으로 정렬
-        },
-      },
-      {
-        $skip: (page - 1) * limit,
-      },
-      {
-        $limit: limit,
-      },
-      {
-        $project: {
-          participantData: 0,
-        },
-      },
-    ];
-    const list = await this.groupBuyingRepository.aggregate(pipeline);
-    const pageMetaDto = new PageMetaDto({
-      pageOptionDto: { page, limit },
-      totalItems: totalCount,
-    });
-    return {
-      data: list,
-      meta: pageMetaDto,
-    };
-  }
-
-  async getParticipatedGroupBuyings(
-    userId: string,
-    optionDto: PageOptionDto,
-  ): Promise<PageResponseDto<GroupBuying>> {
-    const { page, limit } = optionDto;
-    const userObjectId = new Types.ObjectId(userId);
-
-    const joinedIds = await this.participantQueryService.getJoinedGroupBuyingIds(userId);
-    const myGbs = await this.groupBuyingRepository.find({ leaderId: userObjectId });
-    const totalCount = joinedIds.length - myGbs.length;
-
-    const pipeline: PipelineStage[] = [
-      {
-        $match: {
-          _id: { $in: joinedIds },
-          leaderId: { $ne: userObjectId },
-        },
-      },
-      {
-        $addFields: {
-          id: '$_id',
-        },
-      },
-      ...this.participantCountLookupStages(),
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'leaderId',
-          foreignField: '_id',
-          as: 'leaderId',
-        },
-      },
-      {
-        $unwind: { path: '$leaderId', preserveNullAndEmptyArrays: true },
-      },
-      {
-        $sort: {
-          createdAt: -1, // 예시: 최신순으로 정렬
-        },
-      },
-      {
-        $skip: (page - 1) * limit,
-      },
-      {
-        $limit: limit,
-      },
-      {
-        $project: {
-          participantData: 0,
-        },
-      },
-    ];
-    const list = await this.groupBuyingRepository.aggregate(pipeline);
-    const pageMetaDto = new PageMetaDto({
-      pageOptionDto: { page, limit },
-      totalItems: totalCount,
-    });
-    return {
-      data: list,
-      meta: pageMetaDto,
-    };
-  }
-
-  async getGroupBuyingById(gbId: string, userId?: string): Promise<any> {
-    const objectIdGbId = new mongoose.Types.ObjectId(gbId);
-
-    const pipeline: PipelineStage[] = [
-      {
-        $match: { _id: objectIdGbId },
-      },
-      {
-        $addFields: {
-          id: '$_id',
-        },
-      },
-      ...this.participantCountLookupStages(),
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'leaderId',
-          foreignField: '_id',
-          as: 'leaderId',
-        },
-      },
-      {
-        $unwind: { path: '$leaderId', preserveNullAndEmptyArrays: true },
-      },
-      {
-        $project: {
-          participantData: 0,
-          'leaderId._id': 0,
-          'leaderId.updatedAt': 0,
-        },
-      },
-    ];
-
-    const data = await this.groupBuyingRepository.aggregate(pipeline);
-    if (!data.length) {
-      throw new NotFoundException(`공구 ${gbId}가 존재하지 않습니다.`);
-    }
-    const gb = data[0];
-
-    // 로그인하지 않은 경우
-    if (!userId) {
-      return { ...gb, isOwner: false, isParticipant: false };
-    }
-
-    // 로그인한 경우: 소유자인지 확인
-    const isOwner = await this.isLeader(userId, gbId);
-    if (isOwner) {
-      return { ...gb, isOwner: isOwner, isParticipant: false };
-    }
-
-    // 로그인한 경우: 참여자인지 확인
-    const isParticipant = await this.participantQueryService.isParticipant(userId, gbId);
-    if (isParticipant) {
-      const participantInfo = await this.participantQueryService.getDetailParticipant(gbId, userId);
-      const { count } = participantInfo;
-
-      return {
-        ...gb,
-        isOwner: false,
-        isParticipant: isParticipant,
-        participantInfo: {
-          count,
-        },
-      };
-    }
-
-    return { ...gb, isOwner: false, isParticipant: false }; // 공구 참여 가능
+    return allowedTransition[current].includes(next); // 참여 가능 여부를 boolean으로 반환
   }
 
   async createGroupBuying(id: string, createDto: CreateGroupBuyingDto): Promise<GroupBuying> {
@@ -346,7 +59,7 @@ export class GroupBuyingService {
     gbId: string,
     deleteDto: DeleteGroupBuyingDto,
   ): Promise<GroupBuying> {
-    const gb = await this.getGroupBuyingById(gbId, userId);
+    const gb = await this.groupBuyingQueryService.getGroupBuyingById(gbId, userId);
     if (!gb) {
       throw new NotFoundException(`공구 '${gbId}'가 존재하지 않습니다.`);
     }
@@ -385,7 +98,6 @@ export class GroupBuyingService {
         url: `${process.env.FRONT_URL}/group-buying/detail/${gbId}`,
       };
 
-      // Promise.all을 사용해 모든 알림을 병렬로 동시에 보냅니다. (성능 향상)
       const notificationPromises = participants.map((participant) =>
         this.webPushService.sendNotification(participant.userId.id, payload),
       );
@@ -400,7 +112,7 @@ export class GroupBuyingService {
     gbId: string,
     updateDto: UpdateGroupBuyingDto,
   ): Promise<GroupBuying> {
-    const gb = await this.getGroupBuyingById(gbId, userId);
+    const gb = await this.groupBuyingQueryService.getGroupBuyingById(gbId, userId);
     if (!gb) {
       throw new NotFoundException(`공구 ${gbId}가 존재하지 않습니다.`);
     }
@@ -427,6 +139,14 @@ export class GroupBuyingService {
       );
     }
 
+    // 총대 수량이 변경되었다면, 정원을 초과하지 않는지 체크
+    if (updateDto.leaderCount !== undefined) {
+      const participantTotal = await this.participantQueryService.getParticipantCount(gbId); // 일반 참여자 합 (총대 제외)
+      if (participantTotal + updateDto.leaderCount > gb.fixedCount) {
+        throw new BadRequestException('공구 정원을 초과했습니다. 수량을 다시 설정해주세요.');
+      }
+    }
+
     // 공구 업데이트
     const result = await this.groupBuyingRepository.findByGbIdAndUpdate(
       gbId,
@@ -435,9 +155,11 @@ export class GroupBuyingService {
     );
 
     // 모집 개수가 다 찼고 아직 모집 중 상태라면 즉시 확정으로 변경
-    // TODO 초과해서 구매하는 경우 예외 처리
-    const totalCount = await this.participantQueryService.getParticipantCount(gbId);
-    if (totalCount >= gb.fixedCount && gb.groupBuyingStatus === GroupBuyingStatus.RECRUITING) {
+    const effectiveCurrentCount = await this.groupBuyingQueryService.getEffectiveCurrentCount(gbId);
+    if (
+      effectiveCurrentCount >= gb.fixedCount &&
+      gb.groupBuyingStatus === GroupBuyingStatus.RECRUITING
+    ) {
       await this.groupBuyingRepository.updateStatus(gbId, GroupBuyingStatus.CONFIRMED);
     }
 
@@ -503,15 +225,8 @@ export class GroupBuyingService {
     return await this.groupBuyingRepository.updateStatus(gbId, statusDto.status);
   }
 
-  // 현재 공구의 참여자 수 반환 (참여자, 총대 포함)
-  private async getEffectiveCurrentCount(gbId: string): Promise<number> {
-    const participantTotal = await this.participantQueryService.getParticipantCount(gbId);
-    const gb = await this.groupBuyingRepository.findOneByGbId(gbId); // 또는 leaderCount만 조회
-    return participantTotal + (gb?.leaderCount ?? 0);
-  }
-
   // 각 enum 값에 대한 한글 텍스트 매핑 객체를 프론트엔드에 반환
-  async getEnums() {
+  getEnums() {
     return {
       status: getEnumOptions(GroupBuyingStatus, GROUP_BUYING_STATUS_LABELS),
       category: getEnumOptions(ProductCategory, PRODUCT_CATEGORY_LABELS),
