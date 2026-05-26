@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { ParticipantRepository } from './persistence/participant.repository';
-import { CreateParticipantDto } from './dto/create-participant.dto';
 import { Participant } from './schema/participant.schema';
 import { Types } from 'mongoose';
 import { GroupBuyingQueryService } from '../group-buying/query/group-buying-query.service';
@@ -14,11 +13,16 @@ export class ParticipantService {
     private readonly participantRepository: ParticipantRepository,
   ) {}
 
-  async joinGroupBuying(createDto: CreateParticipantDto, userId: string): Promise<Participant> {
+  // 결제 이후 호출되는 내부 메소드
+  async joinGroupBuyingAfterPayment(
+    gbId: string,
+    userId: string,
+    count: number,
+  ): Promise<Participant> {
     const userObjectId = new Types.ObjectId(userId);
-    const gbObjectId = new Types.ObjectId(createDto.gbId);
+    const gbObjectId = new Types.ObjectId(gbId);
 
-    const isLeader = await this.groupBuyingQueryService.isLeader(userId, createDto.gbId);
+    const isLeader = await this.groupBuyingQueryService.isLeader(userId, gbId);
     if (isLeader) {
       throw new BadRequestException('자신이 주최한 공구에는 참여할 수 없습니다.');
     }
@@ -32,33 +36,31 @@ export class ParticipantService {
       throw new BadRequestException('이미 참여한 공구입니다.');
     }
 
-    // 2) 참여 전, 정원을 초과하지 않는지 체크
-    const currentCount = await this.groupBuyingQueryService.getEffectiveCurrentCount(
-      createDto.gbId,
-    ); // 총대 포함 현재 수량
-    const gb = await this.groupBuyingQueryService.getGroupBuyingById(createDto.gbId);
-    if (currentCount + createDto.count > gb.fixedCount) {
+    // 2) 참여 전, 정원을 초과하지 않는지 체크 (confirm 시점 최종 검증)
+    const currentCount = await this.groupBuyingQueryService.getEffectiveCurrentCount(gbId);
+    const gb = await this.groupBuyingQueryService.getGroupBuyingById(gbId);
+    if (currentCount + count > gb.fixedCount) {
       throw new BadRequestException('공구 정원을 초과했습니다. 수량을 다시 설정해주세요.');
     }
 
     // 3) 참여 가능한 경우
     const newParticipant = await this.participantRepository.create({
-      ...createDto,
       userId: userObjectId,
       gbId: gbObjectId,
+      count: count,
     });
 
     // 4) 모집 개수를 모두 만족했고, 현재 RECRUITING 상태라면 즉시 CONFIRMED 상태로 변경
-    await this.groupBuyingRecruitmentService.tryConfirmRecruitmentIfFull(createDto.gbId);
+    await this.groupBuyingRecruitmentService.tryConfirmRecruitmentIfFull(gbId);
 
     return newParticipant;
   }
 
-  // TODO 모집 중일 때만 취소 가능
-  async withdrawGroupBuying(gbId: string, userId: string) {
+  // 환불 이후 호출되는 내부 메소드
+  async withdrawGroupBuyingAfterRefund(gbId: string, userId: string): Promise<Participant> {
     const gbObjectId = new Types.ObjectId(gbId);
     const userObjectId = new Types.ObjectId(userId);
-    // 1. 참여자 정보를 먼저 삭제합니다.
+
     const deletedParticipant = await this.participantRepository.findOneAndDelete({
       gbId: gbObjectId,
       userId: userObjectId,
@@ -68,6 +70,6 @@ export class ParticipantService {
       throw new NotFoundException('참여 내역이 없습니다.');
     }
 
-    return true;
+    return deletedParticipant;
   }
 }
