@@ -1,14 +1,9 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class RefundPaymentDto {
-  @ApiProperty({ description: '환불 대상 결제 키' })
+  @ApiProperty({ description: '취소 사유 (토스 API에 전달)' })
   @IsNotEmpty()
   @IsString()
-  paymentKey: string;
-
-  @ApiPropertyOptional({ description: '취소 사유 (토스 API에 전달)' })
-  @IsOptional()
-  @IsString()
-  cancelReason?: string;
+  cancelReason: string;
 }

@@ -2,29 +2,28 @@ import {
   Injectable,
   BadRequestException,
   InternalServerErrorException,
-  Logger,
   NotFoundException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { PaymentRepository } from './payment.repository';
 import { CreateCheckoutDto } from './dto/create-checkout.dto';
 import { VerifyPaymentDto } from './dto/verify-payment.dto';
-import { RefundPaymentDto } from './dto/refund-payment.dto';
 import { PaymentStatus } from './const/payment.const';
 import { v4 as uuidv4 } from 'uuid';
 import { TossPaymentsClient } from './toss/toss-payments.client';
 import { ParticipantService } from '../participant/participant.service';
 import { GroupBuyingQueryService } from '../group-buying/query/group-buying-query.service';
 import { GroupBuyingStatus } from '../group-buying/const/group-buying.const';
+import { ParticipantQueryService } from '../participant/query/participant-query.service';
 
 @Injectable()
 export class PaymentService {
-  private readonly logger = new Logger(PaymentService.name);
-
   constructor(
     private readonly paymentRepository: PaymentRepository,
     private readonly tossPaymentsClient: TossPaymentsClient,
     private readonly participantService: ParticipantService,
     private readonly groupBuyingQueryService: GroupBuyingQueryService,
+    private readonly participantQueryService: ParticipantQueryService,
   ) {}
 
   // 결제 시작: Payment(INITIATED) 생성
@@ -65,7 +64,10 @@ export class PaymentService {
     };
   }
 
-  async confirm(dto: VerifyPaymentDto) {
+  // checkout 이후 프론트에서 카드 인증이 될 때까지 기다림. 인증이 완료되면 confirm API로 리다이렉트
+  // confirm API에서 금액 변조 검증 후, 토스 클라이언트에 최종 결제 요청
+  // 최종 결제가 완료되면(실제로 돈이 빠져나갔다는 의미), DB 상태를 PAID로 바꾸고 참여자 생성
+  async confirm(dto: VerifyPaymentDto, userId: string) {
     const { paymentKey, orderId, amount } = dto;
 
     // 1. [멱등성 체크] 이미 처리된 결제인지 확인
@@ -73,67 +75,123 @@ export class PaymentService {
     if (!payment) {
       throw new NotFoundException('존재하지 않는 결제 요청입니다.');
     }
-
     if (payment.status === PaymentStatus.PAID) {
-      return { success: true, message: '이미 처리 완료된 결제입니다.' };
+      return await this.participantQueryService.getDetailParticipant(
+        payment.gbId.toString(),
+        userId,
+      ); // 멱등성 보장
+    }
+    if (payment.status !== PaymentStatus.INITIATED) {
+      throw new BadRequestException(`결제를 진행할 수 없는 상태입니다. (현재: ${payment.status})`);
     }
 
-    // 2. [금액 검증] DB에 기록된 금액과 프론트에서 넘어온 금액이 일치하는지 확인
+    // 2. [금액 검증] DB에 기록된 최종 결제 금액과 프론트에서 넘어온 금액이 일치하는지 확인
     if (payment.amount !== amount) {
       throw new BadRequestException('결제 금액이 일치하지 않습니다.');
     }
 
-    // 3. [TossPaymentsClient] 토스에 최종 승인 요청
+    // 3. [본인 확인] 결제 소유자 검증
+    if (payment.userId !== userId) {
+      throw new ForbiddenException('본인의 결제 건만 승인할 수 있습니다.');
+    }
+
+    // 4. [결제 실행] 이 API 호출이 성공적으로 리턴되어야 비로소 결제가 완료되었다는 의미 (실제로 돈이 빠져나갔다는 의미)
     const tossResponse = await this.tossPaymentsClient.confirm({
       paymentKey,
       orderId,
       amount,
     });
 
-    // 4. [PaymentRepository] 상태 변경 (INITIATED -> PAID)
+    // 5. [PaymentRepository] 상태 변경 (INITIATED -> PAID)
     await this.paymentRepository.updateStatus(orderId, {
       status: PaymentStatus.PAID,
       paymentKey: tossResponse.paymentKey,
       approvedAt: tossResponse.approvedAt,
+      pgRawResponse: tossResponse,
     });
 
-    // 5. 참여자 데이터 생성 (실패 시 보상 트랜잭션)
+    // 6. 참여자 데이터 생성 (실패 시 보상 트랜잭션)
+    // 토스 응답은 DB에만 기록하고, 프론트에는 생성된 참여자만 반환
     try {
-      await this.participantService.joinGroupBuyingAfterPayment(
+      return await this.participantService.joinGroupBuyingAfterPayment(
         payment.gbId,
         payment.userId,
         payment.countSnapshot,
       );
-    } catch (participantError) {
-      this.logger.error(
-        `토스 승인 성공 후 참여자 생성 실패 - orderId: ${orderId}`,
-        participantError instanceof Error ? participantError.stack : participantError,
+    } catch (error) {
+      // 돈은 이미 빠져나갔는데(3번 성공), 우리 DB에 "공구 참여자 등록"을 하려다 보니 그새 자리가 꽉 찼거나 서버 에러가 발생한 상황입니다.
+      // 이때 catch 블록으로 떨어지며, 이미 빠져나간 돈을 다시 돌려주기 위해 토스에 취소(cancel) 요청(환불)을 보내는 것입니다.
+      await this.tossPaymentsClient.cancel(
+        paymentKey,
+        '결제 완료 후 내부 시스템 오류로 참여자 등록 실패',
       );
-
-      await this.tossPaymentsClient.cancel(paymentKey, '결제 완료 후 내부 시스템 참여자 등록 실패');
-
       await this.paymentRepository.updateStatus(orderId, { status: PaymentStatus.FAILED });
 
       throw new InternalServerErrorException(
         '결제는 완료되었으나 참여자 등록에 실패하여 자동 환불 처리되었습니다.',
+        error,
       );
     }
-
-    return tossResponse;
   }
 
-  // 3. 환불: 토스 취소 호출 및 재고 복구
-  async refund(dto: RefundPaymentDto) {
-    const { paymentKey, cancelReason } = dto;
+  // 환불: 토스 취소 호출 및 재고 복구
+  // TODO 총대가 공구 무산 시 호출할 메소드 구현
+  async refund(paymentKey: string, cancelReason: string, userId: string) {
+    // 1) payment 조회
+    const payment = await this.paymentRepository.findByPaymentKey(paymentKey);
+    if (!payment) {
+      throw new NotFoundException('존재하지 않는 결제입니다.');
+    }
 
-    // [TossPaymentsClient] 토스 취소 API 호출
+    // 2) 소유자 검증
+    if (payment.userId !== userId) {
+      throw new ForbiddenException('본인의 결제 건만 취소할 수 있습니다.');
+    }
+
+    // 3) 멱등성 보장 (이미 환불된 경우)
+    const gb = await this.groupBuyingQueryService.getGroupBuyingById(payment.gbId);
+    if (payment.status === PaymentStatus.REFUNDED) {
+      return null;
+    }
+
+    // 4) PAID 상태일 때만 취소 가능
+    if (payment.status !== PaymentStatus.PAID) {
+      throw new BadRequestException(`환불을 진행할 수 없는 상태입니다. (현재: ${payment.status})`);
+    }
+
+    // 5) 해당 공구에 참여하고 있는지 여부
+    const isParticipant = await this.participantQueryService.isParticipant(userId, payment.gbId);
+    if (!isParticipant) {
+      throw new ForbiddenException('해당 공구의 참여자만 취소할 수 있습니다.');
+    }
+
+    // 6) 참여자라면 RECRUITING 상태에서만 취소 가능
+    if (gb.groupBuyingStatus !== GroupBuyingStatus.RECRUITING) {
+      throw new BadRequestException('모집 중 상태에서만 참여 취소가 가능합니다.');
+    }
+
+    // 7) 토스 결제 취소 API 호출
     const cancelResponse = await this.tossPaymentsClient.cancel(paymentKey, cancelReason);
 
-    // [PaymentRepository] 상태 변경 (PAID -> REFUNDED)
+    // 8) Payment Document 상태 변경 (PAID -> REFUNDED)
     await this.paymentRepository.updateStatusByPaymentKey(paymentKey, {
       status: PaymentStatus.REFUNDED,
+      pgRawResponse: cancelResponse,
     });
 
-    return cancelResponse;
+    // 9) 참여자 데이터 삭제 (실패 시 보상 트랜잭션)
+    // 토스 응답은 DB에만 기록하고, 프론트에는 취소된 참여자만 반환
+    try {
+      return await this.participantService.withdrawGroupBuyingAfterRefund(
+        payment.gbId.toString(),
+        userId.toString(),
+      );
+    } catch (error) {
+      // confirm과 달리 여기서 토스 cancel을 다시 호출하면 안 됨. (이미 환불되었으므로 다시 결제하지 않음.)
+      throw new InternalServerErrorException(
+        '환불은 완료되었으나 참여 취소 처리에 실패했습니다. 고객센터에 문의해 주세요.',
+        error,
+      );
+    }
   }
 }
