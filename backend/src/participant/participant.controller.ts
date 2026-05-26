@@ -11,7 +11,6 @@ import {
 import { ParticipantService } from './participant.service';
 import { Participant } from './schema/participant.schema';
 import { ApiOperation } from '@nestjs/swagger';
-import { CreateParticipantDto } from './dto/create-participant.dto';
 import { UserDecorator } from '../user/decorator/user.decorator';
 import { ContextRoleDecorator } from '../group-buying/decorator/context-role.decorator';
 import { ContextRole } from '../group-buying/const/context-role.const';
