@@ -1,7 +1,7 @@
 "use client"; // MUI 컴포넌트를 사용하므로 클라이언트 컴포넌트입니다.
 
-import React, { useEffect, useState } from "react";
-import { Box, Container, Skeleton } from "@mui/material";
+import React, { useState } from "react";
+import { Box, Container } from "@mui/material";
 import { GroupBuyingItem, IParticipant } from "@/types/groupBuying";
 
 import DetailInfoSection from "./DetailInfoSection";
@@ -11,7 +11,7 @@ import { useStatusContext } from "@/providers/StatusProvider";
 import CustomModal from "@/components/CustomModal";
 import ParticipationModalContent from "@/app/(home)/group-buying/detail/[id]/components/modals/ParticipationModalContent";
 import EditGroupBuyingModalContent from "@/app/(home)/group-buying/detail/[id]/components/modals/EditGroupBuyingModalContent";
-import { cancelParticipant, confirmPayment, getParticipantList } from "@/apis/services/participant";
+import { cancelParticipant } from "@/apis/services/participant";
 import { useRouter } from "next/navigation";
 import ConfirmModalContent from "@/app/(home)/group-buying/detail/[id]/components/modals/ConfirmModalContent";
 import { useSnackbar } from "@/providers/SnackbarProvider";
@@ -21,13 +21,10 @@ import {
   updateGroupBuyingStatus,
 } from "@/apis/services/groupBuying";
 import { ModalType } from "./types";
-import RequestPaymentModalContent from "@/app/(home)/group-buying/detail/[id]/components/modals/RequestPaymentModalContent";
-import EditPriceModalContent from "@/app/(home)/group-buying/detail/[id]/components/modals/EditPriceModalContent";
 import CancelReasonModalContent from "@/app/(home)/group-buying/detail/[id]/components/modals/CancelReasonModalContent";
 import { ShippedModalContent } from "@/app/(home)/group-buying/detail/[id]/components/modals/ShippedModalContent";
 import { useAuthStore } from "@/store/authStore";
 import CancelledBanner from "@/app/(home)/group-buying/detail/[id]/components/CancelledBanner";
-import { theme } from "@/styles/theme";
 
 interface ClientPageProps {
   item: GroupBuyingItem;
@@ -37,19 +34,10 @@ interface ClientPageProps {
 const DetailClientPage: React.FC<ClientPageProps> = ({ item, participants }) => {
   const { showSnackbar } = useSnackbar();
   const { statusList, statusToStepIndex } = useStatusContext();
-  const [loading, setLoading] = useState(true);
   const user = useAuthStore((s) => s.user);
   const router = useRouter();
   const [activeModal, setActiveModal] = useState<ModalType>(null);
-  const [participationAction, setParticipationAction] = useState<"join" | "modify">("join");
 
-  // useEffect(() => {
-  //   getParticipantList(item.id)
-  //     .then((res) => setParticipants(res.items))
-  //     .finally(() => setLoading(false));
-  // }, [item.id]);
-
-  // 단순 함수는 이곳에서 정의, 폼 기반 함수는 각각의 컴포넌트에서 정의함
   // 참여 취소
   const handleCancelParticipation = async () => {
     try {
@@ -64,9 +52,9 @@ const DetailClientPage: React.FC<ClientPageProps> = ({ item, participants }) => 
   };
 
   // 공동구매 취소
-  const handleCancelGroupBuying = async (reason: string, nonDepositors?: string[]) => {
+  const handleCancelGroupBuying = async (reason: string) => {
     try {
-      await cancelGroupBuying(item.id, reason, nonDepositors);
+      await cancelGroupBuying(item.id, reason);
       showSnackbar("공동구매가 취소되었습니다.", "success");
       router.refresh();
       setActiveModal(null);
@@ -76,33 +64,7 @@ const DetailClientPage: React.FC<ClientPageProps> = ({ item, participants }) => 
     }
   };
 
-  //송금 요청 보내기
-  const handleRequestPayment = async () => {
-    try {
-      await updateGroupBuyingStatus(item.id, "PAYMENT_IN_PROGRESS");
-      showSnackbar("송금 요청을 보냈습니다.", "success");
-      setActiveModal(null);
-      router.refresh(); // 새로고침
-    } catch (error: any) {
-      console.error(error);
-      showSnackbar(error.response?.data?.message || "송금 요청이 실패했습니다.", "error");
-    }
-  };
-
-  // 입금 완료 보내기
-  const handleConfirmPayment = async () => {
-    try {
-      await confirmPayment(item.id);
-      showSnackbar("입금 완료가 확인되었습니다.", "success");
-      setActiveModal(null);
-      router.refresh();
-    } catch (err) {
-      console.error("confirmPayment error:", err);
-      showSnackbar("입금 완료 처리에 실패했습니다.", "error");
-    }
-  };
-
-  // 주문 진행 상태 업데이트
+  // 주문 진행 상태 업데이트 (CONFIRMED → ORDERED)
   const handleProceedOrder = async () => {
     try {
       await updateGroupBuyingStatus(item.id, "ORDERED");
@@ -188,14 +150,13 @@ const DetailClientPage: React.FC<ClientPageProps> = ({ item, participants }) => 
 
           {isCancelled && <CancelledBanner item={item} />}
 
-          {/* 2. 메인 콘텐츠 영역 - 공통 컨테이너로 감싸기 */}
+          {/* 2. 메인 콘텐츠 영역 */}
           <Box
             sx={{
               backgroundColor: "#fff",
               borderRadius: "1rem",
               boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
-              overflow: "hidden", // 자식 요소들이 borderRadius를 넘지 않도록
-              // 취소된 공구일 때만 흑백 필터 및 포인터 비활성화 적용
+              overflow: "hidden",
               filter: isCancelled ? "grayscale(1)" : "none",
               opacity: isCancelled ? 0.75 : 1,
               cursor: isCancelled ? "not-allowed" : "default",
@@ -204,7 +165,7 @@ const DetailClientPage: React.FC<ClientPageProps> = ({ item, participants }) => 
               position: "relative",
             }}
           >
-            {/* 취소된 공구일 때 오버레이 추가 (detail page 영역에만) */}
+            {/* 취소된 공구일 때 오버레이 */}
             {isCancelled && (
               <Box
                 sx={{
@@ -219,17 +180,12 @@ const DetailClientPage: React.FC<ClientPageProps> = ({ item, participants }) => 
                 }}
               />
             )}
-            {/* Flexbox 레이아웃 */}
-            <Box
-              display="flex"
-              flexDirection={{ xs: "column", lg: "row" }}
-              gap={0} // 공통 컨테이너 안에서는 gap 제거
-            >
+            <Box display="flex" flexDirection={{ xs: "column", lg: "row" }} gap={0}>
               {/* 왼쪽 메인 콘텐츠 (2/3 너비) */}
               <Box
                 sx={{
                   width: { xs: "100%", lg: "66.67%" },
-                  borderRight: { lg: "1px solid #f0f0f0" }, // 구분선 추가
+                  borderRight: { lg: "1px solid #f0f0f0" },
                 }}
               >
                 <DetailInfoSection item={item} />
@@ -238,52 +194,32 @@ const DetailClientPage: React.FC<ClientPageProps> = ({ item, participants }) => 
               {/* 오른쪽 사이드바 (1/3 너비) */}
               <Box sx={{ width: { xs: "100%", lg: "33.33%" } }}>
                 <Box sx={{ position: "sticky", top: "2rem", p: "2rem" }}>
-                  {/*{loading ? (*/}
-                  {/*  <>*/}
-                  {/*    <Skeleton variant="text" width={120} height={28} />*/}
-                  {/*    <Skeleton*/}
-                  {/*      variant="rounded"*/}
-                  {/*      width="100%"*/}
-                  {/*      height={50}*/}
-                  {/*      sx={{ mt: 1 }}*/}
-                  {/*    />*/}
-                  {/*    <Skeleton*/}
-                  {/*      variant="rounded"*/}
-                  {/*      width="100%"*/}
-                  {/*      height={50}*/}
-                  {/*      sx={{ mt: 1 }}*/}
-                  {/*    />*/}
-                  {/*  </>*/}
-                  {/*) : (*/}
                   <Sidebar
                     item={item}
                     user={user}
                     participants={participants}
-                    onOpenModal={(type, action) => {
+                    onOpenModal={(type) => {
                       setActiveModal(type);
-                      if (action) setParticipationAction(action);
                     }}
                   />
-                  {/*)}*/}
                 </Box>
               </Box>
             </Box>
           </Box>
         </Container>
       </Box>
+
       {/* ---- 모달창 ----- */}
-      {/* 참여/수정 */}
+      {/* 참여 */}
       <CustomModal
-        title={participationAction === "join" ? "공동구매 참여" : "수량 및 계좌 정보 수정"}
+        title="공동구매 참여"
         open={activeModal === "participation"}
         setOpen={() => setActiveModal(null)}
       >
         <ParticipationModalContent
           gbId={item.id}
           close={() => setActiveModal(null)}
-          action={participationAction}
           remainingCount={item.fixedCount - item.currentCount}
-          isLeader={item.isOwner}
         />
       </CustomModal>
 
@@ -320,64 +256,7 @@ const DetailClientPage: React.FC<ClientPageProps> = ({ item, participants }) => 
         />
       </CustomModal>
 
-      {/* 결제 요청 모달 */}
-      <CustomModal
-        title="결제 요청 보내기"
-        open={activeModal === "requestPayment"}
-        setOpen={() => setActiveModal(null)}
-      >
-        <RequestPaymentModalContent
-          item={item} // 단가 보여줄 거면 props로 넘김
-          participants={participants} // 참여자 목록/금액
-          onConfirm={handleRequestPayment} // 송금 요청 API 호출
-          onOpenModal={setActiveModal}
-        />
-      </CustomModal>
-
-      {/* 가격만 수정 */}
-      <CustomModal
-        title="가격 수정"
-        open={activeModal === "editPrice"}
-        setOpen={() => setActiveModal("requestPayment")}
-      >
-        <EditPriceModalContent
-          item={item}
-          onSuccess={() => {
-            router.refresh();
-            setActiveModal("requestPayment");
-          }}
-        />
-      </CustomModal>
-
-      {/* 입금 완료 확인 */}
-      <CustomModal
-        title="입금 완료 확인"
-        open={activeModal === "confirmPayment"}
-        setOpen={() => setActiveModal(null)}
-      >
-        <ConfirmModalContent
-          message={
-            <>
-              <strong style={{ color: theme.palette.error.main }}>
-                ⛔ 잠깐! 정말 입금 완료하셨나요? ⛔
-              </strong>{" "}
-              <br />
-              총대님이 최종 확인했을 때 입금이 되지 않은 경우, 미입금자로 처리되며 공동구매가 전체
-              취소되니 <strong>꼭 입금 후 완료 버튼을 눌러주세요.</strong>
-              <br />
-              <br />
-              <strong style={{ color: theme.palette.warning.main }}>⚠️ 환불 안내 ⚠️</strong>
-              <br />
-              미입금으로 인한 취소 시, 총대님이 개별 환불을 진행할 예정이에요.
-              <br />
-              자세한 사항은 총대님께 직접 문의해주세요.
-            </>
-          }
-          onConfirm={handleConfirmPayment} // 새로 구현할 함수
-        />
-      </CustomModal>
-
-      {/* 주문하기 */}
+      {/* 주문하기 (CONFIRMED → ORDERED) */}
       <CustomModal
         title="공동구매 주문 진행"
         open={activeModal === "order"}
@@ -397,16 +276,13 @@ const DetailClientPage: React.FC<ClientPageProps> = ({ item, participants }) => 
         />
       </CustomModal>
 
-      {/* 입금 진행 중 공동구매 취소 */}
+      {/* 주문 진행 중 공동구매 취소 */}
       <CustomModal
-        title="주문 전 공동구매 취소"
+        title="공동구매 취소"
         open={activeModal === "cancelForPayment"}
         setOpen={() => setActiveModal(null)}
       >
-        <CancelReasonModalContent
-          participants={participants}
-          onConfirm={(reason, nonDepositors) => handleCancelGroupBuying(reason, nonDepositors)}
-        />
+        <CancelReasonModalContent onConfirm={(reason) => handleCancelGroupBuying(reason)} />
       </CustomModal>
 
       <CustomModal

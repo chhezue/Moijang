@@ -22,10 +22,7 @@ import { useSnackbar } from "@/providers/SnackbarProvider";
 const steps = [
   { label: "상품 정보", description: "상품 정보를 입력하세요" },
   { label: "참여 조건", description: "참여 조건을 입력하세요" },
-  {
-    label: "계좌 및 확인",
-    description: "입금 정보를 입력하고 주의사항을 확인하세요",
-  },
+  { label: "최종 확인", description: "주의사항을 확인하고 동의해주세요" },
 ];
 
 // 오늘 "YYYY-MM-DD"
@@ -55,8 +52,6 @@ export default function CreatePage() {
       fixedCount: "", // "" 가능 (coerce.number가 변환)
       totalPrice: "",
       shippingFee: "",
-      account: "",
-      bank: "",
       endDate: "",
       category: "",
       leaderCount: "",

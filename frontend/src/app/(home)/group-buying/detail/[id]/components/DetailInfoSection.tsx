@@ -131,10 +131,7 @@ const DetailInfoSection: React.FC<DetailInfoSectionProps> = ({ item }) => {
             color="primary.dark"
             sx={{ fontSize: "0.85rem" }}
           >
-            {item.leaderId.displayName}
-          </Typography>
-          <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.75rem" }}>
-            • {item.leaderId.department}
+            {item.leaderId.name}
           </Typography>
         </Box>
       </Box>

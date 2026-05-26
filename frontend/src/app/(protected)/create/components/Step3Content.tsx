@@ -1,20 +1,6 @@
 "use client";
 
-import {
-  Box,
-  TextField,
-  FormControl,
-  InputLabel,
-  Typography,
-  Checkbox,
-  Select,
-  MenuItem,
-  FormControlLabel,
-} from "@mui/material";
-import Grid from "@mui/material/Grid";
-import { Controller, useFormContext } from "react-hook-form";
-import { BANK_NAMES } from "@/constants/bank";
-import { CreateGroupBuyingInput } from "@/schemas/groupBuying";
+import { Box, Typography, Checkbox, FormControlLabel } from "@mui/material";
 
 interface Step3Props {
   agree: boolean;
@@ -22,65 +8,12 @@ interface Step3Props {
 }
 
 export default function Step3Content({ agree, setAgree }: Step3Props) {
-  const { control } = useFormContext<CreateGroupBuyingInput>();
-
   return (
     <Box>
-      <Grid container spacing={2}>
-        {/* 은행 */}
-        <Grid size={{ xs: 12, sm: 6 }}>
-          <Controller
-            name="bank"
-            control={control}
-            render={({ field, fieldState }) => (
-              <FormControl fullWidth error={!!fieldState.error}>
-                <InputLabel id="bank-label">은행</InputLabel>
-                <Select
-                  {...field}
-                  labelId="bank-label"
-                  MenuProps={{
-                    PaperProps: { sx: { maxHeight: 320, overflowY: "auto" } },
-                  }}
-                >
-                  {BANK_NAMES.map((bank) => (
-                    <MenuItem key={bank} value={bank}>
-                      {bank}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {fieldState.error && (
-                  <Typography variant="caption" color="error">
-                    {fieldState.error.message}
-                  </Typography>
-                )}
-              </FormControl>
-            )}
-          />
-        </Grid>
-
-        {/* 계좌번호 */}
-        <Grid size={{ xs: 12, sm: 6 }}>
-          <Controller
-            name="account"
-            control={control}
-            render={({ field, fieldState }) => (
-              <TextField
-                {...field}
-                fullWidth
-                label="계좌번호"
-                variant="outlined"
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
-              />
-            )}
-          />
-        </Grid>
-      </Grid>
-
       {/* 주의사항 */}
       <Box
         sx={{
-          mt: 4,
+          mt: 2,
           p: 2,
           backgroundColor: "#fffbe5",
           border: "1px solid #ffeb3b",
@@ -98,7 +31,7 @@ export default function Step3Content({ agree, setAgree }: Step3Props) {
             문제 발생 시(품절, 배송지연 등) 즉시 참여자들에게 공지해야 합니다.
           </li>
           <li style={{ marginBottom: "4px" }}>
-            개인정보(계좌, 연락처 등)는 공동구매 목적 외 사용이 불가합니다.
+            개인정보(연락처 등)는 공동구매 목적 외 사용이 불가합니다.
           </li>
         </Typography>
       </Box>

@@ -96,10 +96,7 @@ export const ItemOfList = ({ item }: ItemOfListProps) => {
                 color="primary.dark"
                 sx={{ fontSize: "0.75rem" }}
               >
-                {item.leaderId?.displayName}
-              </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.75rem" }}>
-                • {item.leaderId?.department}
+                {item.leaderId?.name}
               </Typography>
             </Stack>
             <Typography variant="caption" color="text.disabled">

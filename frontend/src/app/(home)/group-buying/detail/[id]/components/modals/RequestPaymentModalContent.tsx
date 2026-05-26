@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { Button, Box, Typography, FormControlLabel, Checkbox, alpha, SxProps } from "@mui/material";
 import { IParticipant, GroupBuyingItem } from "@/types/groupBuying";
-import { ModalType } from "@/app/(home)/group-buying/detail/[id]/components/types";
 import { theme } from "@/styles/theme";
 import { Theme } from "@mui/system";
 
@@ -10,7 +9,7 @@ interface Props {
   item: GroupBuyingItem;
   participants: IParticipant[];
   onConfirm: () => void;
-  onOpenModal: (type: ModalType) => void;
+  onOpenModal: (type: string) => void;
 }
 
 interface InfoItemProps {
@@ -193,7 +192,7 @@ const RequestPaymentModalContent = ({ item, participants, onConfirm, onOpenModal
                     color: "text.primary",
                   }}
                 >
-                  {p.userId.displayName}
+                  {p.userId.name}
                 </Typography>
               </Box>
               <Box display="flex" alignItems="center" gap={1}>
