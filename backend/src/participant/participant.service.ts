@@ -13,7 +13,8 @@ export class ParticipantService {
     private readonly participantRepository: ParticipantRepository,
   ) {}
 
-  // 결제 이후 호출되는 내부 메소드
+  // 결제가 모두 완료된 이후 호출되는 내부 메소드
+  // checkout에서 중복 참여/리더 검사 모두 통과 후 실행됨.
   async joinGroupBuyingAfterPayment(
     gbId: string,
     userId: string,
@@ -22,35 +23,20 @@ export class ParticipantService {
     const userObjectId = new Types.ObjectId(userId);
     const gbObjectId = new Types.ObjectId(gbId);
 
-    const isLeader = await this.groupBuyingQueryService.isLeader(userId, gbId);
-    if (isLeader) {
-      throw new BadRequestException('자신이 주최한 공구에는 참여할 수 없습니다.');
-    }
-
-    // 1) 이미 참여한 공구인지 중복 체크
-    const exists = await this.participantRepository.findOne({
-      userId: userObjectId,
-      gbId: gbObjectId,
-    });
-    if (exists) {
-      throw new BadRequestException('이미 참여한 공구입니다.');
-    }
-
-    // 2) 참여 전, 정원을 초과하지 않는지 체크 (confirm 시점 최종 검증)
+    // confirm 시점 정원 최종 검증 (결제 진행 중 다른 참여로 정원이 찼을 수 있음)
     const currentCount = await this.groupBuyingQueryService.getEffectiveCurrentCount(gbId);
     const gb = await this.groupBuyingQueryService.getGroupBuyingById(gbId);
     if (currentCount + count > gb.fixedCount) {
       throw new BadRequestException('공구 정원을 초과했습니다. 수량을 다시 설정해주세요.');
     }
 
-    // 3) 참여 가능한 경우
     const newParticipant = await this.participantRepository.create({
       userId: userObjectId,
       gbId: gbObjectId,
       count: count,
     });
 
-    // 4) 모집 개수를 모두 만족했고, 현재 RECRUITING 상태라면 즉시 CONFIRMED 상태로 변경
+    // 모집 개수를 모두 만족했고, 현재 RECRUITING 상태라면 즉시 CONFIRMED 상태로 변경
     await this.groupBuyingRecruitmentService.tryConfirmRecruitmentIfFull(gbId);
 
     return newParticipant;

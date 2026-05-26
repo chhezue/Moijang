@@ -5,8 +5,10 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PaymentRepository } from './payment.repository';
 import { CreateCheckoutDto } from './dto/create-checkout.dto';
+import { CheckoutResponseDto } from './dto/checkout-response.dto';
 import { VerifyPaymentDto } from './dto/verify-payment.dto';
 import { PaymentStatus } from './const/payment.const';
 import { v4 as uuidv4 } from 'uuid';
@@ -24,11 +26,12 @@ export class PaymentService {
     private readonly participantService: ParticipantService,
     private readonly groupBuyingQueryService: GroupBuyingQueryService,
     private readonly participantQueryService: ParticipantQueryService,
+    private readonly configService: ConfigService,
   ) {}
 
   // 결제 시작: Payment(INITIATED) 생성
   // 반복 결제할 때마다 Payment Document 생성
-  async checkout(dto: CreateCheckoutDto, userId: string) {
+  async checkout(dto: CreateCheckoutDto, userId: string): Promise<CheckoutResponseDto> {
     const { gbId, count } = dto;
 
     // 1. 모집 중 상태인지 확인
@@ -43,10 +46,21 @@ export class PaymentService {
       throw new BadRequestException('공구 정원을 초과했습니다. 수량을 다시 설정해주세요.');
     }
 
+    // 3. 총대인지 체크
+    const isLeader = await this.groupBuyingQueryService.isLeader(userId, gbId);
+    if (isLeader) {
+      throw new BadRequestException('자신이 주최한 공구에는 참여할 수 없습니다.');
+    }
+
+    // 4. 이미 참여한 공구인지 중복 체크
+    if (await this.participantQueryService.isParticipant(userId, gbId)) {
+      throw new BadRequestException('이미 참여한 공구입니다.');
+    }
+
     const amount = gb.estimatedPrice * count; // 결제해야 하는 금액
     const orderId = uuidv4(); // 랜덤 uuid 생성
 
-    // 3. 결제 시도 기록 생성 (상태: INITIATED)
+    // 5. 결제 시도 기록 생성 (상태: INITIATED)
     const payment = await this.paymentRepository.create({
       gbId,
       userId,
@@ -57,10 +71,18 @@ export class PaymentService {
       unitPriceSnapshot: gb.estimatedPrice, // 공구에 등록된 구매 단가
     });
 
+    const clientKey = this.configService.get<string>('TOSS_CLIENT_KEY');
+    if (!clientKey) {
+      throw new InternalServerErrorException('결제 클라이언트 키가 설정되지 않았습니다.');
+    }
+
     return {
       orderId: payment.orderId,
       amount: payment.amount,
-      // TODO 프론트에서 토스 SDK 호출 시 필요한 기타 정보 함께 반환
+      clientKey,
+      orderName: gb.title,
+      gbId,
+      count,
     };
   }
 
@@ -76,10 +98,7 @@ export class PaymentService {
       throw new NotFoundException('존재하지 않는 결제 요청입니다.');
     }
     if (payment.status === PaymentStatus.PAID) {
-      return await this.participantQueryService.getDetailParticipant(
-        payment.gbId.toString(),
-        userId,
-      ); // 멱등성 보장
+      return '이미 결제가 완료되었습니다.';
     }
     if (payment.status !== PaymentStatus.INITIATED) {
       throw new BadRequestException(`결제를 진행할 수 없는 상태입니다. (현재: ${payment.status})`);
@@ -91,7 +110,7 @@ export class PaymentService {
     }
 
     // 3. [본인 확인] 결제 소유자 검증
-    if (payment.userId !== userId) {
+    if (String(payment.userId) !== String(userId)) {
       throw new ForbiddenException('본인의 결제 건만 승인할 수 있습니다.');
     }
 
@@ -113,8 +132,8 @@ export class PaymentService {
     // 토스 응답은 DB에만 기록하고, 프론트에는 생성된 참여자만 반환
     try {
       return await this.participantService.joinGroupBuyingAfterPayment(
-        payment.gbId,
-        payment.userId,
+        String(payment.gbId),
+        String(payment.userId),
         payment.countSnapshot,
       );
     } catch (error) {
@@ -134,7 +153,6 @@ export class PaymentService {
   }
 
   // 환불: 토스 취소 호출 및 재고 복구
-  // TODO 총대가 공구 무산 시 호출할 메소드 구현
   async refund(paymentKey: string, cancelReason: string, userId: string) {
     // 1) payment 조회
     const payment = await this.paymentRepository.findByPaymentKey(paymentKey);
@@ -143,13 +161,13 @@ export class PaymentService {
     }
 
     // 2) 소유자 검증
-    if (payment.userId !== userId) {
+    if (String(payment.userId) !== String(userId)) {
       throw new ForbiddenException('본인의 결제 건만 취소할 수 있습니다.');
     }
 
     // 3) 멱등성 보장 (이미 환불된 경우)
     if (payment.status === PaymentStatus.REFUNDED) {
-      return null;
+      return '이미 환불이 완료되었습니다.';
     }
 
     // 4) PAID 상태일 때만 취소 가능
@@ -158,7 +176,10 @@ export class PaymentService {
     }
 
     // 5) 해당 공구에 참여하고 있는지 여부
-    const isParticipant = await this.participantQueryService.isParticipant(userId, payment.gbId);
+    const isParticipant = await this.participantQueryService.isParticipant(
+      String(payment.userId),
+      String(payment.gbId),
+    );
     if (!isParticipant) {
       throw new ForbiddenException('해당 공구의 참여자만 취소할 수 있습니다.');
     }
@@ -180,8 +201,8 @@ export class PaymentService {
     // 토스 응답은 DB에만 기록하고, 프론트에는 취소된 참여자만 반환
     try {
       return await this.participantService.withdrawGroupBuyingAfterRefund(
-        payment.gbId.toString(),
-        userId.toString(),
+        String(payment.gbId),
+        String(payment.userId),
       );
     } catch (error) {
       // confirm과 달리 여기서 토스 cancel을 다시 호출하면 안 됨. (이미 환불되었으므로 다시 결제하지 않음.)
