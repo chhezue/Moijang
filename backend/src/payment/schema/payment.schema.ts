@@ -24,9 +24,6 @@ const options: SchemaOptions = {
 // 사용자가 결제 버튼을 누른 순간부터 최종 성공/실패까지의 과정
 @Schema(options)
 export class Payment extends Document {
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Participant', required: false })
-  participantId?: string; // 최종 결제(PAID) 완료 시, 생성된 Participant ID와 연결
-
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'GroupBuying', required: true })
   gbId: string;
 
@@ -49,16 +46,13 @@ export class Payment extends Document {
   countSnapshot: number; // checkout 시점 구매 수량 스냅샷
 
   @Prop()
-  unitPriceSnapshot: number; // checkout 시점 단가 스냅샷
+  unitPriceSnapshot: number; // checkout 시점 구매 단가 스냅샷
 
   @Prop()
-  paidAt: Date; // 최종 결제 완료 시각
+  paidAt?: Date;
 
   @Prop()
-  refundedAt: Date; // 환불이 발생한 시각
-
-  @Prop({ type: Object })
-  pgRawResponse: Record<string, any>; // PG사 원본 응답 (추적/디버깅용)
+  refundedAt?: Date;
 }
 
 export const PaymentSchema = SchemaFactory.createForClass(Payment);

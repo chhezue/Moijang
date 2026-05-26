@@ -33,12 +33,6 @@ export class PaymentController {
     return await this.paymentService.confirm(verifyPaymentDto, userId);
   }
 
-  @ApiOperation({ summary: '토스 페이먼츠 웹훅 (비동기 결과 수신)' })
-  @Post('webhook')
-  async handleWebhook(@Body() webhookData: any) {
-    return await this.paymentService.handleWebhook(webhookData);
-  }
-
   @ApiOperation({ summary: '결제 환불 (참여자용)' })
   @UseGuards(JwtAuthGuard)
   @Post('refund/:paymentKey')

@@ -107,7 +107,6 @@ export class PaymentService {
       status: PaymentStatus.PAID,
       paymentKey: tossResponse.paymentKey,
       approvedAt: tossResponse.approvedAt,
-      pgRawResponse: tossResponse,
     });
 
     // 6. 참여자 데이터 생성 (실패 시 보상 트랜잭션)
@@ -149,7 +148,6 @@ export class PaymentService {
     }
 
     // 3) 멱등성 보장 (이미 환불된 경우)
-    const gb = await this.groupBuyingQueryService.getGroupBuyingById(payment.gbId);
     if (payment.status === PaymentStatus.REFUNDED) {
       return null;
     }
@@ -165,19 +163,18 @@ export class PaymentService {
       throw new ForbiddenException('해당 공구의 참여자만 취소할 수 있습니다.');
     }
 
-    // 6) 참여자라면 RECRUITING 상태에서만 취소 가능
+    const gb = await this.groupBuyingQueryService.getGroupBuyingById(payment.gbId);
+
+    // 6) RECRUITING 상태에서만 취소 가능
     if (gb.groupBuyingStatus !== GroupBuyingStatus.RECRUITING) {
       throw new BadRequestException('모집 중 상태에서만 참여 취소가 가능합니다.');
     }
 
     // 7) 토스 결제 취소 API 호출
-    const cancelResponse = await this.tossPaymentsClient.cancel(paymentKey, cancelReason);
+    await this.tossPaymentsClient.cancel(paymentKey, cancelReason);
 
     // 8) Payment Document 상태 변경 (PAID -> REFUNDED)
-    await this.paymentRepository.updateStatusByPaymentKey(paymentKey, {
-      status: PaymentStatus.REFUNDED,
-      pgRawResponse: cancelResponse,
-    });
+    await this.paymentRepository.updateStatusByPaymentKey(paymentKey, PaymentStatus.REFUNDED);
 
     // 9) 참여자 데이터 삭제 (실패 시 보상 트랜잭션)
     // 토스 응답은 DB에만 기록하고, 프론트에는 취소된 참여자만 반환
