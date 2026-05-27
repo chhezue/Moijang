@@ -1,28 +1,28 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { GroupBuyingService } from './group-buying.service';
 import { GroupBuyingController } from './group-buying.controller';
-import { MongooseModule } from '@nestjs/mongoose';
-import { GroupBuying, GroupBuyingSchema } from './schema/group-buying.schema';
-import { GroupBuyingRepository } from './group-buying.repository';
-import { CommonModule } from '../common/common.module';
-import { ParticipantModule } from '../participant/participant.module';
 import { AuthModule } from '../auth/auth.module';
 import { UserModule } from '../user/user.module';
 import { WebPushModule } from '../web-push/web-push.module';
-import { TasksModule } from './scheduler/task.module';
+import { GroupBuyingQueryModule } from './query/group-buying-query.module';
+import { GroupBuyingCommandModule } from './command/group-buying-command.module';
+import { GroupBuyingAccessGuard } from './guard/group-buying-access.guard';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: GroupBuying.name, schema: GroupBuyingSchema }]),
-    CommonModule,
     AuthModule,
     UserModule,
     WebPushModule,
-    TasksModule,
-    forwardRef(() => ParticipantModule),
+    GroupBuyingQueryModule,
+    GroupBuyingCommandModule,
   ],
   controllers: [GroupBuyingController],
-  providers: [GroupBuyingService, GroupBuyingRepository],
-  exports: [GroupBuyingService, GroupBuyingRepository],
+  providers: [GroupBuyingService, GroupBuyingAccessGuard],
+  exports: [
+    GroupBuyingService,
+    GroupBuyingQueryModule,
+    GroupBuyingCommandModule,
+    GroupBuyingAccessGuard,
+  ],
 })
 export class GroupBuyingModule {}

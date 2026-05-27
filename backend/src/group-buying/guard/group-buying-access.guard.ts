@@ -1,14 +1,14 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
-import { ParticipantService } from '../../participant/participant.service';
+import { ParticipantQueryService } from '../../participant/query/participant-query.service';
 import { GetUserDto } from '../../user/dto/get-user.dto';
-import { GroupBuyingService } from '../group-buying.service';
+import { GroupBuyingQueryService } from '../query/group-buying-query.service';
 import { ContextRole } from '../const/context-role.const';
 
 @Injectable()
 export class GroupBuyingAccessGuard implements CanActivate {
   constructor(
-    private readonly participantService: ParticipantService,
-    private readonly groupBuyingService: GroupBuyingService,
+    private readonly participantQueryService: ParticipantQueryService,
+    private readonly groupBuyingQueryService: GroupBuyingQueryService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -36,7 +36,7 @@ export class GroupBuyingAccessGuard implements CanActivate {
     if (!gbId) throw new ForbiddenException('공구 ID가 없습니다.');
 
     // 해당 공구의 리더인지 확인
-    const isLeader = await this.groupBuyingService.isLeader(user.id, gbId);
+    const isLeader = await this.groupBuyingQueryService.isLeader(user.id, gbId);
     if (isLeader) {
       // 컨텍스트에 맞는 객체에 역할을 저장
       if (req) req.contextualRole = ContextRole.LEADER;
@@ -45,8 +45,7 @@ export class GroupBuyingAccessGuard implements CanActivate {
     }
 
     // 해당 공구의 참여자인지 확인
-    const isParticipant = await this.participantService.isParticipant(user.id, gbId);
-    console.log('isParticipant', isParticipant);
+    const isParticipant = await this.participantQueryService.isParticipant(user.id, gbId);
     if (isParticipant) {
       if (req) req.contextualRole = ContextRole.PARTICIPANT;
       if (client) client.contextualRole = ContextRole.PARTICIPANT;

@@ -5,45 +5,30 @@ import {
   ForbiddenException,
   Get,
   Param,
-  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
 import { ParticipantService } from './participant.service';
 import { Participant } from './schema/participant.schema';
 import { ApiOperation } from '@nestjs/swagger';
-import { CreateParticipantDto } from './dto/create-participant.dto';
 import { UserDecorator } from '../user/decorator/user.decorator';
-import { UpdateParticipantDto } from './dto/update-participant.dto';
 import { ContextRoleDecorator } from '../group-buying/decorator/context-role.decorator';
 import { ContextRole } from '../group-buying/const/context-role.const';
 import { GroupBuyingAccessGuard } from '../group-buying/guard/group-buying-access.guard';
-/*import { PageOptionDto } from '../common/dto/page-option.dto';
-import { PageResponseDto } from '../common/dto/page-response.dto';
-import { GroupBuying } from '../group-buying/schema/group-buying.schema';*/
 import { JwtAuthGuard } from '../auth/guard/auth.guard';
+import { ParticipantQueryService } from './query/participant-query.service';
 
 @Controller('participant')
 export class ParticipantController {
-  constructor(private readonly participantService: ParticipantService) {}
-
-  /*@ApiOperation({ summary: '내가 참여 중인 공구 목록 조회' })
-  @UseGuards(JwtAuthGuard)
-  @Get('/my-participant')
-  async getParticipatedGroupBuyings(
-    @UserDecorator('id') userId: string,
-    @Query() optionDto: PageOptionDto,
-  ): Promise<PageResponseDto<GroupBuying>> {
-    return await this.participantService.getParticipatedGroupBuyings(
-      userId,
-      optionDto,
-    );
-  }*/
+  constructor(
+    private readonly participantService: ParticipantService,
+    private readonly participantQueryService: ParticipantQueryService,
+  ) {}
 
   @ApiOperation({ summary: '특정 공구의 참여자 목록 조회' })
   @Get('/:gbId')
   async getParticipants(@Param('gbId') gbId: string): Promise<Participant[]> {
-    return await this.participantService.getParticipants(gbId);
+    return await this.participantQueryService.getParticipants(gbId);
   }
 
   @ApiOperation({ summary: '특정 공구의 참여자 상세 조회' })
@@ -53,7 +38,7 @@ export class ParticipantController {
     @Param('gbId') gbId: string,
     @UserDecorator('id') userId: string,
   ): Promise<Participant> {
-    return await this.participantService.getParticipantById(gbId, userId);
+    return await this.participantQueryService.getDetailParticipant(gbId, userId);
   }
 
   @ApiOperation({ summary: '공구 참여' })
@@ -64,31 +49,6 @@ export class ParticipantController {
     @Body() createDto: CreateParticipantDto,
   ): Promise<Participant> {
     return await this.participantService.joinGroupBuying(createDto, userId);
-  }
-
-  @ApiOperation({ summary: '참여자 정보 수정' })
-  @UseGuards(JwtAuthGuard)
-  @Patch('/:gbId')
-  async updateParticipant(
-    @Param('gbId') gbId: string, // 해당하는 공구
-    @UserDecorator('id') userId: string, // 수정할 참여자 정보
-    @Body() updateDto: UpdateParticipantDto, // 업데이트할 내용
-  ): Promise<Participant> {
-    return await this.participantService.updateParticipant(gbId, userId, updateDto);
-  }
-
-  @ApiOperation({ summary: '참여자가 자신의 입금 확인' })
-  @UseGuards(JwtAuthGuard, GroupBuyingAccessGuard)
-  @Patch('/payment/:gbId')
-  async confirmPayment(
-    @Param('gbId') gbId: string,
-    @UserDecorator('id') userId: string,
-    @ContextRoleDecorator() role: ContextRole,
-  ) {
-    if (role !== ContextRole.PARTICIPANT) {
-      throw new ForbiddenException('입금 확인은 참여자만 가능합니다.');
-    }
-    return await this.participantService.confirmPayment(gbId, userId);
   }
 
   @ApiOperation({ summary: '공구 참여 취소 (RECRUITING 상태에서만 가능)' })
