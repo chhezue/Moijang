@@ -10,40 +10,9 @@ export const getParticipantList = async (gbId: string): Promise<{ items: IPartic
   return { items: participants };
 };
 
-export const joinParticipant = async ({
-  gbId,
-  refundAccount,
-  refundBank,
-  count,
-}: {
-  gbId: string;
-  refundAccount: string;
-  refundBank: string;
-  count: number;
-}) => {
+export const joinParticipant = async ({ gbId, count }: { gbId: string; count: number }) => {
   const { data } = await api.post(`/api/participant`, {
     gbId,
-    refundBank,
-    refundAccount,
-    count,
-  });
-  return data;
-};
-
-export const modifyParticipant = async ({
-  gbId,
-  refundAccount,
-  refundBank,
-  count,
-}: {
-  gbId: string;
-  refundAccount: string;
-  refundBank: string;
-  count: number;
-}) => {
-  const { data } = await api.patch(`/api/participant/${gbId}`, {
-    refundBank,
-    refundAccount,
     count,
   });
   return data;
@@ -62,9 +31,4 @@ export const cancelParticipant = async (gbId: number | string) => {
     // 에러 응답이 있으면 그대로 던져줌
     throw error.response?.data || error;
   }
-};
-
-export const confirmPayment = async (gbId: string) => {
-  const res = await api.patch(`/api/participant/payment/${gbId}`);
-  return res.data;
 };

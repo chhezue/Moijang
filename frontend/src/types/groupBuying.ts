@@ -1,21 +1,16 @@
 // 공구 응답에 embedded되는 유저 객체
 export interface IUser {
   id: string;
-  displayName: string;
-  department: string;
+  name: string;
 }
 
 export interface IParticipant {
   id: string;
   gbId: string;
-  refundAccount: string;
-  refundBank: string;
   count: number;
-  isPaid: boolean;
   userId: {
     id: string;
-    displayName: string;
-    department: string;
+    name: string;
   };
 }
 
@@ -29,8 +24,6 @@ export interface GroupBuyingItem {
   totalPrice: number;
   estimatedPrice: number;
   shippingFee: number;
-  account: string;
-  bank: string;
   startDate: string;
   endDate: string;
   groupBuyingStatus: string;
@@ -44,11 +37,9 @@ export interface GroupBuyingItem {
   pickupTime: string;
   participantInfo: {
     count: number;
-    isPaid: boolean;
   };
   leaderCount: number;
   cancelReason: string;
-  nonDepositors: IUser[];
 }
 
 export interface CreateGroupBuying {
@@ -58,8 +49,6 @@ export interface CreateGroupBuying {
   fixedCount: number;
   totalPrice: number;
   shippingFee: number;
-  account: string;
-  bank: string;
   endDate: string;
   category: string;
   leaderCount: number;

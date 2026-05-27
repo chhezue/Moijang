@@ -51,6 +51,7 @@ const Sidebar: React.FC<SidebarProps> = ({ participants, item, onOpenModal, user
         participants={participants}
         leaderId={item.leaderId.id}
         status={item.groupBuyingStatus}
+        totalCount={item.currentCount}
       />
     </Stack>
   );

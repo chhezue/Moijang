@@ -14,11 +14,6 @@ const createGroupBuyingFieldsSchema = z.object({
   fixedCount: z.coerce.number().int().min(1, "수량을 확인해주세요."),
   totalPrice: z.coerce.number().int().min(1, "가격을 입력해주세요."),
   shippingFee: z.coerce.number().int().min(0, "0 이상 입력해주세요."),
-  account: z
-    .string()
-    .min(8, "계좌번호가 너무 짧습니다.")
-    .transform((v) => v.replace(/[-\s]/g, "")),
-  bank: z.string().min(1, "은행을 선택하세요"),
   endDate: z
     .string()
     .min(1, "마감일을 선택하세요.")
@@ -54,7 +49,7 @@ export type CreateGroupBuyingOutput = z.output<typeof createGroupBuyingSchema>;
 export const STEP_FIELDS: Record<number, (keyof CreateGroupBuyingInput)[]> = {
   0: ["title", "productUrl", "category", "description", "totalPrice", "fixedCount", "shippingFee"],
   1: ["endDate", "leaderCount"],
-  2: ["bank", "account"],
+  2: [], // 최종 확인 단계 (스키마 검증 필드 없음)
 };
 
 // 수정용 스키마 (fixedCount 제외 — 생성 시 object refine은 여기서 적용하지 않음)
