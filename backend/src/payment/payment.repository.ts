@@ -48,4 +48,14 @@ export class PaymentRepository {
     }
     await this.paymentModel.updateOne({ paymentKey }, { $set }).exec();
   }
+
+  async findPaidRefundTargetsByGbId(gbId: string): Promise<Payment[]> {
+    return this.paymentModel
+      .find({
+        gbId,
+        status: PaymentStatus.PAID,
+        paymentKey: { $exists: true, $ne: null },
+      })
+      .exec();
+  }
 }

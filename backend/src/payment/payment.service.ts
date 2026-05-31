@@ -10,7 +10,7 @@ import { PaymentRepository } from './payment.repository';
 import { CreateCheckoutDto } from './dto/create-checkout.dto';
 import { CheckoutResponseDto } from './dto/checkout-response.dto';
 import { VerifyPaymentDto } from './dto/verify-payment.dto';
-import { PaymentStatus } from './const/payment.const';
+import { PaymentStatus, RefundStatus } from './const/payment.const';
 import { v4 as uuidv4 } from 'uuid';
 import { TossPaymentsClient } from './toss/toss-payments.client';
 import { ParticipantService } from '../participant/participant.service';
@@ -114,21 +114,27 @@ export class PaymentService {
       throw new ForbiddenException('본인의 결제 건만 승인할 수 있습니다.');
     }
 
-    // 4. [결제 실행] 이 API 호출이 성공적으로 리턴되어야 비로소 결제가 완료되었다는 의미 (실제로 돈이 빠져나갔다는 의미)
+    // 4. [상태 검증] 취소된 공구 결제가 승인되지 않도록 confirm 시점에 한 번 더 확인
+    const gb = await this.groupBuyingQueryService.getGroupBuyingById(String(payment.gbId));
+    if (gb.groupBuyingStatus !== GroupBuyingStatus.RECRUITING) {
+      throw new BadRequestException('현재 참여 가능한 모집 상태가 아닙니다.');
+    }
+
+    // 5. [결제 실행] 이 API 호출이 성공적으로 리턴되어야 비로소 결제가 완료되었다는 의미 (실제로 돈이 빠져나갔다는 의미)
     const tossResponse = await this.tossPaymentsClient.confirm({
       paymentKey,
       orderId,
       amount,
     });
 
-    // 5. [PaymentRepository] 상태 변경 (INITIATED -> PAID)
+    // 6. [PaymentRepository] 상태 변경 (INITIATED -> PAID)
     await this.paymentRepository.updateStatus(orderId, {
       status: PaymentStatus.PAID,
       paymentKey: tossResponse.paymentKey,
       approvedAt: tossResponse.approvedAt,
     });
 
-    // 6. 참여자 데이터 생성 (실패 시 보상 트랜잭션)
+    // 7. 참여자 데이터 생성 (실패 시 보상 트랜잭션)
     // 토스 응답은 DB에만 기록하고, 프론트에는 생성된 참여자만 반환
     try {
       return await this.participantService.joinGroupBuyingAfterPayment(
@@ -211,5 +217,52 @@ export class PaymentService {
         error,
       );
     }
+  }
+
+  // 공구 취소 시, 해당 공구의 PAID 결제를 순차 환불 (실패 건은 수집하고 계속 진행)
+  async refundForGroupBuyingCancellation(gbId: string, cancelReason: string) {
+    const payments = await this.paymentRepository.findPaidRefundTargetsByGbId(gbId);
+
+    let successCount = 0;
+    const failures: { orderId: string; reason: string }[] = [];
+
+    for (const payment of payments) {
+      const orderId = String(payment.orderId);
+      const paymentKey = payment.paymentKey;
+
+      if (!paymentKey) {
+        failures.push({ orderId, reason: 'paymentKey가 없어 환불할 수 없습니다.' });
+        continue;
+      }
+
+      try {
+        // 1) 토스 결제 취소 API 호출
+        await this.tossPaymentsClient.cancel(paymentKey, cancelReason);
+
+        // 2) Payment Document 상태 변경 (PAID -> REFUNDED)
+        await this.paymentRepository.updateStatusByPaymentKey(paymentKey, PaymentStatus.REFUNDED);
+
+        // 3) 참여자 데이터 삭제
+        await this.participantService.withdrawGroupBuyingAfterRefund(
+          String(payment.gbId),
+          String(payment.userId),
+        );
+
+        successCount += 1;
+      } catch (error) {
+        const reason = error instanceof Error ? error.message : '환불 처리에 실패했습니다.';
+        failures.push({ orderId, reason });
+      }
+    }
+
+    const failCount = failures.length;
+    let status = RefundStatus.ALL_SUCCESS;
+    if (failCount > 0 && successCount === 0) {
+      status = RefundStatus.FAILED;
+    } else if (failCount > 0) {
+      status = RefundStatus.PARTIAL_SUCCESS;
+    }
+
+    return status;
   }
 }

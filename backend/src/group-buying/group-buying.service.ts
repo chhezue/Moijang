@@ -76,35 +76,34 @@ export class GroupBuyingService {
     }
 
     // 2. 취소 사유에 따른 데이터 준비 (알림 메시지, 미입금자 목록)
-    let notificationBody = '';
-    switch (deleteDto.cancelReason) {
-      case CancelReason.LEADER_CANCELLED: // 총대 개인 사유
-        notificationBody = `[${gb.title}] 총대님이 개인 사정으로 공구를 취소했어요. 자세한 내용은 공지사항을 확인해주세요.`;
-        break;
-      case CancelReason.RECRUITMENT_FAILED:
-        notificationBody = `[${gb.title}] 모집 인원이 충족되지 않아 총대님이 공구를 취소했어요.`;
-        break;
-      case CancelReason.PRODUCT_UNAVAILABLE: // 상품 품절 또는 가격 변동
-        notificationBody = `[${gb.title}] 상품 품절 또는 가격 변동으로 공구가 취소되었어요. 곧 총대님이 환불을 진행할 예정이에요.`;
-        break;
-
-      default:
-        throw new BadRequestException('유효하지 않은 취소 사유입니다.');
-    }
-
-    const participants: any = await this.participantQueryService.getParticipants(gbId);
-    if (participants.length > 0 && notificationBody) {
-      const payload: PayloadDto = {
-        title: `❌ 공구 취소`,
-        body: notificationBody,
-        url: `${process.env.FRONT_URL}/group-buying/detail/${gbId}`,
-      };
-
-      const notificationPromises = participants.map((participant) =>
-        this.webPushService.sendNotification(participant.userId.id, payload),
-      );
-      await Promise.all(notificationPromises);
-    }
+    // let notificationBody = '';
+    // switch (deleteDto.cancelReason) {
+    //   case CancelReason.LEADER_CANCELLED: // 총대 개인 사유
+    //     notificationBody = `[${gb.title}] 총대님이 개인 사정으로 공구를 취소했어요. 자세한 내용은 공지사항을 확인해주세요.`;
+    //     break;
+    //   case CancelReason.RECRUITMENT_FAILED:
+    //     notificationBody = `[${gb.title}] 모집 인원이 충족되지 않아 총대님이 공구를 취소했어요.`;
+    //     break;
+    //   case CancelReason.PRODUCT_UNAVAILABLE: // 상품 품절 또는 가격 변동
+    //     notificationBody = `[${gb.title}] 상품 품절 또는 가격 변동으로 공구가 취소되었어요. 곧 총대님이 환불을 진행할 예정이에요.`;
+    //     break;
+    //   default:
+    //     throw new BadRequestException('유효하지 않은 취소 사유입니다.');
+    // }
+    //
+    // const participants: any = await this.participantQueryService.getParticipants(gbId);
+    // if (participants.length > 0 && notificationBody) {
+    //   const payload: PayloadDto = {
+    //     title: `❌ 공구 취소`,
+    //     body: notificationBody,
+    //     url: `${process.env.FRONT_URL}/group-buying/detail/${gbId}`,
+    //   };
+    //
+    //   const notificationPromises = participants.map((participant) =>
+    //     this.webPushService.sendNotification(participant.userId.id, payload),
+    //   );
+    //   await Promise.all(notificationPromises);
+    // }
 
     return this.groupBuyingRepository.findByGbIdAndDelete(gbId, deleteDto.cancelReason);
   }
