@@ -1,20 +1,8 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  ForbiddenException,
-  Get,
-  Param,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { ParticipantService } from './participant.service';
 import { Participant } from './schema/participant.schema';
 import { ApiOperation } from '@nestjs/swagger';
 import { UserDecorator } from '../user/decorator/user.decorator';
-import { ContextRoleDecorator } from '../group-buying/decorator/context-role.decorator';
-import { ContextRole } from '../group-buying/const/context-role.const';
-import { GroupBuyingAccessGuard } from '../group-buying/guard/group-buying-access.guard';
 import { JwtAuthGuard } from '../auth/guard/auth.guard';
 import { ParticipantQueryService } from './query/participant-query.service';
 
@@ -39,36 +27,5 @@ export class ParticipantController {
     @UserDecorator('id') userId: string,
   ): Promise<Participant> {
     return await this.participantQueryService.getDetailParticipant(gbId, userId);
-  }
-
-  @ApiOperation({ summary: '공구 참여' })
-  @UseGuards(JwtAuthGuard)
-  @Post()
-  async joinGroupBuying(
-    @UserDecorator('id') userId: string,
-    @Body() createDto: CreateParticipantDto,
-  ): Promise<Participant> {
-    return await this.participantService.joinGroupBuying(createDto, userId);
-  }
-
-  @ApiOperation({ summary: '공구 참여 취소 (RECRUITING 상태에서만 가능)' })
-  @UseGuards(JwtAuthGuard, GroupBuyingAccessGuard)
-  @Delete('/:gbId')
-  async withdrawGroupBuying(
-    @Param('gbId') gbId: string,
-    @UserDecorator('id') userId: string,
-    @ContextRoleDecorator() role: ContextRole,
-  ) {
-    // 총대는 자동으로 공구 참여 & 취소 불가
-    if (role === ContextRole.LEADER) {
-      throw new ForbiddenException('총대는 필수로 공구에 참여해야 합니다.');
-    }
-    // 해당 공구의 참여자가 아닌 경우 취소 불가
-    if (role !== ContextRole.PARTICIPANT) {
-      throw new ForbiddenException('참여 취소는 본인만 가능합니다.');
-    }
-
-    // 해당 공구의 참여자인 경우 취소 가능
-    return await this.participantService.withdrawGroupBuying(gbId, userId);
   }
 }

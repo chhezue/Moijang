@@ -18,12 +18,15 @@ import { JwtAuthGuard } from '../auth/guard/auth.guard';
 import { OptionalJwtAuthGuard } from '../auth/guard/optional-auth.guard';
 import { PageOptionDto } from '../common/dto/page-option.dto';
 import { GroupBuyingQueryService } from './query/group-buying-query.service';
+import { GroupBuyingCancelOrchestratorService } from '../cancel-orchestrator/group-buying-cancel-orchestrator.service';
+import { CancelGroupBuyingResponseDto } from '../cancel-orchestrator/dto/cancel-group-buying-response.dto';
 
 @Controller('group-buying')
 export class GroupBuyingController {
   constructor(
     private readonly groupBuyingService: GroupBuyingService,
     private readonly groupBuyingQueryService: GroupBuyingQueryService,
+    private readonly groupBuyingCancelOrchestratorService: GroupBuyingCancelOrchestratorService,
   ) {}
 
   @ApiOperation({ summary: '전체 공구 목록 조회' })
@@ -88,11 +91,15 @@ export class GroupBuyingController {
     @Param('gbId') gbId: string,
     @Body() deleteDto: DeleteGroupBuyingDto,
     @ContextRoleDecorator() role: ContextRole,
-  ) {
+  ): Promise<CancelGroupBuyingResponseDto> {
     if (role !== ContextRole.LEADER) {
       throw new ForbiddenException('공구 취소는 총대만 가능합니다.');
     }
-    return await this.groupBuyingService.deleteGroupBuying(userId, gbId, deleteDto);
+    return await this.groupBuyingCancelOrchestratorService.cancelGroupBuying(
+      userId,
+      gbId,
+      deleteDto,
+    );
   }
 
   @ApiOperation({ summary: '공구 업데이트' })
