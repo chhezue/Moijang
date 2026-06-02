@@ -15,7 +15,7 @@
   1. `POST /payment/checkout`
   2. (프론트에서 토스 결제창 호출)
   3. `POST /payment/confirm`
-  4. 참여 취소 시 `POST /payment/refund/:paymentKey`
+  4. 참여 취소 시 `POST /payment/refund` (body: `gbId`, `cancelReason`)
 - 공구 취소(`PATCH /group-buying/cancel/:gbId`) 시 백엔드에서 결제 일괄 환불을 수행한다.
 
 ### 상태값 변경
@@ -33,7 +33,7 @@
 
 - `POST /payment/confirm` 응답: `Participant | string`
   - 멱등 재호출 시 `"이미 결제가 완료되었습니다."`
-- `POST /payment/refund/:paymentKey` 응답: `Participant | string`
+- `POST /payment/refund` 응답: `Participant | string`
   - 멱등 재호출 시 `"이미 환불이 완료되었습니다."`
 
 ---
@@ -64,7 +64,7 @@
 ### 참여 취소(환불) 플로우
 
 1. 모집 중(`RECRUITING`)이고 이미 참여한 사용자가 취소 클릭
-2. 해당 사용자 결제의 `paymentKey`를 사용해 `refund` 호출
+2. 공구 `gbId`와 `cancelReason`으로 `refund` 호출 (서버가 본인 PAID 결제 조회)
 3. 성공 시 상세 리프레시
 
 ### 총대 플로우
@@ -112,8 +112,9 @@
 
 3. `refundPayment`
 
-- `POST /api/payment/refund/:paymentKey`
+- `POST /api/payment/refund`
 - body:
+  - `gbId: string`
   - `cancelReason: string`
 - response: `Participant | string`
 
@@ -141,7 +142,7 @@ export interface ConfirmPaymentRequest {
 }
 
 export interface RefundPaymentRequest {
-  paymentKey: string;
+  gbId: string;
   cancelReason: string;
 }
 ```
@@ -158,16 +159,7 @@ export interface RefundPaymentRequest {
 
 #### `src/types/groupBuying.ts`
 
-- 결제 취소에 필요한 `participantInfo` 확장 여부 확인
-- 백엔드에서 `paymentKey`를 내려주지 않으면 환불 API 호출이 어려우므로, 아래 중 하나를 선택:
-
-옵션 1 (권장): 백엔드 상세 응답에 `participantInfo.paymentKey` 추가되도록 협의 후 타입 반영
-
-- 예: `participantInfo: { count: number; isPaid: boolean; paymentKey?: string }`
-
-옵션 2: 별도 결제 조회 API를 추가로 붙여 paymentKey 확보 (백엔드 협의 필요)
-
-**중요:** 프론트 단독으로 `refund/:paymentKey`를 호출하려면 paymentKey 소스가 반드시 있어야 한다.
+- 참여 취소 시 상세 페이지의 공구 `id`(gbId)만 있으면 `refund` 호출 가능 (`paymentKey` 불필요)
 
 ---
 
@@ -192,7 +184,7 @@ export interface RefundPaymentRequest {
 
 참여 취소 시:
 
-- `refundPayment(paymentKey, cancelReason)` 호출
+- `refundPayment(gbId, cancelReason)` 호출
 
 총대 공구 취소 시:
 
@@ -273,7 +265,7 @@ export interface RefundPaymentRequest {
 
 아래 항목이 충족돼야 프론트 구현이 막히지 않는다:
 
-1. 공구 상세 응답에서 사용자별 결제 취소에 필요한 `paymentKey` 접근 가능 여부
+1. 참여 취소 시 `refund` body에 `gbId`만 전달하면 되는지 확인 (상세 페이지 `item.id` 사용)
 2. `confirm`/`refund`의 문자열 멱등 응답을 프론트에서 성공으로 처리할지 정책 확정
 3. 공구 취소 응답의 `refundStatus`(`allSuccess | partialSuccess | failed`)를 UI에 노출할지 결정
 
@@ -299,7 +291,7 @@ export interface RefundPaymentRequest {
 
 - `PAYMENT_IN_PROGRESS`, `ORDER_PENDING` 문자열이 프론트 코드에 남아있지 않다.
 - 참여자가 실제로 `checkout -> (토스) -> confirm` 경로를 타도록 연결되어 있다.
-- 참여 취소가 `POST /payment/refund/:paymentKey`를 사용한다.
+- 참여 취소가 `POST /payment/refund` (`gbId`, `cancelReason`)를 사용한다.
 - 총대 공구 취소 후 `refundStatus`를 처리할 수 있는 상태다(최소 로그/토스트라도 반영).
 - `npm run lint` / `npm run build` 기준 치명 에러가 없다.
 
@@ -307,6 +299,6 @@ export interface RefundPaymentRequest {
 
 ## 9) 리스크 / 후속 작업
 
-- 현재 백엔드 응답에서 `paymentKey` 노출 경로가 명확하지 않으면 환불 UX 구현이 막힐 수 있다.
+- 환불 API는 `gbId` 기준이므로 프론트는 `paymentKey`를 보관할 필요가 없다.
 - `confirm` 멱등 시 문자열 반환은 프론트에서 성공 플로우로 흡수해야 UX가 안정적이다.
 - `refundStatus = partialSuccess`의 운영 처리(관리자 재시도)는 별도 정책이 필요하다.

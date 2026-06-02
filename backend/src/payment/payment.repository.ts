@@ -19,10 +19,6 @@ export class PaymentRepository {
     return this.paymentModel.findOne({ orderId }).exec();
   }
 
-  async findByPaymentKey(paymentKey: string): Promise<Payment | null> {
-    return this.paymentModel.findOne({ paymentKey }).exec();
-  }
-
   async updateStatus(
     orderId: string,
     updates: {
@@ -47,6 +43,20 @@ export class PaymentRepository {
       $set.refundedAt = new Date();
     }
     await this.paymentModel.updateOne({ paymentKey }, { $set }).exec();
+  }
+
+  // userId와 gbId로 Payment 찾아서 반환
+  async findPaymentByUserIdAndGbId(userId: string, gbId: string): Promise<Payment | null> {
+    // PAID 상태의 문서가 있으면 반환
+    const paid = await this.paymentModel
+      .findOne({ userId, gbId, status: PaymentStatus.PAID })
+      .exec();
+    if (paid) {
+      return paid;
+    }
+
+    // PAID 상태의 문서가 없고, REFUNDED 상태의 문서가 있으면 반환
+    return this.paymentModel.findOne({ userId, gbId, status: PaymentStatus.REFUNDED }).exec();
   }
 
   async findPaidRefundTargetsByGbId(gbId: string): Promise<Payment[]> {

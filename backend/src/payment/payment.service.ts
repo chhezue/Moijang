@@ -17,6 +17,7 @@ import { ParticipantService } from '../participant/participant.service';
 import { GroupBuyingQueryService } from '../group-buying/query/group-buying-query.service';
 import { GroupBuyingStatus } from '../group-buying/const/group-buying.const';
 import { ParticipantQueryService } from '../participant/query/participant-query.service';
+import { RefundPaymentDto } from './dto/refund-payment.dto';
 
 @Injectable()
 export class PaymentService {
@@ -159,29 +160,24 @@ export class PaymentService {
   }
 
   // 환불: 토스 취소 호출 및 재고 복구
-  async refund(paymentKey: string, cancelReason: string, userId: string) {
-    // 1) payment 조회
-    const payment = await this.paymentRepository.findByPaymentKey(paymentKey);
+  async refund(dto: RefundPaymentDto, userId: string) {
+    const { gbId, cancelReason } = dto;
+
+    // 1) 본인 결제 조회 (PAID 또는 이미 REFUNDED)
+    const payment = await this.paymentRepository.findPaymentByUserIdAndGbId(userId, gbId);
     if (!payment) {
-      throw new NotFoundException('존재하지 않는 결제입니다.');
+      throw new NotFoundException('환불 가능한 결제가 없습니다.');
     }
-
-    // 2) 소유자 검증
-    if (String(payment.userId) !== String(userId)) {
-      throw new ForbiddenException('본인의 결제 건만 취소할 수 있습니다.');
-    }
-
-    // 3) 멱등성 보장 (이미 환불된 경우)
     if (payment.status === PaymentStatus.REFUNDED) {
       return '이미 환불이 완료되었습니다.';
     }
 
-    // 4) PAID 상태일 때만 취소 가능
-    if (payment.status !== PaymentStatus.PAID) {
-      throw new BadRequestException(`환불을 진행할 수 없는 상태입니다. (현재: ${payment.status})`);
+    const paymentKey = payment.paymentKey;
+    if (!paymentKey) {
+      throw new BadRequestException('결제 키가 없어 환불할 수 없습니다.');
     }
 
-    // 5) 해당 공구에 참여하고 있는지 여부
+    // 2) 해당 공구에 참여하고 있는지 여부
     const isParticipant = await this.participantQueryService.isParticipant(
       String(payment.userId),
       String(payment.gbId),
@@ -190,20 +186,20 @@ export class PaymentService {
       throw new ForbiddenException('해당 공구의 참여자만 취소할 수 있습니다.');
     }
 
-    const gb = await this.groupBuyingQueryService.getGroupBuyingById(payment.gbId);
+    const gb = await this.groupBuyingQueryService.getGroupBuyingById(gbId);
 
-    // 6) RECRUITING 상태에서만 취소 가능
+    // 3) RECRUITING 상태에서만 취소 가능
     if (gb.groupBuyingStatus !== GroupBuyingStatus.RECRUITING) {
       throw new BadRequestException('모집 중 상태에서만 참여 취소가 가능합니다.');
     }
 
-    // 7) 토스 결제 취소 API 호출
+    // 4) 토스 결제 취소 API 호출
     await this.tossPaymentsClient.cancel(paymentKey, cancelReason);
 
-    // 8) Payment Document 상태 변경 (PAID -> REFUNDED)
+    // 5) Payment Document 상태 변경 (PAID -> REFUNDED)
     await this.paymentRepository.updateStatusByPaymentKey(paymentKey, PaymentStatus.REFUNDED);
 
-    // 9) 참여자 데이터 삭제 (실패 시 보상 트랜잭션)
+    // 6) 참여자 데이터 삭제 (실패 시 보상 트랜잭션)
     // 토스 응답은 DB에만 기록하고, 프론트에는 취소된 참여자만 반환
     try {
       return await this.participantService.withdrawGroupBuyingAfterRefund(

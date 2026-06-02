@@ -16,7 +16,7 @@
 | 구성                                              | 내용                                                                                                           |
 | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | `PaymentModule`                                   | `GroupBuyingQueryModule`, `ParticipantModule`, `ParticipantQueryModule`                                        |
-| `PaymentController`                               | `POST /payment/checkout`, `confirm`, `refund/:paymentKey`                                                      |
+| `PaymentController`                               | `POST /payment/checkout`, `confirm`, `refund` (`gbId`, `cancelReason`)                                         |
 | `PaymentService.checkout`                         | `RECRUITING`·정원·리더·중복 참여 선검증 → `Payment(INITIATED)`                                                 |
 | `PaymentService.confirm`                          | 멱등·금액·소유자(`String` 비교)·`RECRUITING` 재검증 → 토스 confirm → `PAID` → join / 실패 시 cancel + `FAILED` |
 | `PaymentService.refund`                           | 개인 참여 취소 — 토스 cancel → `REFUNDED` → withdraw                                                           |
@@ -129,7 +129,7 @@ confirm  ← 사실상 "한 덩어리"
 2. 프론트 토스 결제창
 3. `POST /payment/confirm` — `PAID` → `Participant` (정원 **최종** 검증) / 실패 시 cancel + `FAILED`
 4. `PATCH /group-buying/cancel/:gbId` (리더) — `CANCELLED` + PAID 건 순차 환불 → `{ groupBuying, status, successCount, failCount, failures }`
-5. `POST /payment/refund/:paymentKey` (참여자) — `REFUNDED` + withdraw
+5. `POST /payment/refund` (참여자, body `gbId`) — `REFUNDED` + withdraw
 
 **핵심 원칙**
 
