@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import React, { useEffect } from 'react';
-import { ThemeProvider, CssBaseline } from '@mui/material';
-import { theme } from '@/styles/theme';
-import { StatusProvider } from '@/providers/StatusProvider';
-import { CategoryProvider } from '@/providers/CategoryProvider';
-import { SnackbarProvider } from '@/providers/SnackbarProvider';
-import { UserDto } from '@/types/auth';
-import { useAuthStore } from '@/store/authStore';
+import React, { useRef } from "react";
+import { ThemeProvider, CssBaseline } from "@mui/material";
+import { theme } from "@/styles/theme";
+import { StatusProvider } from "@/providers/StatusProvider";
+import { CategoryProvider } from "@/providers/CategoryProvider";
+import { SnackbarProvider } from "@/providers/SnackbarProvider";
+import { UserDto } from "@/types/auth";
+import { useAuthStore } from "@/store/authStore";
 
 export default function Providers({
   children,
@@ -16,11 +16,12 @@ export default function Providers({
   children: React.ReactNode;
   initialUser?: UserDto | null;
 }) {
-  const setUser = useAuthStore((s) => s.setUser);
+  const initialized = useRef(false);
 
-  useEffect(() => {
-    if (initialUser) setUser(initialUser);
-  }, []);
+  if (!initialized.current) {
+    useAuthStore.setState({ user: initialUser });
+    initialized.current = true;
+  }
 
   return (
     <ThemeProvider theme={theme}>
