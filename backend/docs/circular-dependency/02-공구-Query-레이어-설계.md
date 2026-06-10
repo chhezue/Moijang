@@ -109,13 +109,13 @@ currentCount: {
 
 ## 6. Query 레이어 전용 리스크
 
-| 리스크                             | 대응                                          | 현재                                                             |
-| ---------------------------------- | --------------------------------------------- | ---------------------------------------------------------------- |
-| 과도한 추상화 (Port/DI everywhere) | 필요 시만 Port 도입                           | ✅ Port 미도입                                                   |
-| aggregate 파이프라인 중복          | `participantCountLookupStages()` 단일 private | ✅                                                               |
-| Query에 write 유입                 | CONFIRMED는 `GroupBuyingRecruitmentService`   | ✅                                                               |
-| GB Query ↔ Participant Query 결합  | snapshot 또는 역정규화는 필요 시              | 🔶 호출 1곳 유지                                                 |
-| read 후 write race (join 정원)     | DB 원자 연산·unique index — PG 전후 공통      | ⬜ [refactoring-analysis.md](../payment/refactoring-analysis.md) |
+| 리스크                             | 대응                                          | 현재                                                         |
+| ---------------------------------- | --------------------------------------------- | ------------------------------------------------------------ |
+| 과도한 추상화 (Port/DI everywhere) | 필요 시만 Port 도입                           | ✅ Port 미도입                                               |
+| aggregate 파이프라인 중복          | `participantCountLookupStages()` 단일 private | ✅                                                           |
+| Query에 write 유입                 | CONFIRMED는 `GroupBuyingRecruitmentService`   | ✅                                                           |
+| GB Query ↔ Participant Query 결합  | snapshot 또는 역정규화는 필요 시              | 🔶 호출 1곳 유지                                             |
+| read 후 write race (join 정원)     | DB 원자 연산·unique index — PG 전후 공통      | ⬜ [03-구현-체크리스트.md](../payment/03-구현-체크리스트.md) |
 
 작업 체크리스트(Phase 3): [01번 문서 §4 Phase 3](./01-모듈-순환-참조-해소-아키텍처.md#phase-3-groupbuying-query-레이어).
 
