@@ -1,6 +1,6 @@
 "use client"; // MUI 컴포넌트를 사용하므로 클라이언트 컴포넌트입니다.
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Container } from "@mui/material";
 import { GroupBuyingItem, IParticipant } from "@/types/groupBuying";
 
@@ -11,8 +11,8 @@ import { useStatusContext } from "@/providers/StatusProvider";
 import CustomModal from "@/components/CustomModal";
 import ParticipationModalContent from "@/app/(home)/group-buying/detail/[id]/components/modals/ParticipationModalContent";
 import EditGroupBuyingModalContent from "@/app/(home)/group-buying/detail/[id]/components/modals/EditGroupBuyingModalContent";
-import { cancelParticipant } from "@/apis/services/participant";
-import { useRouter } from "next/navigation";
+import { refundPayment } from "@/apis/services/payment";
+import { useRouter, useSearchParams } from "next/navigation";
 import ConfirmModalContent from "@/app/(home)/group-buying/detail/[id]/components/modals/ConfirmModalContent";
 import { useSnackbar } from "@/providers/SnackbarProvider";
 import {
@@ -36,13 +36,22 @@ const DetailClientPage: React.FC<ClientPageProps> = ({ item, participants }) => 
   const { statusList, statusToStepIndex } = useStatusContext();
   const user = useAuthStore((s) => s.user);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [activeModal, setActiveModal] = useState<ModalType>(null);
 
-  // 참여 취소
+  useEffect(() => {
+    if (searchParams.get("joined") === "true") {
+      showSnackbar("공동구매 참여가 완료되었습니다.", "success");
+      router.replace(`/group-buying/detail/${item.id}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 참여 취소 (환불)
   const handleCancelParticipation = async () => {
     try {
-      await cancelParticipant(item.id);
-      showSnackbar("참여가 취소되었습니다.", "success");
+      await refundPayment({ gbId: item.id, cancelReason: "LEADER_CANCELLED" });
+      showSnackbar("참여가 취소되고 환불이 처리되었습니다.", "success");
       router.refresh();
       setActiveModal(null);
     } catch (err) {
@@ -54,8 +63,23 @@ const DetailClientPage: React.FC<ClientPageProps> = ({ item, participants }) => 
   // 공동구매 취소
   const handleCancelGroupBuying = async (reason: string) => {
     try {
-      await cancelGroupBuying(item.id, reason);
-      showSnackbar("공동구매가 취소되었습니다.", "success");
+      const result = await cancelGroupBuying(item.id, reason);
+      const refundStatus = result?.refundStatus;
+      if (refundStatus === "allSuccess") {
+        showSnackbar("공동구매가 취소되고 전체 환불이 완료되었습니다.", "success");
+      } else if (refundStatus === "partialSuccess") {
+        showSnackbar(
+          "공동구매가 취소되었으나 일부 환불에 실패했습니다. 관리자에게 문의해 주세요.",
+          "warning",
+        );
+      } else if (refundStatus === "failed") {
+        showSnackbar(
+          "공동구매가 취소되었으나 환불 처리에 실패했습니다. 관리자에게 문의해 주세요.",
+          "error",
+        );
+      } else {
+        showSnackbar("공동구매가 취소되었습니다.", "success");
+      }
       router.refresh();
       setActiveModal(null);
     } catch (err) {

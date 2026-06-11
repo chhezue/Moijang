@@ -28,6 +28,9 @@ const CancelReasonConfig: Record<string, { label: string }> = {
   PRODUCT_UNAVAILABLE: {
     label: "상품이 품절되었거나 가격이 변동되었어요.",
   },
+  RECRUITMENT_FAILED: {
+    label: "모집 인원이 부족해요.",
+  },
   LEADER_CANCELLED: {
     label: "개인적인 사정이에요.",
   },

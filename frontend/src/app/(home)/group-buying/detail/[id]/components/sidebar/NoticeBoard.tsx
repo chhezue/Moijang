@@ -38,7 +38,7 @@ const getNoticeMessage = (item: GroupBuyingItem): Notice | null => {
   if (isParticipant && !isOwner && groupBuyingStatus === "CONFIRMED") {
     return {
       type: "info",
-      text: "총대가 입금 요청을 하면 24시간 내에 송금을 완료해 주세요.",
+      text: "결제가 완료되었어요. 총대가 곧 상품을 주문할 예정이에요.",
     };
   }
 

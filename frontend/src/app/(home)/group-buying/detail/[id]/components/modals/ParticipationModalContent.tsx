@@ -3,7 +3,8 @@ import React, { useState } from "react";
 import TextInput from "@/components/TextInput";
 import styled from "styled-components";
 import { Button, Box, Typography, alpha } from "@mui/material";
-import { joinParticipant } from "@/apis/services/participant";
+import { checkout } from "@/apis/services/payment";
+import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 import { useSnackbar } from "@/providers/SnackbarProvider";
 import { useRouter } from "next/navigation";
 import { theme } from "@/styles/theme";
@@ -26,25 +27,57 @@ interface Props {
 
 const ParticipationModalContent = ({ gbId, close, remainingCount }: Props) => {
   const [count, setCount] = useState<number>(1);
+  const [countError, setCountError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { showSnackbar } = useSnackbar();
   const router = useRouter();
 
-  const register = async () => {
+  const handleCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = Number(e.target.value);
+    setCount(val);
+    if (val > remainingCount) {
+      setCountError(`목표 수량을 넘길 수 없습니다. (최대 ${remainingCount}개)`);
+    } else if (val < 1) {
+      setCountError("최소 1개 이상 입력해주세요.");
+    } else {
+      setCountError("");
+    }
+  };
+
+  const handlePay = async () => {
+    if (countError || count < 1 || count > remainingCount) return;
+
+    setIsLoading(true);
     try {
-      const data = await joinParticipant({ gbId, count });
-      console.log(data);
-      showSnackbar("공구 참여가 완료되었습니다.", "success");
-      close();
-      router.refresh();
+      const checkoutData = await checkout({ gbId, count });
+      const tossPayments = await loadTossPayments(checkoutData.clientKey);
+      const payment = tossPayments.payment({ customerKey: ANONYMOUS });
+      await payment.requestPayment({
+        method: "CARD",
+        amount: { currency: "KRW", value: checkoutData.amount },
+        orderId: checkoutData.orderId,
+        orderName: checkoutData.orderName,
+        successUrl: `${window.location.origin}/payment/success?gbId=${encodeURIComponent(gbId)}`,
+        failUrl: `${window.location.origin}/payment/fail`,
+      });
     } catch (e: any) {
-      console.log(e);
-      showSnackbar(e.response?.data?.message ?? "참여에 실패했습니다.", "error");
+      if (e?.code === "USER_CANCEL") {
+        close();
+        return;
+      }
+      const msg = e?.response?.data?.message ?? "결제 시작에 실패했습니다.";
+      showSnackbar(msg, "error");
+      // 정원 초과 에러면 최신 잔여 수량으로 갱신
+      if (msg.includes("정원") || msg.includes("수량")) {
+        router.refresh();
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <Container>
-      {/* 제목과 설명 섹션 */}
       <Box
         sx={{
           mb: 2,
@@ -58,23 +91,15 @@ const ParticipationModalContent = ({ gbId, close, remainingCount }: Props) => {
         <Typography
           variant="subtitle1"
           fontWeight={600}
-          sx={{
-            fontSize: "0.9rem",
-            color: "text.primary",
-          }}
+          sx={{ fontSize: "0.9rem", color: "text.primary" }}
         >
           🎯 공구 참여 신청
         </Typography>
         <Typography
           variant="caption"
-          sx={{
-            fontSize: "0.8rem",
-            color: "text.secondary",
-            lineHeight: 1.4,
-            mb: 1,
-          }}
+          sx={{ fontSize: "0.8rem", color: "text.secondary", lineHeight: 1.4 }}
         >
-          참여할 수량을 입력해주세요.
+          수량 입력 후 토스 결제창에서 결제를 완료해 주세요.
         </Typography>
       </Box>
 
@@ -85,24 +110,26 @@ const ParticipationModalContent = ({ gbId, close, remainingCount }: Props) => {
           min={1}
           max={remainingCount}
           value={count.toString()}
-          onChange={(e) => {
-            setCount(Number(e.target.value));
-          }}
-          onBlur={() => {
-            if (count < 1) setCount(1);
-            if (count > remainingCount) setCount(remainingCount);
-          }}
+          onChange={handleCountChange}
         />
+        {countError ? (
+          <Typography variant="caption" color="error" sx={{ mt: 0.5, display: "block" }}>
+            {countError}
+          </Typography>
+        ) : (
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
+            현재 가능한 수량: {remainingCount}개
+          </Typography>
+        )}
       </Wrapper>
 
       <Button
         variant="contained"
         fullWidth
-        onClick={() => {
-          register().then();
-        }}
+        onClick={handlePay}
+        disabled={isLoading || !!countError || count < 1}
       >
-        확인 및 참여
+        {isLoading ? "결제 준비 중..." : "결제하기"}
       </Button>
     </Container>
   );

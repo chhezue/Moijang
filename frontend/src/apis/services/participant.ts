@@ -10,25 +10,7 @@ export const getParticipantList = async (gbId: string): Promise<{ items: IPartic
   return { items: participants };
 };
 
-export const joinParticipant = async ({ gbId, count }: { gbId: string; count: number }) => {
-  const { data } = await api.post(`/api/participant`, {
-    gbId,
-    count,
-  });
-  return data;
-};
-
 export const getParticipantInfo = async ({ gbId, id }: { gbId: string; id: string }) => {
   const { data } = await api.get(`/api/participant/${gbId}/${id}`);
   return data;
-};
-
-export const cancelParticipant = async (gbId: number | string) => {
-  try {
-    const res = await api.delete(`/api/participant/${gbId}`);
-    return res.data; // 백엔드에서 내려주는 응답 데이터
-  } catch (error: any) {
-    // 에러 응답이 있으면 그대로 던져줌
-    throw error.response?.data || error;
-  }
 };

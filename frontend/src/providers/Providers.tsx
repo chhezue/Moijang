@@ -19,8 +19,8 @@ export default function Providers({
   const initialized = useRef(false);
 
   if (!initialized.current) {
-    useAuthStore.setState({ user: initialUser });
     initialized.current = true;
+    if (initialUser) useAuthStore.setState({ user: initialUser });
   }
 
   return (
