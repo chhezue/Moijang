@@ -17,7 +17,7 @@ export class ParticipantRepository {
   async findAll(query: any) {
     return this.participantModel.find(query).populate({
       path: 'userId',
-      select: 'displayName department',
+      select: 'name',
     });
   }
 

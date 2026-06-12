@@ -92,7 +92,7 @@ export class GroupBuyingRepository {
   async findOneByGbId(gbId: string) {
     return this.groupBuyingModel.findOne({ _id: gbId }).populate({
       path: 'leaderId',
-      select: 'displayName department',
+      select: 'name',
     });
   }
 
@@ -120,7 +120,7 @@ export class GroupBuyingRepository {
 
     const populateOptions = {
       path: 'leaderId',
-      select: 'displayName department',
+      select: 'name',
     };
 
     return this.commonService.findWithPagination(
@@ -140,7 +140,7 @@ export class GroupBuyingRepository {
 
     const populateOptions = {
       path: 'leaderId',
-      select: 'displayName department',
+      select: 'name',
     };
 
     return this.commonService.findWithPagination(
