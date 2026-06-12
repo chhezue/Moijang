@@ -11,11 +11,7 @@ import { useStatusContext } from "@/providers/StatusProvider";
 import CustomModal from "@/components/CustomModal";
 import ParticipationModalContent from "@/app/(home)/group-buying/detail/[id]/components/modals/ParticipationModalContent";
 import EditGroupBuyingModalContent from "@/app/(home)/group-buying/detail/[id]/components/modals/EditGroupBuyingModalContent";
-import {
-  cancelParticipant,
-  confirmPayment,
-  getParticipantList,
-} from "@/apis/services/participant";
+import { cancelParticipant, confirmPayment, getParticipantList } from "@/apis/services/participant";
 import { useRouter } from "next/navigation";
 import ConfirmModalContent from "@/app/(home)/group-buying/detail/[id]/components/modals/ConfirmModalContent";
 import { useSnackbar } from "@/providers/SnackbarProvider";
@@ -38,19 +34,14 @@ interface ClientPageProps {
   participants: IParticipant[];
 }
 
-const DetailClientPage: React.FC<ClientPageProps> = ({
-  item,
-  participants,
-}) => {
+const DetailClientPage: React.FC<ClientPageProps> = ({ item, participants }) => {
   const { showSnackbar } = useSnackbar();
   const { statusList, statusToStepIndex } = useStatusContext();
   const [loading, setLoading] = useState(true);
   const user = useAuthStore((s) => s.user);
   const router = useRouter();
   const [activeModal, setActiveModal] = useState<ModalType>(null);
-  const [participationAction, setParticipationAction] = useState<
-    "join" | "modify"
-  >("join");
+  const [participationAction, setParticipationAction] = useState<"join" | "modify">("join");
 
   // useEffect(() => {
   //   getParticipantList(item.id)
@@ -73,10 +64,7 @@ const DetailClientPage: React.FC<ClientPageProps> = ({
   };
 
   // 공동구매 취소
-  const handleCancelGroupBuying = async (
-    reason: string,
-    nonDepositors?: string[]
-  ) => {
+  const handleCancelGroupBuying = async (reason: string, nonDepositors?: string[]) => {
     try {
       await cancelGroupBuying(item.id, reason, nonDepositors);
       showSnackbar("공동구매가 취소되었습니다.", "success");
@@ -97,10 +85,7 @@ const DetailClientPage: React.FC<ClientPageProps> = ({
       router.refresh(); // 새로고침
     } catch (error: any) {
       console.error(error);
-      showSnackbar(
-        error.response?.data?.message || "송금 요청이 실패했습니다.",
-        "error"
-      );
+      showSnackbar(error.response?.data?.message || "송금 요청이 실패했습니다.", "error");
     }
   };
 
@@ -126,10 +111,7 @@ const DetailClientPage: React.FC<ClientPageProps> = ({
       setActiveModal(null);
     } catch (error: any) {
       console.error("주문 진행 중 오류 발생:", error);
-      showSnackbar(
-        error.response?.data?.message || "상태 변경에 실패하였습니다.",
-        "error"
-      );
+      showSnackbar(error.response?.data?.message || "상태 변경에 실패하였습니다.", "error");
     }
   };
 
@@ -200,10 +182,7 @@ const DetailClientPage: React.FC<ClientPageProps> = ({
           {/* 1. 최상단 Stepper (취소된 공구일 때는 숨김) */}
           {!isCancelled && (
             <Box sx={{ mb: 4 }}>
-              <Stepper
-                steps={statusList}
-                activeStep={statusToStepIndex[item.groupBuyingStatus]}
-              />
+              <Stepper steps={statusList} activeStep={statusToStepIndex[item.groupBuyingStatus]} />
             </Box>
           )}
 
@@ -295,11 +274,7 @@ const DetailClientPage: React.FC<ClientPageProps> = ({
       {/* ---- 모달창 ----- */}
       {/* 참여/수정 */}
       <CustomModal
-        title={
-          participationAction === "join"
-            ? "공동구매 참여"
-            : "수량 및 계좌 정보 수정"
-        }
+        title={participationAction === "join" ? "공동구매 참여" : "수량 및 계좌 정보 수정"}
         open={activeModal === "participation"}
         setOpen={() => setActiveModal(null)}
       >
@@ -330,10 +305,7 @@ const DetailClientPage: React.FC<ClientPageProps> = ({
         open={activeModal === "editGroupBuying"}
         setOpen={() => setActiveModal(null)}
       >
-        <EditGroupBuyingModalContent
-          item={item}
-          close={() => setActiveModal(null)}
-        />
+        <EditGroupBuyingModalContent item={item} close={() => setActiveModal(null)} />
       </CustomModal>
 
       {/* 모집 중 공동구매 취소 */}
@@ -390,14 +362,11 @@ const DetailClientPage: React.FC<ClientPageProps> = ({
                 ⛔ 잠깐! 정말 입금 완료하셨나요? ⛔
               </strong>{" "}
               <br />
-              총대님이 최종 확인했을 때 입금이 되지 않은 경우, 미입금자로
-              처리되며 공동구매가 전체 취소되니{" "}
-              <strong>꼭 입금 후 완료 버튼을 눌러주세요.</strong>
+              총대님이 최종 확인했을 때 입금이 되지 않은 경우, 미입금자로 처리되며 공동구매가 전체
+              취소되니 <strong>꼭 입금 후 완료 버튼을 눌러주세요.</strong>
               <br />
               <br />
-              <strong style={{ color: theme.palette.warning.main }}>
-                ⚠️ 환불 안내 ⚠️
-              </strong>
+              <strong style={{ color: theme.palette.warning.main }}>⚠️ 환불 안내 ⚠️</strong>
               <br />
               미입금으로 인한 취소 시, 총대님이 개별 환불을 진행할 예정이에요.
               <br />
@@ -419,8 +388,8 @@ const DetailClientPage: React.FC<ClientPageProps> = ({
             <>
               공동구매 상태가 <strong>주문 진행 중</strong>으로 바뀌어요.
               <br />
-              상품이 도착하면, <strong>배송 완료</strong> 버튼을 눌러 수령
-              장소와 시간을 공지해 주세요.
+              상품이 도착하면, <strong>배송 완료</strong> 버튼을 눌러 수령 장소와 시간을 공지해
+              주세요.
             </>
           }
           onConfirm={handleProceedOrder}
@@ -436,9 +405,7 @@ const DetailClientPage: React.FC<ClientPageProps> = ({
       >
         <CancelReasonModalContent
           participants={participants}
-          onConfirm={(reason, nonDepositors) =>
-            handleCancelGroupBuying(reason, nonDepositors)
-          }
+          onConfirm={(reason, nonDepositors) => handleCancelGroupBuying(reason, nonDepositors)}
         />
       </CustomModal>
 

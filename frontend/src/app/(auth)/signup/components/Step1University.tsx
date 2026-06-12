@@ -5,7 +5,6 @@ import { Autocomplete, TextField, Box, Typography, CircularProgress } from "@mui
 import { University } from "@/types/auth";
 import { searchUniversity } from "@/apis/services/auth";
 
-
 interface Props {
   university: University | null;
   onUniversityChange: (u: University | null) => void;

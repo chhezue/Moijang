@@ -91,8 +91,7 @@ const CancelledBanner: React.FC<CancelledBannerProps> = ({ item }) => {
     case "PRODUCT_UNAVAILABLE":
       reasonText = (
         <>
-          상품이 <strong>품절되었거나 가격이 변동</strong>되어 공동구매가
-          취소되었어요.
+          상품이 <strong>품절되었거나 가격이 변동</strong>되어 공동구매가 취소되었어요.
         </>
       );
       break;

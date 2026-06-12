@@ -22,18 +22,11 @@ export class WebPushService {
     webpush.setVapidDetails('mailto:ybcho@pmirnc.com', publicKey, privateKey);
   }
 
-  async createSubscription(
-    userId: string,
-    sub: SubscriptionDto,
-  ): Promise<Subscription> {
+  async createSubscription(userId: string, sub: SubscriptionDto): Promise<Subscription> {
     return await this.webPushRepository.upsert(userId, sub);
   }
 
-  async sendNotification(
-    receiverId: string,
-    payload: PayloadDto,
-    senderName?: string,
-  ) {
+  async sendNotification(receiverId: string, payload: PayloadDto, senderName?: string) {
     try {
       // 수신자의 구독 정보 확인
       const sub = await this.webPushRepository.findOne({ userId: receiverId });

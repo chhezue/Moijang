@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { GroupBuyingService } from './group-buying.service';
 import { CreateGroupBuyingDto } from './dto/create-group-buying.dto';
 import { ApiOperation } from '@nestjs/swagger';
@@ -52,10 +43,7 @@ export class GroupBuyingController {
     @UserDecorator('id') userId: string,
     @Query() optionDto: PageOptionDto,
   ): Promise<PageResponseDto<GroupBuying>> {
-    return await this.groupBuyingService.getCreatedGroupBuyings(
-      userId,
-      optionDto,
-    );
+    return await this.groupBuyingService.getCreatedGroupBuyings(userId, optionDto);
   }
 
   @ApiOperation({ summary: '내가 참여한 공구 목록 조회' })
@@ -65,10 +53,7 @@ export class GroupBuyingController {
     @UserDecorator('id') userId: string,
     @Query() optionDto: PageOptionDto,
   ): Promise<PageResponseDto<GroupBuying>> {
-    return await this.groupBuyingService.getParticipatedGroupBuyings(
-      userId,
-      optionDto,
-    );
+    return await this.groupBuyingService.getParticipatedGroupBuyings(userId, optionDto);
   }
 
   @ApiOperation({ summary: '공구 상세 조회' })
@@ -103,11 +88,7 @@ export class GroupBuyingController {
     if (role !== ContextRole.LEADER) {
       throw new ForbiddenException('공구 취소는 총대만 가능합니다.');
     }
-    return await this.groupBuyingService.deleteGroupBuying(
-      userId,
-      gbId,
-      deleteDto,
-    );
+    return await this.groupBuyingService.deleteGroupBuying(userId, gbId, deleteDto);
   }
 
   @ApiOperation({ summary: '공구 업데이트' })
@@ -122,11 +103,7 @@ export class GroupBuyingController {
     if (role !== ContextRole.LEADER) {
       throw new ForbiddenException('공구 수정은 총대만 가능합니다.');
     }
-    return await this.groupBuyingService.updateGroupBuying(
-      userId,
-      gbId,
-      updateDto,
-    );
+    return await this.groupBuyingService.updateGroupBuying(userId, gbId, updateDto);
   }
 
   @ApiOperation({ summary: '공구 다음 단계로 이동' })

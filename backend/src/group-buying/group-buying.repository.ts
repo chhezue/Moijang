@@ -1,11 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import {
-  AggregateOptions,
-  FilterQuery,
-  Model,
-  PipelineStage,
-  RootFilterQuery,
-} from 'mongoose';
+import { AggregateOptions, FilterQuery, Model, PipelineStage, RootFilterQuery } from 'mongoose';
 import { GroupBuying } from './schema/group-buying.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateGroupBuyingDto } from './dto/create-group-buying.dto';
@@ -103,9 +97,7 @@ export class GroupBuyingRepository {
 
     const gb = await this.groupBuyingModel.findOne({ _id: gbId });
     if (beforeTotalCount + quantityChange > gb.fixedCount) {
-      throw new BadRequestException(
-        '모집 인원이 마감되었거나 정원을 초과합니다.',
-      );
+      throw new BadRequestException('모집 인원이 마감되었거나 정원을 초과합니다.');
     }
 
     return gb;
@@ -128,9 +120,7 @@ export class GroupBuyingRepository {
       });
   }
 
-  async findAndCount(
-    searchDto: SearchGroupBuyingDto,
-  ): Promise<PageResponseDto<GroupBuying>> {
+  async findAndCount(searchDto: SearchGroupBuyingDto): Promise<PageResponseDto<GroupBuying>> {
     // 필터링 조건 객체 생성
     const query: FilterQuery<GroupBuying> = {};
 

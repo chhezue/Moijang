@@ -53,9 +53,7 @@ export default function Step2Content() {
                 fullWidth
                 error={!!fieldState.error}
                 helperText={fieldState.error?.message}
-                onChange={(e) =>
-                  field.onChange(e.target.value.replace(/[^\d]/g, ""))
-                }
+                onChange={(e) => field.onChange(e.target.value.replace(/[^\d]/g, ""))}
               />
             )}
           />

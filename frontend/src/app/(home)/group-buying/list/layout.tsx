@@ -44,11 +44,7 @@ export default function GroupBuyingViewLayout({
             component="nav"
             sx={{ borderBottom: (theme) => `1px solid ${theme.palette.divider}`, mb: 2 }}
           >
-            <TabMenu
-              tabs={TABS}
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-            />
+            <TabMenu tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
           </Box>
 
           <Box
@@ -58,7 +54,9 @@ export default function GroupBuyingViewLayout({
               mb: "1rem",
             }}
           >
-            <Suspense><SearchAndFilterHeader /></Suspense>
+            <Suspense>
+              <SearchAndFilterHeader />
+            </Suspense>
           </Box>
 
           {children}

@@ -20,13 +20,7 @@ export class PageMetaDto {
   @ApiProperty({ description: '다음 페이지 존재 여부' })
   public readonly hasNextPage: boolean;
 
-  constructor({
-    pageOptionDto,
-    totalItems,
-  }: {
-    pageOptionDto: PageOptionDto;
-    totalItems: number;
-  }) {
+  constructor({ pageOptionDto, totalItems }: { pageOptionDto: PageOptionDto; totalItems: number }) {
     this.page = pageOptionDto.page;
     this.limit = pageOptionDto.limit;
     this.totalItems = totalItems;

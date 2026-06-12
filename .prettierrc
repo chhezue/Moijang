@@ -3,5 +3,13 @@
   "semi": true,
   "tabWidth": 2,
   "printWidth": 100,
-  "trailingComma": "all"
+  "trailingComma": "all",
+  "overrides": [
+    {
+      "files": ["frontend/**/*.{ts,tsx,js,jsx}"],
+      "options": {
+        "singleQuote": false
+      }
+    }
+  ]
 }

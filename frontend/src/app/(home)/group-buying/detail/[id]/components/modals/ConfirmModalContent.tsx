@@ -32,12 +32,7 @@ const ConfirmModalContent: React.FC<ConfirmModalContentProps> = ({
 
       {/* 버튼 영역 */}
       <Box display="flex" justifyContent="end" gap={1}>
-        <Button
-          variant="contained"
-          color="error"
-          size="small"
-          onClick={onConfirm}
-        >
+        <Button variant="contained" color="error" size="small" onClick={onConfirm}>
           {confirmLabel}
         </Button>
       </Box>

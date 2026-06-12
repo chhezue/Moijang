@@ -1,10 +1,4 @@
-import {
-  FormControl,
-  Select,
-  MenuItem,
-  InputLabel,
-  SelectChangeEvent,
-} from "@mui/material";
+import { FormControl, Select, MenuItem, InputLabel, SelectChangeEvent } from "@mui/material";
 
 interface Option {
   value: string;
@@ -18,12 +12,7 @@ interface FilterDropdownProps {
   options: Option[];
 }
 
-const FilterDropdown: React.FC<FilterDropdownProps> = ({
-  label,
-  value,
-  onChange,
-  options,
-}) => {
+const FilterDropdown: React.FC<FilterDropdownProps> = ({ label, value, onChange, options }) => {
   return (
     <FormControl size="small" fullWidth sx={{ minWidth: 50 }}>
       <InputLabel
@@ -60,11 +49,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
         }}
       >
         {options.map((option) => (
-          <MenuItem
-            key={option.value}
-            value={option.value}
-            sx={{ fontSize: "14px" }}
-          >
+          <MenuItem key={option.value} value={option.value} sx={{ fontSize: "14px" }}>
             {option.label}
           </MenuItem>
         ))}

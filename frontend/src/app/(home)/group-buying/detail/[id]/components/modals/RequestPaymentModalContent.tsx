@@ -1,14 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import {
-  Button,
-  Box,
-  Typography,
-  FormControlLabel,
-  Checkbox,
-  alpha,
-  SxProps,
-} from "@mui/material";
+import { Button, Box, Typography, FormControlLabel, Checkbox, alpha, SxProps } from "@mui/material";
 import { IParticipant, GroupBuyingItem } from "@/types/groupBuying";
 import { ModalType } from "@/app/(home)/group-buying/detail/[id]/components/types";
 import { theme } from "@/styles/theme";
@@ -42,10 +34,7 @@ const InfoItem = ({ label, value, sx, valueSx }: InfoItemProps) => (
       ...sx, // 커스텀 스타일 적용
     }}
   >
-    <Typography
-      variant="body2"
-      sx={{ fontSize: "0.8rem", color: "text.secondary" }}
-    >
+    <Typography variant="body2" sx={{ fontSize: "0.8rem", color: "text.secondary" }}>
       {label}
     </Typography>
     <Typography
@@ -62,12 +51,7 @@ const InfoItem = ({ label, value, sx, valueSx }: InfoItemProps) => (
   </Box>
 );
 
-const RequestPaymentModalContent = ({
-  item,
-  participants,
-  onConfirm,
-  onOpenModal,
-}: Props) => {
+const RequestPaymentModalContent = ({ item, participants, onConfirm, onOpenModal }: Props) => {
   const [isAgreed, setIsAgreed] = useState(false);
 
   return (
@@ -188,10 +172,7 @@ const RequestPaymentModalContent = ({
                 px: 2,
                 py: 1.5,
                 borderRadius: 1.5,
-                bgcolor:
-                  index % 2 === 0
-                    ? alpha(theme.palette.grey[50], 0.5)
-                    : "transparent",
+                bgcolor: index % 2 === 0 ? alpha(theme.palette.grey[50], 0.5) : "transparent",
               }}
             >
               <Box display="flex" alignItems="center" gap={1}>
@@ -216,10 +197,7 @@ const RequestPaymentModalContent = ({
                 </Typography>
               </Box>
               <Box display="flex" alignItems="center" gap={1}>
-                <Typography
-                  variant="body2"
-                  sx={{ fontSize: "0.8rem", color: "text.secondary" }}
-                >
+                <Typography variant="body2" sx={{ fontSize: "0.8rem", color: "text.secondary" }}>
                   {p.count}개
                 </Typography>
                 <Typography
@@ -291,8 +269,7 @@ const RequestPaymentModalContent = ({
             <br />
             - 금액 확인: 요청 후에는 금액 변경이 불가해요. <br />- 입금 기한:{" "}
             <strong>요청 후 24시간 내</strong> <br />
-            ※ 기한 내 1명이라도 미입금 시 공구는 자동 취소되고, 환불 절차가
-            진행돼요.
+            ※ 기한 내 1명이라도 미입금 시 공구는 자동 취소되고, 환불 절차가 진행돼요.
             <br />※ 금액 차이가 크다면 먼저 팀원과 상의하는 것을 권장드려요.
           </Typography>
         </Box>

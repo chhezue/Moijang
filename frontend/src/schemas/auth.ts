@@ -14,11 +14,9 @@ export const nameSchema = z
 export const emailLocalSchema = z
   .string()
   .min(1, "이메일 아이디를 입력해주세요.")
-  .regex(/^[a-zA-Z0-9._%+\-]+$/, "올바른 형식이 아닙니다.");
+  .regex(/^[-a-zA-Z0-9._%+]+$/, "올바른 형식이 아닙니다.");
 
-export const emailSchema = z
-  .string()
-  .email("올바른 이메일 형식이 아닙니다.");
+export const emailSchema = z.string().email("올바른 이메일 형식이 아닙니다.");
 
 export const passwordSchema = z
   .string()

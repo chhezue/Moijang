@@ -74,11 +74,7 @@ const getNoticeMessage = (item: GroupBuyingItem): Notice | null => {
     };
   }
 
-  if (
-    isParticipant &&
-    !isOwner &&
-    groupBuyingStatus === "PAYMENT_IN_PROGRESS"
-  ) {
+  if (isParticipant && !isOwner && groupBuyingStatus === "PAYMENT_IN_PROGRESS") {
     if (!isPaid && count > 0) {
       const amount = (count * item.estimatedPrice).toLocaleString("ko-KR");
       return {
@@ -160,8 +156,7 @@ const getNoticeMessage = (item: GroupBuyingItem): Notice | null => {
           </div>
 
           <div style={{ marginTop: "0.75rem", color: "#555" }}>
-            ※ 배송 완료일로부터 <strong>3일 후</strong>에 공동구매는 자동
-            종료돼요.
+            ※ 배송 완료일로부터 <strong>3일 후</strong>에 공동구매는 자동 종료돼요.
           </div>
         </>
       ),

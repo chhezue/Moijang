@@ -27,8 +27,7 @@
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1),
-    0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 
   /* Radius */
   --radius-lg: 16px;
@@ -71,20 +70,12 @@
 
 /* Accent Variants */
 .bento-accent-main {
-  background: linear-gradient(
-    180deg,
-    rgba(139, 92, 246, 0.06),
-    rgba(139, 92, 246, 0.02)
-  );
+  background: linear-gradient(180deg, rgba(139, 92, 246, 0.06), rgba(139, 92, 246, 0.02));
   border-color: rgba(139, 92, 246, 0.25);
 }
 
 .bento-accent-sub {
-  background: linear-gradient(
-    180deg,
-    rgba(245, 158, 11, 0.08),
-    rgba(245, 158, 11, 0.03)
-  );
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.08), rgba(245, 158, 11, 0.03));
   border-color: rgba(245, 158, 11, 0.28);
 }
 

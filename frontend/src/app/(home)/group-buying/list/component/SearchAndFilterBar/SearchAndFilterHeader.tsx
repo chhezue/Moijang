@@ -21,10 +21,7 @@ export default function SearchAndFilterHeader() {
     category: searchParams.get("category") || "",
   });
 
-  const handleLocalFilterChange = (
-    key: keyof typeof localFilters,
-    value: string
-  ) => {
+  const handleLocalFilterChange = (key: keyof typeof localFilters, value: string) => {
     setLocalFilters((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -32,11 +29,9 @@ export default function SearchAndFilterHeader() {
   const handleApplyFilters = () => {
     const currentParams = new URLSearchParams(); // 빈 파라미터에서 시작
     // 로컬 상태의 값이 존재할 때만 파라미터에 추가
-    if (localFilters.keyword)
-      currentParams.set("keyword", localFilters.keyword);
+    if (localFilters.keyword) currentParams.set("keyword", localFilters.keyword);
     if (localFilters.status) currentParams.set("status", localFilters.status);
-    if (localFilters.category)
-      currentParams.set("category", localFilters.category);
+    if (localFilters.category) currentParams.set("category", localFilters.category);
 
     currentParams.set("page", "1");
     router.push(`${pathname}?${currentParams.toString()}`);
@@ -87,9 +82,7 @@ export default function SearchAndFilterHeader() {
               <FilterDropdown
                 label="진행 상태"
                 value={localFilters.status}
-                onChange={(e: any) =>
-                  handleLocalFilterChange("status", e.target.value)
-                }
+                onChange={(e: any) => handleLocalFilterChange("status", e.target.value)}
                 options={statusOptions}
               />
             </Box>
@@ -97,18 +90,14 @@ export default function SearchAndFilterHeader() {
               <FilterDropdown
                 label="카테고리"
                 value={localFilters.category}
-                onChange={(e: any) =>
-                  handleLocalFilterChange("category", e.target.value)
-                }
+                onChange={(e: any) => handleLocalFilterChange("category", e.target.value)}
                 options={categoryOptions}
               />
             </Box>
             <Box sx={{ flex: 4 }}>
               <SearchInput
                 initialValue={localFilters.keyword} // 초기값 설정
-                onValueChange={(keyword) =>
-                  handleLocalFilterChange("keyword", keyword)
-                }
+                onValueChange={(keyword) => handleLocalFilterChange("keyword", keyword)}
               />
             </Box>
             <Box sx={{ flex: 1 }}>

@@ -41,11 +41,7 @@ export class ParticipantRepository {
     return this.participantModel.findOne(query);
   }
 
-  async findOneAndUpdate(
-    query: any,
-    update: UpdateQuery<Participant>,
-    options: { new: boolean },
-  ) {
+  async findOneAndUpdate(query: any, update: UpdateQuery<Participant>, options: { new: boolean }) {
     return this.participantModel.findOneAndUpdate(query, update, options);
   }
 
@@ -72,9 +68,7 @@ export class ParticipantRepository {
     optionDto: PageOptionDto,
   ): Promise<PageResponseDto<GroupBuying>> {
     // 1. 내가 참여한 모든 groupBuying의 ID 목록 조회
-    const participatedRecords = await this.participantModel
-      .find({ userId })
-      .lean();
+    const participatedRecords = await this.participantModel.find({ userId }).lean();
     const participatedGbIds = participatedRecords.map((p) => p.gbId);
 
     // 참여한 공구가 없으면 null 반환

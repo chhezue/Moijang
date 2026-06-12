@@ -32,8 +32,7 @@ function useHeaderStyles() {
     left: 0,
     zIndex: 999,
     borderBottom: `1px solid ${theme.palette.divider}`,
-    transition:
-      "background-color 240ms ease, box-shadow 240ms ease, border-color 240ms ease",
+    transition: "background-color 240ms ease, box-shadow 240ms ease, border-color 240ms ease",
     display: "flex",
     alignItems: "center",
     background: scrolled

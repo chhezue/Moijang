@@ -1,9 +1,5 @@
 import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
-import {
-  CancelReason,
-  GroupBuyingStatus,
-  ProductCategory,
-} from '../const/group-buying.const';
+import { CancelReason, GroupBuyingStatus, ProductCategory } from '../const/group-buying.const';
 import { Document } from 'mongoose';
 
 const options: SchemaOptions = {

@@ -1,15 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
-import {
-  Box,
-  Button,
-  CircularProgress,
-  TextField,
-  Typography,
-  Grid,
-  alpha,
-} from "@mui/material";
+import { Box, Button, CircularProgress, TextField, Typography, Grid, alpha } from "@mui/material";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSnackbar } from "@/providers/SnackbarProvider";
@@ -61,9 +53,7 @@ const EditPriceModalContent = ({ item, onSuccess }: Props) => {
   }, [price, shipping, qty]);
 
   const estimatedPriceText =
-    estimatedPrice == null
-      ? "—"
-      : `${new Intl.NumberFormat("ko-KR").format(estimatedPrice)}원`;
+    estimatedPrice == null ? "—" : `${new Intl.NumberFormat("ko-KR").format(estimatedPrice)}원`;
 
   // API 호출
   const onSubmit = async (data: UpdatePriceInput) => {
@@ -156,9 +146,7 @@ const EditPriceModalContent = ({ item, onSuccess }: Props) => {
                 }}
               >
                 💡 산정된 1개당 가격 = <strong>{estimatedPriceText}</strong>
-                <span style={{ fontSize: "0.75rem", opacity: 0.8 }}>
-                  (수정 불가, 자동 계산)
-                </span>
+                <span style={{ fontSize: "0.75rem", opacity: 0.8 }}>(수정 불가, 자동 계산)</span>
               </Typography>
             </Box>
           </Grid>

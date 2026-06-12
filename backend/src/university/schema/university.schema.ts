@@ -22,16 +22,16 @@ const options: SchemaOptions = {
 
 @Schema(options)
 export class University extends Document {
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   name: string;
 
-  @Prop({required: false})
+  @Prop({ required: true })
   domain: string;
 
-  @Prop()
+  @Prop({ required: true })
   campusType: string;
 
-  @Prop()
+  @Prop({ required: true })
   region: string;
 }
 

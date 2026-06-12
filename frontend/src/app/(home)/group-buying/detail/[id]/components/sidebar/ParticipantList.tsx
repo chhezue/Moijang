@@ -20,24 +20,11 @@ interface ParticipantListProps {
   status: string;
 }
 
-const ParticipantList: React.FC<ParticipantListProps> = ({
-  participants,
-  leaderId,
-  status,
-}) => {
+const ParticipantList: React.FC<ParticipantListProps> = ({ participants, leaderId, status }) => {
   return (
     <Box>
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="space-between"
-        mb={2}
-      >
-        <Typography
-          variant="subtitle1"
-          fontWeight={600}
-          sx={{ fontSize: "1rem" }}
-        >
+      <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+        <Typography variant="subtitle1" fontWeight={600} sx={{ fontSize: "1rem" }}>
           참여자
         </Typography>
         <Chip
@@ -141,10 +128,8 @@ const ParticipantList: React.FC<ParticipantListProps> = ({
                         "&.MuiChip-outlined": {
                           borderColor: (theme) => {
                             const chipProps = getChipProps();
-                            if (chipProps.color === "primary")
-                              return theme.palette.primary.main;
-                            if (chipProps.color === "success")
-                              return theme.palette.success.main;
+                            if (chipProps.color === "primary") return theme.palette.primary.main;
+                            if (chipProps.color === "success") return theme.palette.success.main;
                             return theme.palette.grey[500];
                           },
                         },

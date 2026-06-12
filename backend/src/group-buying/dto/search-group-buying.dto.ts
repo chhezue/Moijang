@@ -1,10 +1,7 @@
 import { IsOptional, IsString } from 'class-validator';
 import { PageOptionDto } from '../../common/dto/page-option.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  GroupBuyingStatus,
-  ProductCategory,
-} from '../const/group-buying.const';
+import { GroupBuyingStatus, ProductCategory } from '../const/group-buying.const';
 
 export class SearchGroupBuyingDto extends PageOptionDto {
   // page, limit, orderBy

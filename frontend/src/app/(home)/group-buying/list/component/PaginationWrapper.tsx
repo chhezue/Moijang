@@ -9,10 +9,7 @@ interface PaginationWrapperProps {
   count: number; // 전체 페이지 수
 }
 
-export const PaginationWrapper: React.FC<PaginationWrapperProps> = ({
-  page,
-  count,
-}) => {
+export const PaginationWrapper: React.FC<PaginationWrapperProps> = ({ page, count }) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams(); // 현재 URL의 searchParams를 읽어옵니다.
@@ -30,12 +27,5 @@ export const PaginationWrapper: React.FC<PaginationWrapperProps> = ({
     router.push(`${pathname}?${currentParams.toString()}`);
   };
 
-  return (
-    <Pagination
-      page={page}
-      count={count}
-      onChange={handleChange}
-      color="primary"
-    />
-  );
+  return <Pagination page={page} count={count} onChange={handleChange} color="primary" />;
 };

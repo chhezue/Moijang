@@ -1,5 +1,5 @@
-import { Prop, Schema, SchemaFactory, SchemaOptions } from "@nestjs/mongoose";
-import { Document, Schema as MongooseSchema } from "mongoose";
+import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 
 const options: SchemaOptions = {
   timestamps: true,
@@ -36,13 +36,13 @@ export class User extends Document {
 
   @Prop({
     type: MongooseSchema.Types.ObjectId,
-    ref: "University",
+    ref: 'University',
     required: true,
   })
   universityId: MongooseSchema.Types.ObjectId;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
-UserSchema.virtual("id").get(function (this: any) {
+UserSchema.virtual('id').get(function (this: any) {
   return this._id?.toString();
 });

@@ -1,8 +1,8 @@
-import { Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { Model, FilterQuery } from "mongoose";
-import { University } from "./schema/university.schema";
-import { SearchUniversityDto } from "./dto/search-university.dto";
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, FilterQuery } from 'mongoose';
+import { University } from './schema/university.schema';
+import { SearchUniversityDto } from './dto/search-university.dto';
 
 @Injectable()
 export class UniversityRepository {
@@ -15,7 +15,7 @@ export class UniversityRepository {
     const query: FilterQuery<University> = {};
     const keyword = searchDto.keyword?.trim();
     if (keyword) {
-      query.name = { $regex: keyword, $options: "i" };
+      query.name = { $regex: keyword, $options: 'i' };
     }
     return this.universityModel.find(query).sort({ name: 1 }).exec();
   }

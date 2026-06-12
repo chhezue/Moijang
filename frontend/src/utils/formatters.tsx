@@ -14,9 +14,7 @@ export const calcDday = (endDate: string) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const diff = Math.ceil(
-    (end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
-  );
+  const diff = Math.ceil((end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
   if (diff > 0) return `D-${diff}`;
   if (diff === 0) return "D-DAY";

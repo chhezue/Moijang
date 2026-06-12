@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  Box,
-  Typography,
-  Divider,
-  Link as MuiLink,
-  Stack,
-  Skeleton,
-} from "@mui/material";
+import { Box, Typography, Divider, Link as MuiLink, Stack, Skeleton } from "@mui/material";
 import StatusTag from "@/components/StatusTag";
 import { GroupBuyingItem } from "@/types/groupBuying";
 import { useStatusContext } from "@/providers/StatusProvider";
@@ -19,19 +12,9 @@ interface DetailInfoSectionProps {
   item: GroupBuyingItem;
 }
 
-const InfoItem = ({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) => (
+const InfoItem = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <Stack sx={{ p: 2 }} spacing={0.5}>
-    <Typography
-      variant="caption"
-      color="text.secondary"
-      sx={{ fontWeight: 500 }}
-    >
+    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
       {label}
     </Typography>
     <Box>
@@ -43,16 +26,8 @@ const InfoItem = ({
 );
 
 const DetailInfoSection: React.FC<DetailInfoSectionProps> = ({ item }) => {
-  const {
-    isLoading: isStatusLoading,
-    statusMap,
-    colorMap,
-  } = useStatusContext();
-  const {
-    categoryMap,
-    categoryIconMap,
-    isLoading: isCategoryLoading,
-  } = useCategoryContext();
+  const { isLoading: isStatusLoading, statusMap, colorMap } = useStatusContext();
+  const { categoryMap, categoryIconMap, isLoading: isCategoryLoading } = useCategoryContext();
 
   const isLoading = isStatusLoading || isCategoryLoading;
 
@@ -158,11 +133,7 @@ const DetailInfoSection: React.FC<DetailInfoSectionProps> = ({ item }) => {
           >
             {item.leaderId.displayName}
           </Typography>
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{ fontSize: "0.75rem" }}
-          >
+          <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.75rem" }}>
             • {item.leaderId.department}
           </Typography>
         </Box>
@@ -204,13 +175,9 @@ const DetailInfoSection: React.FC<DetailInfoSectionProps> = ({ item }) => {
           {new Date(item.startDate).toLocaleDateString()} ~ <br />
           {new Date(item.endDate).toLocaleDateString()}
         </InfoItem>
-        <InfoItem label="상품 총 가격">
-          {formatCurrency(item.totalPrice)}
-        </InfoItem>
+        <InfoItem label="상품 총 가격">{formatCurrency(item.totalPrice)}</InfoItem>
         <InfoItem label="배송비">{formatCurrency(item.shippingFee)}</InfoItem>
-        <InfoItem label="1개당 가격(배송비 포함)">
-          {formatCurrency(item.estimatedPrice)}
-        </InfoItem>
+        <InfoItem label="1개당 가격(배송비 포함)">{formatCurrency(item.estimatedPrice)}</InfoItem>
       </Box>
 
       {/* 상세 설명 */}

@@ -13,9 +13,7 @@ import { TasksModule } from './scheduler/task.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: GroupBuying.name, schema: GroupBuyingSchema },
-    ]),
+    MongooseModule.forFeature([{ name: GroupBuying.name, schema: GroupBuyingSchema }]),
     CommonModule,
     AuthModule,
     UserModule,

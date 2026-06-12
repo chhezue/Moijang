@@ -76,10 +76,7 @@ export const CANCEL_REASON_LABELS = {
 };
 
 // 헬퍼 함수 - enum을 key-label 배열로 변환
-export const getEnumOptions = (
-  enumObject: any,
-  labels: Record<string, string>,
-) => {
+export const getEnumOptions = (enumObject: any, labels: Record<string, string>) => {
   return Object.values(enumObject).map((key) => ({
     key,
     label: labels[key as string],

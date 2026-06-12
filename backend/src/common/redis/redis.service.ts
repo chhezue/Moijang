@@ -1,6 +1,6 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRedis } from "@nestjs-modules/ioredis";
-import Redis from "ioredis";
+import { Injectable } from '@nestjs/common';
+import { InjectRedis } from '@nestjs-modules/ioredis';
+import Redis from 'ioredis';
 
 /**
  * 앱 전역에서 사용할 Redis 래퍼.

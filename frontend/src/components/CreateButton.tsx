@@ -51,19 +51,13 @@ export default function CreateButton({
         })}
         aria-label="공동구매 생성"
       >
-        <AddIcon
-          fontSize={
-            size === "small" ? "small" : size === "large" ? "large" : "medium"
-          }
-        />
+        <AddIcon fontSize={size === "small" ? "small" : size === "large" ? "large" : "medium"} />
       </IconButton>
 
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>로그인이 필요합니다</DialogTitle>
         <DialogContent>
-          <Typography variant="body2">
-            공동구매를 생성하려면 먼저 로그인해 주세요.
-          </Typography>
+          <Typography variant="body2">공동구매를 생성하려면 먼저 로그인해 주세요.</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>취소</Button>
