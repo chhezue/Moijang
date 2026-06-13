@@ -2,8 +2,6 @@
 import React, { useEffect, useState } from "react";
 import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
 import { useRouter } from "next/navigation";
-import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
-import { logout } from "@/apis/services/auth";
 import LoginIcon from "@mui/icons-material/Login";
 import CreateButton from "@/components/CreateButton";
 import UserMenu from "@/components/UserMenu";
@@ -47,17 +45,6 @@ const Header: React.FC = () => {
   const styles = useHeaderStyles();
   const theme = useTheme();
   const user = useAuthStore((s) => s.user);
-  const clearUser = useAuthStore((s) => s.clearUser);
-
-  const onLogout = async () => {
-    try {
-      await logout();
-      clearUser();
-      router.refresh();
-    } catch (error) {
-      console.error("로그아웃 실패:", error);
-    }
-  };
 
   const onLogin = () => {
     router.push("/login");
@@ -153,21 +140,7 @@ const Header: React.FC = () => {
           {/* 공구 생성 버튼 */}
           <CreateButton />
 
-          {user ? (
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={onLogout}
-              startIcon={<LogoutOutlinedIcon />}
-              sx={{
-                fontSize: "0.75rem",
-                padding: "6px 10px",
-                borderRadius: 999,
-              }}
-            >
-              로그아웃
-            </Button>
-          ) : (
+          {!user && (
             <Button
               variant="outlined"
               size="small"

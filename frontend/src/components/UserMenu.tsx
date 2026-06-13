@@ -17,6 +17,9 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
+import { logout } from "@/apis/services/auth";
+import { useAuthStore } from "@/store/authStore";
 
 interface UserMenuProps {
   displayName: string;
@@ -39,8 +42,20 @@ const UserMenu: React.FC<UserMenuProps> = ({ displayName }) => {
   const theme = useTheme();
   const router = useRouter();
   const pathname = usePathname();
+  const clearUser = useAuthStore((s) => s.clearUser);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [open, setOpen] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      clearUser();
+      router.refresh();
+    } catch (error) {
+      console.error("로그아웃 실패:", error);
+    }
+    handleClose();
+  };
 
   const handleToggle = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -205,6 +220,36 @@ const UserMenu: React.FC<UserMenuProps> = ({ displayName }) => {
                       </MenuItem>
                     );
                   })}
+
+                  <Divider sx={{ my: 0.5 }} />
+
+                  <MenuItem
+                    onClick={handleLogout}
+                    sx={{
+                      py: 1,
+                      px: 2,
+                      mx: 0.5,
+                      my: 0.25,
+                      borderRadius: 1.5,
+                      transition: "all 120ms ease-out",
+                      color: theme.palette.text.secondary,
+                      "&:hover": {
+                        backgroundColor: "rgba(239, 68, 68, 0.06)",
+                        color: theme.palette.error.main,
+                        "& .logout-icon": { color: theme.palette.error.main },
+                      },
+                    }}
+                  >
+                    <Box
+                      className="logout-icon"
+                      sx={{ mr: 1.5, color: "inherit", transition: "color 120ms ease-out" }}
+                    >
+                      <LogoutOutlinedIcon sx={{ fontSize: "1rem" }} />
+                    </Box>
+                    <Typography variant="body2" sx={{ fontSize: "0.875rem" }}>
+                      로그아웃
+                    </Typography>
+                  </MenuItem>
                 </MenuList>
               </Paper>
             </Fade>
