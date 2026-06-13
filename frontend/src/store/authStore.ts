@@ -1,4 +1,5 @@
-import { create } from "zustand";
+import { createStore, useStore } from "zustand";
+import { createContext, useContext } from "react";
 import { UserDto } from "@/types/auth";
 
 interface AuthState {
@@ -7,8 +8,19 @@ interface AuthState {
   clearUser: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  setUser: (user) => set({ user }),
-  clearUser: () => set({ user: null }),
-}));
+export type AuthStoreApi = ReturnType<typeof createAuthStore>;
+
+export const createAuthStore = (initialUser: UserDto | null) =>
+  createStore<AuthState>()((set) => ({
+    user: initialUser,
+    setUser: (user) => set({ user }),
+    clearUser: () => set({ user: null }),
+  }));
+
+export const AuthStoreContext = createContext<AuthStoreApi | null>(null);
+
+export function useAuthStore<T>(selector: (state: AuthState) => T): T {
+  const store = useContext(AuthStoreContext);
+  if (!store) throw new Error("useAuthStore must be used within AuthStoreProvider");
+  return useStore(store, selector);
+}

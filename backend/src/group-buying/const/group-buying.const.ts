@@ -1,8 +1,7 @@
+// PG 결제로 인해 PAYMENT_IN_PROGRESS, ORDER_PENDING 삭제
 export enum GroupBuyingStatus {
   RECRUITING = 'RECRUITING', // 모집 중
   CONFIRMED = 'CONFIRMED', // 모집 완료
-  PAYMENT_IN_PROGRESS = 'PAYMENT_IN_PROGRESS', // 입금 진행 중
-  ORDER_PENDING = 'ORDER_PENDING', // 주문 대기
   ORDERED = 'ORDERED', // 주문 진행 중
   SHIPPED = 'SHIPPED', // 배송 완료
   CANCELLED = 'CANCELLED', // 공구 취소
@@ -28,10 +27,10 @@ export enum ProductCategory {
   ETC = 'ETC', // 기타 중고물품
 }
 
+// TODO 스케줄링 다시 구현
 export enum CancelReason {
   LEADER_CANCELLED = 'LEADER_CANCELLED', // 총대 개인 사유
   RECRUITMENT_FAILED = 'RECRUITMENT_FAILED', // 모집 인원 미달
-  PAYMENT_FAILED = 'PAYMENT_FAILED', // 미입금자 발생
   PRODUCT_UNAVAILABLE = 'PRODUCT_UNAVAILABLE', // 상품 품절 또는 가격 변동
   SYSTEM_CANCELLED = 'SYSTEM_CANCELLED', // 시스템 자동 취소 (ex: 시간 초과)
 }
@@ -40,8 +39,6 @@ export enum CancelReason {
 export const GROUP_BUYING_STATUS_LABELS = {
   [GroupBuyingStatus.RECRUITING]: '모집 중',
   [GroupBuyingStatus.CONFIRMED]: '모집 완료',
-  [GroupBuyingStatus.PAYMENT_IN_PROGRESS]: '입금 진행 중',
-  [GroupBuyingStatus.ORDER_PENDING]: '주문 대기',
   [GroupBuyingStatus.ORDERED]: '주문 진행 중',
   [GroupBuyingStatus.SHIPPED]: '배송 완료',
   [GroupBuyingStatus.CANCELLED]: '공구 취소',
@@ -70,7 +67,6 @@ export const PRODUCT_CATEGORY_LABELS = {
 export const CANCEL_REASON_LABELS = {
   [CancelReason.LEADER_CANCELLED]: '총대 개인 사유',
   [CancelReason.RECRUITMENT_FAILED]: '모집 인원 미달',
-  [CancelReason.PAYMENT_FAILED]: '미입금자 발생',
   [CancelReason.PRODUCT_UNAVAILABLE]: '상품 품절 또는 가격 변동',
   [CancelReason.SYSTEM_CANCELLED]: '시스템 자동 취소',
 };

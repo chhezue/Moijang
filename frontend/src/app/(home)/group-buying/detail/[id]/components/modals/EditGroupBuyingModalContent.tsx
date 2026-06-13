@@ -18,7 +18,6 @@ import {
 } from "@mui/material";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { BANK_NAMES, BankName } from "@/constants/bank";
 import {
   updateGroupBuyingSchema,
   UpdateGroupBuyingInput,
@@ -60,8 +59,6 @@ const EditGroupBuyingModalContent = ({ item, close, onlyPrice = false }: Props) 
       description: item.description,
       totalPrice: item.totalPrice, // number
       shippingFee: item.shippingFee, // number
-      account: item.account,
-      bank: item.bank as BankName,
       endDate: item.endDate.split("T")[0], // yyyy-MM-dd
       category: item.category,
       leaderCount: item.leaderCount, // number
@@ -422,84 +419,6 @@ const EditGroupBuyingModalContent = ({ item, close, onlyPrice = false }: Props) 
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
                   onChange={(e) => field.onChange(e.target.value.replace(/[^\d]/g, ""))}
-                  sx={{
-                    "& .MuiInputLabel-root": { fontSize: "0.85rem" },
-                    "& .MuiInputBase-input": { fontSize: "0.85rem" },
-                    "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
-                  }}
-                />
-              )}
-            />
-          </Grid>
-        </Grid>
-      </Box>
-      {/* 입금 정보 */}
-      <Box mb={3}>
-        <Box
-          sx={{
-            mb: 2,
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-          }}
-        >
-          <Box
-            sx={{
-              width: 4,
-              height: 20,
-              bgcolor: theme.palette.primary.main,
-              borderRadius: 1,
-            }}
-          />
-          <Typography
-            variant="subtitle1"
-            fontWeight={600}
-            sx={{
-              fontSize: "1rem",
-              color: "text.primary",
-            }}
-          >
-            3. 입금 정보 및 최종 확인
-          </Typography>
-        </Box>
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Controller
-              name="bank"
-              control={control}
-              render={({ field, fieldState }) => (
-                <FormControl
-                  fullWidth
-                  error={!!fieldState.error}
-                  sx={{
-                    "& .MuiInputLabel-root": { fontSize: "0.85rem" },
-                    "& .MuiSelect-select": { fontSize: "0.85rem" },
-                    "& .MuiMenuItem-root": { fontSize: "0.85rem" },
-                  }}
-                >
-                  <InputLabel id="bank-label">은행</InputLabel>
-                  <Select {...field} labelId="bank-label">
-                    {BANK_NAMES.map((bank) => (
-                      <MenuItem key={bank} value={bank}>
-                        {bank}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Controller
-              name="account"
-              control={control}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  label="계좌번호"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
                   sx={{
                     "& .MuiInputLabel-root": { fontSize: "0.85rem" },
                     "& .MuiInputBase-input": { fontSize: "0.85rem" },

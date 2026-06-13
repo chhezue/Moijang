@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import Providers from "@/providers/Providers";
+import { AuthStoreProvider } from "@/providers/AuthStoreProvider";
 import { getMyInfoServer } from "@/apis/services/auth.server";
 
 export default async function AuthLayout({
@@ -12,10 +13,12 @@ export default async function AuthLayout({
   if (user) redirect("/");
 
   return (
-    <Providers initialUser={null}>
-      <main className="grid min-h-screen w-full place-items-center overflow-hidden py-10">
-        <Suspense>{children}</Suspense>
-      </main>
-    </Providers>
+    <AuthStoreProvider initialUser={null}>
+      <Providers>
+        <main className="grid min-h-screen w-full place-items-center overflow-hidden py-10">
+          <Suspense>{children}</Suspense>
+        </main>
+      </Providers>
+    </AuthStoreProvider>
   );
 }

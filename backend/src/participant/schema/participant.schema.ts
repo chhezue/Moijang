@@ -1,40 +1,52 @@
 import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 
 const options: SchemaOptions = {
-  timestamps: true, // 기존에 사용하던 timestamps 옵션
+  timestamps: true,
+  versionKey: false,
   toJSON: {
-    virtuals: true, // virtual 필드(id)를 JSON에 포함
+    virtuals: true,
+    transform: (_doc, ret) => {
+      delete ret._id;
+      return ret;
+    },
   },
   toObject: {
-    virtuals: true, // virtual 필드를 객체에 포함
+    virtuals: true,
+    transform: (_doc, ret) => {
+      delete ret._id;
+      return ret;
+    },
   },
 };
 
 @Schema(options)
 export class Participant extends Document {
-  @Prop({ type: String, ref: 'User' })
-  userId: string;
+  @Prop({
+    type: MongooseSchema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  })
+  userId: MongooseSchema.Types.ObjectId;
 
-  @Prop({ type: String, ref: 'GroupBuying' })
-  gbId: string;
-
-  @Prop({ default: false })
-  isPaid: boolean;
-
-  @Prop()
-  refundAccount: string;
-
-  @Prop()
-  refundBank: string;
+  @Prop({
+    type: MongooseSchema.Types.ObjectId,
+    ref: 'GroupBuying',
+    required: true,
+  })
+  gbId: MongooseSchema.Types.ObjectId;
 
   @Prop()
   count: number;
 
-  // @Prop()
-  // confirmedPrice: number;
-
   @Prop({ default: () => Date.now() })
   joinedDate: Date;
 }
+
 export const ParticipantSchema = SchemaFactory.createForClass(Participant);
+
+// gbId와 userId의 조합은 DB에 유일하게 존재한다. (동시성/조회 성능 문제 해결)
+ParticipantSchema.index({ gbId: 1, userId: 1 }, { unique: true });
+ParticipantSchema.virtual('id').get(function (this: any) {
+  return this._id?.toString();
+});

@@ -9,12 +9,9 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
-  MenuItem,
-  Select,
   Checkbox,
   alpha,
 } from "@mui/material";
-import { IParticipant } from "@/types/groupBuying";
 import { theme } from "@/styles/theme";
 
 // 컨테이너 스타일
@@ -27,13 +24,12 @@ const Wrapper = styled.div`
 `;
 
 // 취소 사유 enum 값 + UI 설정
-const CancelReasonConfig: Record<string, { label: string; needParticipant?: boolean }> = {
-  PAYMENT_FAILED: {
-    label: "팀원 중 입금하지 않은 사람이 있어요.",
-    needParticipant: true,
-  },
+const CancelReasonConfig: Record<string, { label: string }> = {
   PRODUCT_UNAVAILABLE: {
     label: "상품이 품절되었거나 가격이 변동되었어요.",
+  },
+  RECRUITMENT_FAILED: {
+    label: "모집 인원이 부족해요.",
   },
   LEADER_CANCELLED: {
     label: "개인적인 사정이에요.",
@@ -41,23 +37,20 @@ const CancelReasonConfig: Record<string, { label: string; needParticipant?: bool
 };
 
 interface Props {
-  participants: IParticipant[];
-  onConfirm: (reason: string, participantId?: string[]) => void;
+  onConfirm: (reason: string) => void;
   visibleReasons?: string[]; // 필요한 경우 특정 사유만 노출
 }
 
 const CancelReasonModalContent = ({
-  participants,
   onConfirm,
   visibleReasons = Object.keys(CancelReasonConfig),
 }: Props) => {
   const [selectedReason, setSelectedReason] = useState<string>("");
-  const [selectedParticipantList, setSelectedParticipantList] = useState<string[]>([]);
   const [isAgreed, setIsAgreed] = useState(false);
 
   const handleConfirm = () => {
     if (!selectedReason || !isAgreed) return;
-    onConfirm(selectedReason, selectedParticipantList || undefined);
+    onConfirm(selectedReason);
   };
 
   return (
@@ -88,61 +81,6 @@ const CancelReasonModalContent = ({
                     },
                   }}
                 />
-
-                {/* 참가자 선택 UI */}
-                {selectedReason === reason && config.needParticipant && (
-                  <Box
-                    sx={{
-                      ml: 2,
-                      mb: 1,
-                      p: 2,
-                      bgcolor: "grey.50",
-                      borderRadius: 1,
-                    }}
-                  >
-                    <Typography
-                      variant="caption"
-                      display="block"
-                      gutterBottom
-                      sx={{
-                        fontSize: "0.8rem",
-                        fontWeight: 600,
-                        color: "text.primary",
-                        mb: 1,
-                      }}
-                    >
-                      어떤 팀원이 입금하지 않았나요?
-                    </Typography>
-                    <Select
-                      multiple
-                      size="small"
-                      fullWidth
-                      value={selectedParticipantList}
-                      onChange={(e) => setSelectedParticipantList(e.target.value as string[])}
-                      renderValue={(selected) =>
-                        (selected as string[])
-                          .map((id) => participants.find((p) => p.id === id)?.userId.displayName)
-                          .join(", ")
-                      }
-                      sx={{
-                        "& .MuiSelect-select": { fontSize: "0.8rem" },
-                        "& .MuiMenuItem-root": { fontSize: "0.8rem" },
-                      }}
-                    >
-                      {participants.map((p) => (
-                        <MenuItem key={p.id} value={p.id}>
-                          <Checkbox
-                            checked={selectedParticipantList.indexOf(p.id) > -1}
-                            size="small"
-                          />
-                          <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
-                            {p.userId.displayName}
-                          </Typography>
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </Box>
-                )}
               </Box>
             );
           })}
@@ -170,8 +108,6 @@ const CancelReasonModalContent = ({
             }}
           >
             확인을 누르면 공동구매가 취소되고, 팀원들에게 즉시 안내돼요.
-            <br />
-            <strong>취소 후, 입금한 팀원들에게 환불을 진행해주세요.</strong>
           </Typography>
         </Box>
 

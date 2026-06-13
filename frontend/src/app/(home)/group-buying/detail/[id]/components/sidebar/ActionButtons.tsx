@@ -3,7 +3,7 @@
 import React from "react";
 import { Button } from "@mui/material";
 import styled from "styled-components";
-import { GroupBuyingItem, IParticipant, IUser } from "@/types/groupBuying";
+import { GroupBuyingItem } from "@/types/groupBuying";
 import { ModalType } from "../types";
 
 const ButtonWrap = styled.div`
@@ -18,8 +18,7 @@ interface ActionButtonsProps {
 }
 
 const ActionButtons: React.FC<ActionButtonsProps> = ({ item, onOpenModal }) => {
-  const { isOwner, isParticipant, groupBuyingStatus, participantInfo } = item;
-  const isPaid = participantInfo?.isPaid ?? false;
+  const { isOwner, isParticipant, groupBuyingStatus } = item;
 
   return (
     <ButtonWrap>
@@ -29,40 +28,15 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ item, onOpenModal }) => {
         </Button>
       )}
 
-      {!isOwner && isParticipant && (
-        <>
-          {groupBuyingStatus === "RECRUITING" && (
-            <>
-              <Button
-                variant="contained"
-                color="warning"
-                onClick={() => onOpenModal("participation", "modify")}
-                fullWidth
-              >
-                수량 및 계좌 수정
-              </Button>
-              <Button
-                variant="contained"
-                color="error"
-                onClick={() => onOpenModal("cancelParticipation")}
-                fullWidth
-              >
-                참여 취소
-              </Button>
-            </>
-          )}
-
-          {!isPaid && groupBuyingStatus === "PAYMENT_IN_PROGRESS" && (
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => onOpenModal("confirmPayment")}
-              fullWidth
-            >
-              입금 완료
-            </Button>
-          )}
-        </>
+      {!isOwner && isParticipant && groupBuyingStatus === "RECRUITING" && (
+        <Button
+          variant="contained"
+          color="error"
+          onClick={() => onOpenModal("cancelParticipation")}
+          fullWidth
+        >
+          참여 취소
+        </Button>
       )}
 
       {isOwner && (
@@ -89,12 +63,6 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ item, onOpenModal }) => {
           )}
 
           {groupBuyingStatus === "CONFIRMED" && (
-            <Button variant="contained" onClick={() => onOpenModal("requestPayment")} fullWidth>
-              결제 요청 보내기
-            </Button>
-          )}
-
-          {groupBuyingStatus === "ORDER_PENDING" && (
             <Button
               variant="contained"
               color="secondary"
@@ -106,25 +74,24 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ item, onOpenModal }) => {
           )}
 
           {groupBuyingStatus === "ORDERED" && (
-            <Button
-              variant="contained"
-              color="warning"
-              onClick={() => onOpenModal("shipped")}
-              fullWidth
-            >
-              배송 완료 및 공지
-            </Button>
-          )}
-
-          {["ORDER_PENDING", "ORDERED"].includes(groupBuyingStatus) && (
-            <Button
-              variant="contained"
-              color="error"
-              onClick={() => onOpenModal("cancelForPayment")}
-              fullWidth
-            >
-              공동구매 취소
-            </Button>
+            <>
+              <Button
+                variant="contained"
+                color="warning"
+                onClick={() => onOpenModal("shipped")}
+                fullWidth
+              >
+                배송 완료 및 공지
+              </Button>
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => onOpenModal("cancelForPayment")}
+                fullWidth
+              >
+                공동구매 취소
+              </Button>
+            </>
           )}
 
           {groupBuyingStatus === "SHIPPED" && (

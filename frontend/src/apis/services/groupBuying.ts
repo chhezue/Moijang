@@ -35,15 +35,10 @@ export const updateGroupBuying = async (
 };
 
 // 취소하기(삭제)
-export const cancelGroupBuying = async (
-  gbId: string,
-  cancelReason: string,
-  nonDepositors?: string[],
-) => {
+export const cancelGroupBuying = async (gbId: string, cancelReason: string) => {
   try {
     const { data } = await api.patch(`/api/group-buying/cancel/${gbId}`, {
       cancelReason,
-      nonDepositors,
     });
     return data;
   } catch (error: any) {

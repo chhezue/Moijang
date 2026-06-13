@@ -17,17 +17,24 @@ import { ForbiddenException } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guard/auth.guard';
 import { OptionalJwtAuthGuard } from '../auth/guard/optional-auth.guard';
 import { PageOptionDto } from '../common/dto/page-option.dto';
+import { GroupBuyingQueryService } from './query/group-buying-query.service';
+import { GroupBuyingCancelOrchestratorService } from '../cancel-orchestrator/group-buying-cancel-orchestrator.service';
+import { CancelGroupBuyingResponseDto } from '../cancel-orchestrator/dto/cancel-group-buying-response.dto';
 
 @Controller('group-buying')
 export class GroupBuyingController {
-  constructor(private readonly groupBuyingService: GroupBuyingService) {}
+  constructor(
+    private readonly groupBuyingService: GroupBuyingService,
+    private readonly groupBuyingQueryService: GroupBuyingQueryService,
+    private readonly groupBuyingCancelOrchestratorService: GroupBuyingCancelOrchestratorService,
+  ) {}
 
   @ApiOperation({ summary: '전체 공구 목록 조회' })
   @Get()
   async getAllGroupBuyings(
     @Query() searchDto: SearchGroupBuyingDto,
   ): Promise<PageResponseDto<any[]>> {
-    return await this.groupBuyingService.getAllGroupBuyings(searchDto);
+    return await this.groupBuyingQueryService.getAllGroupBuyings(searchDto);
   }
 
   @ApiOperation({ summary: '공구 enum 옵션 반환' })
@@ -39,21 +46,21 @@ export class GroupBuyingController {
   @ApiOperation({ summary: '내가 생성한 공구 목록 조회' })
   @UseGuards(JwtAuthGuard)
   @Get('/my-create')
-  async getCreatedGroupBuyings(
+  async getGroupBuyingsAsLeader(
     @UserDecorator('id') userId: string,
     @Query() optionDto: PageOptionDto,
   ): Promise<PageResponseDto<GroupBuying>> {
-    return await this.groupBuyingService.getCreatedGroupBuyings(userId, optionDto);
+    return await this.groupBuyingQueryService.getGroupBuyingsAsLeader(userId, optionDto);
   }
 
   @ApiOperation({ summary: '내가 참여한 공구 목록 조회' })
   @UseGuards(JwtAuthGuard)
   @Get('/my-participant')
-  async getParticipantGroupBuyings(
+  async getGroupBuyingsAsParticipant(
     @UserDecorator('id') userId: string,
     @Query() optionDto: PageOptionDto,
   ): Promise<PageResponseDto<GroupBuying>> {
-    return await this.groupBuyingService.getParticipatedGroupBuyings(userId, optionDto);
+    return await this.groupBuyingQueryService.getGroupBuyingsAsParticipant(userId, optionDto);
   }
 
   @ApiOperation({ summary: '공구 상세 조회' })
@@ -63,7 +70,7 @@ export class GroupBuyingController {
     @Param('gbId') gbId: string,
     @OptionalUserDecorator('id') userId?: string,
   ): Promise<any> {
-    return await this.groupBuyingService.getGroupBuyingById(gbId, userId);
+    return await this.groupBuyingQueryService.getGroupBuyingById(gbId, userId);
   }
 
   @ApiOperation({ summary: '공구 생성' })
@@ -84,11 +91,15 @@ export class GroupBuyingController {
     @Param('gbId') gbId: string,
     @Body() deleteDto: DeleteGroupBuyingDto,
     @ContextRoleDecorator() role: ContextRole,
-  ) {
+  ): Promise<CancelGroupBuyingResponseDto> {
     if (role !== ContextRole.LEADER) {
       throw new ForbiddenException('공구 취소는 총대만 가능합니다.');
     }
-    return await this.groupBuyingService.deleteGroupBuying(userId, gbId, deleteDto);
+    return await this.groupBuyingCancelOrchestratorService.cancelGroupBuying(
+      userId,
+      gbId,
+      deleteDto,
+    );
   }
 
   @ApiOperation({ summary: '공구 업데이트' })

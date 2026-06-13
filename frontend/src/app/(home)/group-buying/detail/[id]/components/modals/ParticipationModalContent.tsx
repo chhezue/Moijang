@@ -1,17 +1,12 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import TextInput from "@/components/TextInput";
 import styled from "styled-components";
-import { Button, FormControl, MenuItem, Select, Box, Typography, alpha } from "@mui/material";
-import {
-  joinParticipant,
-  modifyParticipant,
-  getParticipantInfo,
-} from "@/apis/services/participant";
+import { Button, Box, Typography, alpha } from "@mui/material";
+import { checkout } from "@/apis/services/payment";
+import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 import { useSnackbar } from "@/providers/SnackbarProvider";
-import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
-import { BANK_NAMES, BankName } from "@/constants/bank";
 import { theme } from "@/styles/theme";
 
 const Label = styled.label`
@@ -27,84 +22,62 @@ const Wrapper = styled.div`
 interface Props {
   gbId: string;
   close: () => void;
-  action?: "join" | "modify";
   remainingCount: number;
-  isLeader?: boolean;
 }
-const ParticipationModalContent = ({ gbId, close, action, isLeader, remainingCount }: Props) => {
+
+const ParticipationModalContent = ({ gbId, close, remainingCount }: Props) => {
   const [count, setCount] = useState<number>(1);
-  const [originalCount, setOriginalCount] = useState<number>(0);
-  const [refundBank, setRefundBank] = useState<BankName | "">("");
-  const [refundAccount, setRefundAccount] = useState<string>("");
+  const [countError, setCountError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { showSnackbar } = useSnackbar();
-  const user = useAuthStore((s) => s.user);
   const router = useRouter();
 
-  // 제목과 설명 텍스트
-  const title = action === "modify" ? "참여 정보 수정" : "공구 참여 신청";
-  const description =
-    action === "modify"
-      ? "수량과 환불 계좌 정보를 수정해주세요."
-      : "참여할 수량과 환불 계좌 정보를 입력해주세요.";
-  const register = async () => {
+  const handleCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = Number(e.target.value);
+    setCount(val);
+    if (val > remainingCount) {
+      setCountError(`목표 수량을 넘길 수 없습니다. (최대 ${remainingCount}개)`);
+    } else if (val < 1) {
+      setCountError("최소 1개 이상 입력해주세요.");
+    } else {
+      setCountError("");
+    }
+  };
+
+  const handlePay = async () => {
+    if (countError || count < 1 || count > remainingCount) return;
+
+    setIsLoading(true);
     try {
-      //API
-      const payload = {
-        gbId,
-        count,
-        refundBank,
-        refundAccount,
-      };
-      const data = await joinParticipant(payload);
-      console.log(data);
-      showSnackbar("공구 참여가 완료되었습니다.", "success");
-      close();
-      router.refresh();
+      const checkoutData = await checkout({ gbId, count });
+      const tossPayments = await loadTossPayments(checkoutData.clientKey);
+      const payment = tossPayments.payment({ customerKey: ANONYMOUS });
+      await payment.requestPayment({
+        method: "CARD",
+        amount: { currency: "KRW", value: checkoutData.amount },
+        orderId: checkoutData.orderId,
+        orderName: checkoutData.orderName,
+        successUrl: `${window.location.origin}/payment/success?gbId=${encodeURIComponent(gbId)}`,
+        failUrl: `${window.location.origin}/payment/fail`,
+      });
     } catch (e: any) {
-      console.log(e);
-      showSnackbar(e.response.data.message, "error");
-    }
-  };
-  const modify = async () => {
-    try {
-      //API
-      const payload = {
-        gbId,
-        count,
-        refundBank,
-        refundAccount,
-        //cookieHeader,
-      };
-
-      const data = await modifyParticipant(payload);
-      console.log(data);
-      showSnackbar("참여 정보가 수정되었습니다.", "success");
-      close();
-      router.refresh();
-    } catch (e: any) {
-      console.log(e);
-      showSnackbar(e.response.data.message, "error");
+      if (e?.code === "USER_CANCEL") {
+        close();
+        return;
+      }
+      const msg = e?.response?.data?.message ?? "결제 시작에 실패했습니다.";
+      showSnackbar(msg, "error");
+      // 정원 초과 에러면 최신 잔여 수량으로 갱신
+      if (msg.includes("정원") || msg.includes("수량")) {
+        router.refresh();
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const getParticipant = async () => {
-    if (!user) {
-      showSnackbar("유저 정보가 없습니다.", "error");
-      return;
-    }
-    const data = await getParticipantInfo({ gbId, id: user.id });
-    setCount(data.count);
-    setOriginalCount(data.count);
-    setRefundBank(data.refundBank);
-    setRefundAccount(data.refundAccount);
-  };
-
-  useEffect(() => {
-    if (action === "modify") getParticipant().then();
-  }, []);
   return (
     <Container>
-      {/* 제목과 설명 섹션 */}
       <Box
         sx={{
           mb: 2,
@@ -118,23 +91,15 @@ const ParticipationModalContent = ({ gbId, close, action, isLeader, remainingCou
         <Typography
           variant="subtitle1"
           fontWeight={600}
-          sx={{
-            fontSize: "0.9rem",
-            color: "text.primary",
-          }}
+          sx={{ fontSize: "0.9rem", color: "text.primary" }}
         >
-          {action === "modify" ? "✏️" : "🎯"} {title}
+          🎯 공구 참여 신청
         </Typography>
         <Typography
           variant="caption"
-          sx={{
-            fontSize: "0.8rem",
-            color: "text.secondary",
-            lineHeight: 1.4,
-            mb: 1,
-          }}
+          sx={{ fontSize: "0.8rem", color: "text.secondary", lineHeight: 1.4 }}
         >
-          {description}
+          수량 입력 후 토스 결제창에서 결제를 완료해 주세요.
         </Typography>
       </Box>
 
@@ -143,73 +108,29 @@ const ParticipationModalContent = ({ gbId, close, action, isLeader, remainingCou
         <TextInput
           type="number"
           min={1}
-          max={originalCount + remainingCount}
+          max={remainingCount}
           value={count.toString()}
-          onChange={(e) => {
-            setCount(Number(e.target.value));
-          }}
-          onBlur={() => {
-            const maxAllowed = originalCount + remainingCount;
-            if (count < 1) setCount(1);
-            if (count > maxAllowed) setCount(maxAllowed);
-          }}
-        ></TextInput>
+          onChange={handleCountChange}
+        />
+        {countError ? (
+          <Typography variant="caption" color="error" sx={{ mt: 0.5, display: "block" }}>
+            {countError}
+          </Typography>
+        ) : (
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
+            현재 가능한 수량: {remainingCount}개
+          </Typography>
+        )}
       </Wrapper>
 
-      {/*{!isLeader && (*/}
-      <>
-        <Wrapper>
-          <Label>환불 은행</Label>
-          <FormControl fullWidth size="small">
-            <Select
-              value={refundBank}
-              onChange={(e) => setRefundBank(e.target.value as BankName)}
-              displayEmpty
-            >
-              <MenuItem value="">
-                <em>은행 선택</em>
-              </MenuItem>
-              {BANK_NAMES.map((bank) => (
-                <MenuItem key={bank} value={bank}>
-                  {bank}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Wrapper>
-        <Wrapper>
-          <Label>환불 계좌번호</Label>
-          <TextInput
-            value={refundAccount}
-            onChange={(e) => {
-              setRefundAccount(e.target.value);
-            }}
-            placeholder="예: 123-456-7890"
-          ></TextInput>
-        </Wrapper>
-      </>
-      {/*)}*/}
-      {action === "join" ? (
-        <Button
-          variant="contained"
-          fullWidth
-          onClick={() => {
-            register().then();
-          }}
-        >
-          확인 및 참여
-        </Button>
-      ) : (
-        <Button
-          variant="contained"
-          fullWidth
-          onClick={() => {
-            modify().then();
-          }}
-        >
-          수정하기
-        </Button>
-      )}
+      <Button
+        variant="contained"
+        fullWidth
+        onClick={handlePay}
+        disabled={isLoading || !!countError || count < 1}
+      >
+        {isLoading ? "결제 준비 중..." : "결제하기"}
+      </Button>
     </Container>
   );
 };

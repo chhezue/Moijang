@@ -1,7 +1,7 @@
 "use client";
 
 import { Box, Typography } from "@mui/material";
-import { GroupBuyingItem, IUser } from "@/types/groupBuying";
+import { GroupBuyingItem } from "@/types/groupBuying";
 
 interface CancelledBannerProps {
   item: GroupBuyingItem;
@@ -23,77 +23,16 @@ const CancelledBanner: React.FC<CancelledBannerProps> = ({ item }) => {
       );
       break;
 
-    case "PAYMENT_FAILED":
-      console.log("🚨 cancelReason: PAYMENT_FAILED", item.nonDepositors);
-      reasonText = (
-        <>
-          일부 참여자가 입금을 완료하지 않아 <strong>공동구매가 취소</strong>
-          되었어요.
-          {item.nonDepositors && item.nonDepositors.length > 0 && (
-            <Box mt={1}>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1.5,
-                  flexWrap: "wrap",
-                }}
-              >
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{
-                    fontWeight: 500,
-                    fontSize: "0.875rem",
-                    flexShrink: 0,
-                  }}
-                >
-                  미입금자 명단:
-                </Typography>
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: 0.75,
-                    alignItems: "center",
-                  }}
-                >
-                  {item.nonDepositors.map((user: IUser, index: number) => (
-                    <Box
-                      key={user.id}
-                      sx={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        px: 1.5,
-                        py: 0.5,
-                        borderRadius: "20px",
-                        backgroundColor: (theme) => theme.palette.grey[50],
-                        fontSize: "0.75rem",
-                        color: (theme) => theme.palette.text.secondary,
-                        fontWeight: 500,
-                        "&:hover": {
-                          backgroundColor: (theme) => theme.palette.grey[100],
-                        },
-                        transition: "background-color 0.2s ease",
-                      }}
-                    >
-                      {user.displayName} ({user.department})
-                    </Box>
-                  ))}
-                </Box>
-              </Box>
-            </Box>
-          )}
-        </>
-      );
-      break;
-
     case "PRODUCT_UNAVAILABLE":
       reasonText = (
         <>
           상품이 <strong>품절되었거나 가격이 변동</strong>되어 공동구매가 취소되었어요.
         </>
       );
+      break;
+
+    case "SYSTEM_CANCELLED":
+      reasonText = <>시스템에 의해 공동구매가 자동 취소되었어요.</>;
       break;
 
     default:
