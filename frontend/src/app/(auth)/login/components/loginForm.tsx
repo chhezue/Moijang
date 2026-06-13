@@ -38,7 +38,7 @@ export const LoginForm = () => {
     try {
       const user = await login({ loginId: username, password });
       setUser(user);
-      router.push(redirectTo);
+      window.location.href = redirectTo;
     } catch {
       showSnackbar("아이디 또는 비밀번호가 올바르지 않습니다.", "error", 3000);
     } finally {

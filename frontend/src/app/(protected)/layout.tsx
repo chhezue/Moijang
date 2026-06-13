@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import ProtectedClient from "@/app/(protected)/protectedClient";
 import Providers from "@/providers/Providers";
 import { AuthStoreProvider } from "@/providers/AuthStoreProvider";
@@ -16,6 +17,7 @@ export default async function ProtectedLayout({ children }: { children: React.Re
       </AuthStoreProvider>
     );
   } catch {
-    redirect("/login");
+    const pathname = headers().get("x-pathname") ?? "/";
+    redirect(`/login?redirect=${encodeURIComponent(pathname)}`);
   }
 }

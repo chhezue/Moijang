@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import LoginIcon from "@mui/icons-material/Login";
 import CreateButton from "@/components/CreateButton";
 import UserMenu from "@/components/UserMenu";
@@ -42,12 +42,13 @@ function useHeaderStyles() {
 
 const Header: React.FC = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const styles = useHeaderStyles();
   const theme = useTheme();
   const user = useAuthStore((s) => s.user);
 
   const onLogin = () => {
-    router.push("/login");
+    router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
   };
 
   return (
