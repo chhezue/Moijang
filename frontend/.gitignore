@@ -1,0 +1,11 @@
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+
+# E2E test helpers (DB 직접 접근, 로컬 전용)
+e2e/helpers/
