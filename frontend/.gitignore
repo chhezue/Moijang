@@ -7,5 +7,5 @@ node_modules/
 /playwright/.cache/
 /playwright/.auth/
 
-# E2E test helpers (DB 직접 접근, 로컬 전용)
-e2e/helpers/
+# .env (root .gitignore와 중복이지만 명시)
+.env
