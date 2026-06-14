@@ -49,6 +49,26 @@
 
 ---
 
+### `(root)` 공유 layout 도입 (2026-06-14) ✅
+
+**결정**: `app/(root)/layout.tsx` 추가 → `AuthStoreProvider` + `Providers`를 모든 route group이 공유하는 단일 지점에 집약
+
+**변경 내용**:
+
+- `app/(root)/layout.tsx` 신규 생성 — `getMyInfoServer()` + `AuthStoreProvider` + `Providers`
+- `(auth)/`, `(home)/`, `(protected)/` 폴더를 `(root)/` 하위로 이동
+- `getMyInfoServer`에 React `cache()` 추가 — 동일 요청에서 여러 layout이 호출해도 네트워크 1회
+- `(auth)/layout.tsx` — `AuthStoreProvider` 제거, auth check + UI만
+- `(home)/layout.tsx` — `AuthStoreProvider`/`getMyInfoServer` 제거, `Header`만
+- `(protected)/layout.tsx` — `AuthStoreProvider` 제거, auth check + `ProtectedClient`만
+- `LoginForm.tsx` — `window.location.href` → `router.refresh() + router.push()`
+
+**해결된 것**: `(root)/layout.tsx`가 `/login`과 홈 경로의 공유 segment → `router.refresh()`가 이 segment를 무효화 → 이후 navigation에서 fresh RSC fetch → 로그인 후 헤더에 user 정상 표시
+
+**핵심 원인이었던 것**: 팩토리 패턴 전환 후 Router Cache 문제가 드러남. 구 싱글톤은 `setUser()`가 전역 store를 바꿔서 캐시된 `initialUser=null`이 와도 덮어썼지만, 팩토리는 mount마다 `initialUser` prop으로 새 store를 만들어서 캐시된 null이 그대로 user=null store를 생성했음
+
+---
+
 ## 결제 플로우
 
 ### 참여자 직접 생성 방식 → Toss PG 결제 (`#8`, 2026-06-10)

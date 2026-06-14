@@ -8,6 +8,10 @@ UI 라이브러리 -> MUI,
 전역 상태도구
 
 - user 정보 -> zustand 팩토리 + react context
-  라우팅 : Next.js App Router, route groups (home)/(auth)/(protected)
+  라우팅 : Next.js App Router, route groups (root)/(home)/(auth)/(protected)
+- (root)/layout.tsx : getMyInfoServer + AuthStoreProvider + Providers 공유 (1회만 호출)
+- (auth)/layout.tsx : 로그인 상태면 / redirect, UI만
+- (home)/layout.tsx : Header만
+- (protected)/layout.tsx : 미로그인 시 /login?redirect=<path> redirect, ProtectedClient만
   API: axios + withCredentials
-  서버데이터: SSR layout에서 fetch, CSR은 store/router.refresh()
+  서버데이터: SSR layout에서 fetch (React cache()로 중복 제거), CSR은 store/router.refresh()
