@@ -16,17 +16,11 @@ import { IParticipant } from "@/types/groupBuying";
 
 interface ParticipantListProps {
   participants: IParticipant[];
-  leaderId: string;
-  status: string;
-  totalCount: number; // 백엔드 currentCount (총대 + 일반 참여자 합산)
+  leaderInfo: { name: string; count: number };
 }
 
-const ParticipantList: React.FC<ParticipantListProps> = ({
-  participants,
-  leaderId: _leaderId,
-  status: _status,
-  totalCount,
-}) => {
+const ParticipantList: React.FC<ParticipantListProps> = ({ participants, leaderInfo }) => {
+  const totalPeople = participants.length + 1; // 일반 참여자 + 총대
   return (
     <Box>
       <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
@@ -34,7 +28,7 @@ const ParticipantList: React.FC<ParticipantListProps> = ({
           참여자
         </Typography>
         <Chip
-          label={`${totalCount}명`}
+          label={`${totalPeople}명`}
           size="small"
           sx={{
             backgroundColor: "primary.main",
@@ -47,6 +41,59 @@ const ParticipantList: React.FC<ParticipantListProps> = ({
       </Box>
 
       <List dense sx={{ p: 0 }}>
+        {/* 총대 (항상 첫 번째) */}
+        <ListItem
+          sx={{
+            border: "1px solid",
+            borderColor: "primary.main",
+            borderRadius: "12px",
+            mb: 1,
+            p: 1.5,
+            backgroundColor: "primary.50",
+          }}
+          여
+        >
+          <ListItemAvatar sx={{ minWidth: "auto", mr: 1.5 }}>
+            <Avatar sx={{ bgcolor: "#7C3AED", width: 36, height: 36 }}>
+              <AccountCircleIcon fontSize="small" />
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText
+            disableTypography
+            primary={
+              <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+                <Box>
+                  <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
+                    <Typography
+                      variant="body2"
+                      fontWeight={600}
+                      color="text.primary"
+                      sx={{ fontSize: "0.85rem" }}
+                    >
+                      {leaderInfo.name}
+                    </Typography>
+                  </Box>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    component="div"
+                    sx={{ fontSize: "0.75rem", opacity: 0.8 }}
+                  >
+                    구매 수량: {leaderInfo.count}개
+                  </Typography>
+                </Box>
+                <Chip
+                  size="small"
+                  label="총대"
+                  color="primary"
+                  sx={{ height: "22px", fontSize: "0.7rem", fontWeight: 600, mt: "1px" }}
+                />
+              </Box>
+            }
+          />
+        </ListItem>
+
+        {/* 일반 참여자 */}
         {participants.map((p) => (
           <ListItem
             key={p.id}
@@ -60,17 +107,10 @@ const ParticipantList: React.FC<ParticipantListProps> = ({
             }}
           >
             <ListItemAvatar sx={{ minWidth: "auto", mr: 1.5 }}>
-              <Avatar
-                sx={{
-                  bgcolor: "#A78BFA",
-                  width: 36,
-                  height: 36,
-                }}
-              >
+              <Avatar sx={{ bgcolor: "#A78BFA", width: 36, height: 36 }}>
                 <AccountCircleIcon fontSize="small" />
               </Avatar>
             </ListItemAvatar>
-
             <ListItemText
               disableTypography
               primary={
@@ -95,7 +135,6 @@ const ParticipantList: React.FC<ParticipantListProps> = ({
                       구매 수량: {p.count}개
                     </Typography>
                   </Box>
-
                   <Chip
                     variant="outlined"
                     size="small"
