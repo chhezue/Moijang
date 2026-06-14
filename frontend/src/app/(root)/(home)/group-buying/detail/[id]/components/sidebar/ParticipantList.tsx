@@ -51,7 +51,6 @@ const ParticipantList: React.FC<ParticipantListProps> = ({ participants, leaderI
             p: 1.5,
             backgroundColor: "primary.50",
           }}
-          여
         >
           <ListItemAvatar sx={{ minWidth: "auto", mr: 1.5 }}>
             <Avatar sx={{ bgcolor: "#7C3AED", width: 36, height: 36 }}>
