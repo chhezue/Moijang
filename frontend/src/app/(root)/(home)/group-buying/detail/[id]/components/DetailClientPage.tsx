@@ -1,0 +1,356 @@
+"use client"; // MUI 컴포넌트를 사용하므로 클라이언트 컴포넌트입니다.
+
+import React, { useEffect, useState } from "react";
+import { Box, Container } from "@mui/material";
+import { GroupBuyingItem, IParticipant } from "@/types/groupBuying";
+
+import DetailInfoSection from "./DetailInfoSection";
+import Stepper from "@/components/Stepper";
+import Sidebar from "@/app/(root)/(home)/group-buying/detail/[id]/components/sidebar/Sidebar";
+import { useStatusContext } from "@/providers/StatusProvider";
+import CustomModal from "@/components/CustomModal";
+import ParticipationModalContent from "@/app/(root)/(home)/group-buying/detail/[id]/components/modals/ParticipationModalContent";
+import EditGroupBuyingModalContent from "@/app/(root)/(home)/group-buying/detail/[id]/components/modals/EditGroupBuyingModalContent";
+import { refundPayment } from "@/apis/services/payment";
+import { useRouter, useSearchParams } from "next/navigation";
+import ConfirmModalContent from "@/app/(root)/(home)/group-buying/detail/[id]/components/modals/ConfirmModalContent";
+import { useSnackbar } from "@/providers/SnackbarProvider";
+import {
+  cancelGroupBuying,
+  updateGroupBuying,
+  updateGroupBuyingStatus,
+} from "@/apis/services/groupBuying";
+import { ModalType } from "./types";
+import CancelReasonModalContent from "@/app/(root)/(home)/group-buying/detail/[id]/components/modals/CancelReasonModalContent";
+import { ShippedModalContent } from "@/app/(root)/(home)/group-buying/detail/[id]/components/modals/ShippedModalContent";
+import { useAuthStore } from "@/store/authStore";
+import CancelledBanner from "@/app/(root)/(home)/group-buying/detail/[id]/components/CancelledBanner";
+
+interface ClientPageProps {
+  item: GroupBuyingItem;
+  participants: IParticipant[];
+}
+
+const DetailClientPage: React.FC<ClientPageProps> = ({ item, participants }) => {
+  const { showSnackbar } = useSnackbar();
+  const { statusList, statusToStepIndex } = useStatusContext();
+  const user = useAuthStore((s) => s.user);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [activeModal, setActiveModal] = useState<ModalType>(null);
+
+  useEffect(() => {
+    if (searchParams.get("joined") === "true") {
+      showSnackbar("공동구매 참여가 완료되었습니다.", "success");
+      router.replace(`/group-buying/detail/${item.id}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 참여 취소 (환불)
+  const handleCancelParticipation = async () => {
+    try {
+      await refundPayment({ gbId: item.id, cancelReason: "LEADER_CANCELLED" });
+      showSnackbar("참여가 취소되고 환불이 처리되었습니다.", "success");
+      router.refresh();
+      setActiveModal(null);
+    } catch (err) {
+      console.error("참여 취소 실패:", err);
+      showSnackbar("공동구매 참여 취소에 실패했습니다.", "error");
+    }
+  };
+
+  // 공동구매 취소
+  const handleCancelGroupBuying = async (reason: string) => {
+    try {
+      const result = await cancelGroupBuying(item.id, reason);
+      const refundStatus = result?.refundStatus;
+      if (refundStatus === "allSuccess") {
+        showSnackbar("공동구매가 취소되고 전체 환불이 완료되었습니다.", "success");
+      } else if (refundStatus === "partialSuccess") {
+        showSnackbar(
+          "공동구매가 취소되었으나 일부 환불에 실패했습니다. 관리자에게 문의해 주세요.",
+          "warning",
+        );
+      } else if (refundStatus === "failed") {
+        showSnackbar(
+          "공동구매가 취소되었으나 환불 처리에 실패했습니다. 관리자에게 문의해 주세요.",
+          "error",
+        );
+      } else {
+        showSnackbar("공동구매가 취소되었습니다.", "success");
+      }
+      router.refresh();
+      setActiveModal(null);
+    } catch (err) {
+      console.error("공동구매 취소 실패:", err);
+      showSnackbar("공동구매 취소가 실패했습니다.", "error");
+    }
+  };
+
+  // 주문 진행 상태 업데이트 (CONFIRMED → ORDERED)
+  const handleProceedOrder = async () => {
+    try {
+      await updateGroupBuyingStatus(item.id, "ORDERED");
+      window.open(item.productUrl, "_blank");
+      router.refresh();
+      setActiveModal(null);
+    } catch (error: any) {
+      console.error("주문 진행 중 오류 발생:", error);
+      showSnackbar(error.response?.data?.message || "상태 변경에 실패하였습니다.", "error");
+    }
+  };
+
+  // 주문 완료, 수령 공지
+  const handleShipped = async ({
+    pickupPlace,
+    pickupTime,
+  }: {
+    pickupPlace: string;
+    pickupTime: string;
+  }) => {
+    try {
+      await updateGroupBuyingStatus(item.id, "SHIPPED");
+      await updateGroupBuying(item.id, { pickupPlace, pickupTime });
+      showSnackbar("배송 완료 처리되었습니다.", "success");
+      setActiveModal(null);
+      router.refresh();
+    } catch (err) {
+      console.error("shippedModal error:", err);
+      showSnackbar("배송 정보 저장에 실패했습니다.", "error");
+    }
+  };
+
+  // 수령 장소/시간 수정
+  const handleEditShipped = async ({
+    pickupPlace,
+    pickupTime,
+  }: {
+    pickupPlace: string;
+    pickupTime: string;
+  }) => {
+    try {
+      await updateGroupBuying(item.id, { pickupPlace, pickupTime });
+      showSnackbar("수령 정보가 수정되었습니다.", "success");
+      setActiveModal(null);
+      router.refresh();
+    } catch (err) {
+      console.error("editPickupModal error:", err);
+      showSnackbar("수령 정보 수정에 실패했습니다.", "error");
+    }
+  };
+
+  // 취소된 공구인지 확인
+  const isCancelled = item.groupBuyingStatus === "CANCELLED";
+
+  const handleComplete = async () => {
+    try {
+      await updateGroupBuyingStatus(item.id, "COMPLETED");
+      showSnackbar("공구가 완료되었습니다.", "success");
+      setActiveModal(null);
+      router.refresh();
+    } catch (e) {
+      showSnackbar("공구 완료 처리 실패", "error");
+      console.error(e);
+    }
+  };
+
+  return (
+    // 페이지 전체를 감싸는 배경 Box
+    <>
+      <Box
+        sx={{
+          minHeight: "100vh",
+          bgcolor: "var(--bg-0)",
+        }}
+      >
+        <Container maxWidth="lg" sx={{ py: 4 }}>
+          {/* 1. 최상단 Stepper (취소된 공구일 때는 숨김) */}
+          {!isCancelled && (
+            <Box sx={{ mb: 4 }}>
+              <Stepper steps={statusList} activeStep={statusToStepIndex[item.groupBuyingStatus]} />
+            </Box>
+          )}
+
+          {isCancelled && <CancelledBanner item={item} />}
+
+          {/* 2. 메인 콘텐츠 영역 */}
+          <Box
+            sx={{
+              backgroundColor: "#fff",
+              borderRadius: "1rem",
+              boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
+              overflow: "hidden",
+              filter: isCancelled ? "grayscale(1)" : "none",
+              opacity: isCancelled ? 0.75 : 1,
+              cursor: isCancelled ? "not-allowed" : "default",
+              pointerEvents: isCancelled ? "none" : "auto",
+              transition: "filter 0.3s ease, opacity 0.3s ease",
+              position: "relative",
+            }}
+          >
+            {/* 취소된 공구일 때 오버레이 */}
+            {isCancelled && (
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor: "rgba(0, 0, 0, 0.05)",
+                  pointerEvents: "none",
+                  zIndex: 1,
+                }}
+              />
+            )}
+            <Box display="flex" flexDirection={{ xs: "column", lg: "row" }} gap={0}>
+              {/* 왼쪽 메인 콘텐츠 (2/3 너비) */}
+              <Box
+                sx={{
+                  width: { xs: "100%", lg: "66.67%" },
+                  borderRight: { lg: "1px solid #f0f0f0" },
+                }}
+              >
+                <DetailInfoSection item={item} />
+              </Box>
+
+              {/* 오른쪽 사이드바 (1/3 너비) */}
+              <Box sx={{ width: { xs: "100%", lg: "33.33%" } }}>
+                <Box sx={{ position: "sticky", top: "2rem", p: "2rem" }}>
+                  <Sidebar
+                    item={item}
+                    user={user}
+                    participants={participants}
+                    onOpenModal={(type) => {
+                      setActiveModal(type);
+                    }}
+                  />
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+        </Container>
+      </Box>
+
+      {/* ---- 모달창 ----- */}
+      {/* 참여 */}
+      <CustomModal
+        title="공동구매 참여"
+        open={activeModal === "participation"}
+        setOpen={() => setActiveModal(null)}
+      >
+        <ParticipationModalContent
+          gbId={item.id}
+          close={() => setActiveModal(null)}
+          remainingCount={item.fixedCount - item.currentCount}
+        />
+      </CustomModal>
+
+      {/* 참여 취소 */}
+      <CustomModal
+        title="참여 취소"
+        open={activeModal === "cancelParticipation"}
+        setOpen={() => setActiveModal(null)}
+      >
+        <ConfirmModalContent
+          message="정말로 공동구매 참여를 취소하시겠어요?"
+          onConfirm={handleCancelParticipation}
+        />
+      </CustomModal>
+
+      {/* 공동구매 수정 */}
+      <CustomModal
+        title="공동구매 수정"
+        open={activeModal === "editGroupBuying"}
+        setOpen={() => setActiveModal(null)}
+      >
+        <EditGroupBuyingModalContent item={item} close={() => setActiveModal(null)} />
+      </CustomModal>
+
+      {/* 모집 중 공동구매 취소 */}
+      <CustomModal
+        title="모집 중 공동구매 취소"
+        open={activeModal === "cancelGroupBuying"}
+        setOpen={() => setActiveModal(null)}
+      >
+        <ConfirmModalContent
+          message="정말로 공동구매를 취소하시겠어요?"
+          onConfirm={() => handleCancelGroupBuying("LEADER_CANCELLED")}
+        />
+      </CustomModal>
+
+      {/* 주문하기 (CONFIRMED → ORDERED) */}
+      <CustomModal
+        title="공동구매 주문 진행"
+        open={activeModal === "order"}
+        setOpen={() => setActiveModal(null)}
+      >
+        <ConfirmModalContent
+          message={
+            <>
+              공동구매 상태가 <strong>주문 진행 중</strong>으로 바뀌어요.
+              <br />
+              상품이 도착하면, <strong>배송 완료</strong> 버튼을 눌러 수령 장소와 시간을 공지해
+              주세요.
+            </>
+          }
+          onConfirm={handleProceedOrder}
+          confirmLabel="주문하러 가기"
+        />
+      </CustomModal>
+
+      {/* 주문 진행 중 공동구매 취소 */}
+      <CustomModal
+        title="공동구매 취소"
+        open={activeModal === "cancelForPayment"}
+        setOpen={() => setActiveModal(null)}
+      >
+        <CancelReasonModalContent onConfirm={(reason) => handleCancelGroupBuying(reason)} />
+      </CustomModal>
+
+      <CustomModal
+        title="수령 시간 및 장소 공지"
+        open={activeModal === "shipped"}
+        setOpen={() => setActiveModal(null)}
+      >
+        <ShippedModalContent onSubmit={handleShipped} />
+      </CustomModal>
+
+      <CustomModal
+        title="수령 시간 및 장소 수정"
+        open={activeModal === "editShipped"}
+        setOpen={() => setActiveModal(null)}
+      >
+        <ShippedModalContent
+          initialPlace={item.pickupPlace}
+          initialTime={item.pickupTime}
+          onSubmit={handleEditShipped}
+        />
+      </CustomModal>
+
+      {/* 공동구매 완료(종료) */}
+      <CustomModal
+        title="수령 확인 및 공동구매 완료"
+        open={activeModal === "completeGroupBuying"}
+        setOpen={() => setActiveModal(null)}
+      >
+        <ConfirmModalContent
+          message={
+            <>
+              수령 확인을 마치셨나요? <br />
+              이제 공동구매를 <strong>완료</strong>할 수 있어요.
+              <br />
+              <br />
+              총대님, 고생 많으셨습니다! 🙌
+            </>
+          }
+          onConfirm={() => handleComplete()}
+          confirmLabel={"완료"}
+        />
+      </CustomModal>
+    </>
+  );
+};
+
+export default DetailClientPage;
