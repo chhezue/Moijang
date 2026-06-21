@@ -70,7 +70,6 @@ export default function LeaderDashboard({ item, participants }: LeaderDashboardP
   const handleProceedOrder = async () => {
     try {
       await updateGroupBuyingStatus(item.id, "ORDERED");
-      window.open(item.productUrl, "_blank");
       router.refresh();
       setActiveModal(null);
     } catch (error: any) {
