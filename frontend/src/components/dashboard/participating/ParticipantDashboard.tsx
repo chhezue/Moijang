@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Box, Chip, Link, Paper, Stack, Typography } from "@mui/material";
+import { Box, Chip, Divider, Link, Stack, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import LeaderInfoCard from "@/components/LeaderInfoCard";
 import { GroupBuyingItem } from "@/types/groupBuying";
@@ -69,30 +69,34 @@ export default function ParticipantDashboard({ item }: ParticipantDashboardProps
 
         {/* 진행 단계 */}
         {!isCancelled && (
-          <Paper variant="outlined" sx={{ p: 2.5, mb: 3, borderRadius: 2 }}>
+          <Box sx={{ mb: 3 }}>
             <Stepper steps={statusList} activeStep={statusToStepIndex[item.groupBuyingStatus]} />
-          </Paper>
+          </Box>
         )}
 
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
           {/* 총대 정보 */}
-          <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2 }}>
+          <Box>
             <Typography variant="subtitle2" fontWeight={700} mb={1.5}>
               총대 정보
             </Typography>
             <LeaderInfoCard name={item.leaderId.name} count={item.leaderCount} variant="plain" />
-          </Paper>
+          </Box>
+
+          <Divider />
 
           {/* 공지사항 */}
-          <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2 }}>
+          <Box>
             <Typography variant="subtitle2" fontWeight={700} mb={1.5}>
               공지사항
             </Typography>
             <NoticeBoard item={item} />
-          </Paper>
+          </Box>
+
+          <Divider />
 
           {/* 내 참여 정보 */}
-          <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2 }}>
+          <Box>
             <Typography variant="subtitle2" fontWeight={700} mb={1.5}>
               내 참여 정보
             </Typography>
@@ -122,7 +126,7 @@ export default function ParticipantDashboard({ item }: ParticipantDashboardProps
                 />
               </Box>
             )}
-          </Paper>
+          </Box>
         </Box>
       </Box>
 

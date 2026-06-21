@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Box, Chip, Link, Paper, Stack, Typography } from "@mui/material";
+import { Box, Chip, Divider, Link, Stack, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { GroupBuyingItem, IParticipant } from "@/types/groupBuying";
 import { useRouter } from "next/navigation";
@@ -157,52 +157,55 @@ export default function LeaderDashboard({ item, participants }: LeaderDashboardP
 
         {/* 진행 단계 */}
         {!isCancelled && (
-          <Paper variant="outlined" sx={{ p: 2.5, mb: 3, borderRadius: 2 }}>
+          <Box sx={{ mb: 3 }}>
             <Stepper steps={statusList} activeStep={statusToStepIndex[item.groupBuyingStatus]} />
-          </Paper>
+          </Box>
         )}
 
         {/* 메인 2단 레이아웃 */}
         <Box
           sx={{
             display: "flex",
-            gap: 3,
+            gap: 4,
             flexDirection: { xs: "column", md: "row" },
             opacity: isCancelled ? 0.6 : 1,
             pointerEvents: isCancelled ? "none" : "auto",
           }}
         >
           {/* 좌: 참여자 목록 */}
-          <Paper
-            variant="outlined"
-            sx={{ flex: "0 0 340px", p: 2.5, borderRadius: 2, alignSelf: "flex-start" }}
-          >
+          <Box sx={{ flex: "0 0 300px", alignSelf: "flex-start" }}>
             <ParticipantList
               participants={participants}
               leaderInfo={{ name: item.leaderId.name, count: item.leaderCount }}
             />
-          </Paper>
+          </Box>
+
+          <Divider orientation="vertical" flexItem />
 
           {/* 우: 진행사항 관리 */}
-          <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
+          <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 3 }}>
             {/* 공지사항 */}
-            <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2 }}>
+            <Box>
               <Typography variant="subtitle2" fontWeight={700} mb={1.5}>
                 공지사항
               </Typography>
               <NoticeBoard item={item} />
-            </Paper>
+            </Box>
+
+            <Divider />
 
             {/* 진행사항 액션 버튼 */}
-            <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2 }}>
+            <Box>
               <Typography variant="subtitle2" fontWeight={700} mb={1.5}>
                 진행사항 입력
               </Typography>
               <ActionButtons item={item} onOpenModal={(type) => setActiveModal(type)} />
-            </Paper>
+            </Box>
+
+            <Divider />
 
             {/* 기본 정보 */}
-            <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2 }}>
+            <Box>
               <Typography variant="subtitle2" fontWeight={700} mb={1.5}>
                 공구 정보
               </Typography>
@@ -216,7 +219,7 @@ export default function LeaderDashboard({ item, participants }: LeaderDashboardP
                 {item.pickupPlace && <InfoRow label="수령 장소" value={item.pickupPlace} />}
                 {item.pickupTime && <InfoRow label="수령 시간" value={item.pickupTime} />}
               </Stack>
-            </Paper>
+            </Box>
           </Box>
         </Box>
       </Box>
