@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Box, TextField, Button, Typography, CircularProgress } from "@mui/material";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { GradientTitle } from "@/components/GradientTitle";
 import { login } from "@/apis/services/auth";
 import { useSnackbar } from "@/providers/SnackbarProvider";
@@ -11,7 +11,6 @@ import { usernameSchema, passwordSchema, getError } from "@/schemas/auth";
 import { useAuthStore } from "@/store/authStore";
 
 export const LoginForm = () => {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { showSnackbar } = useSnackbar();
   const setUser = useAuthStore((s) => s.setUser);
@@ -38,8 +37,7 @@ export const LoginForm = () => {
     try {
       const user = await login({ loginId: username, password });
       setUser(user);
-      router.refresh();
-      router.push(redirectTo);
+      window.location.href = redirectTo;
     } catch {
       showSnackbar("아이디 또는 비밀번호가 올바르지 않습니다.", "error", 3000);
     } finally {

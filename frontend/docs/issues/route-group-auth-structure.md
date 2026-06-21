@@ -87,3 +87,53 @@ router.push(redirectTo)           ← 신선한 캐시 + 쿠키로 RSC fetch →
 - 공유 segment가 있으면 하나의 캐시 항목을 여러 URL이 참조
 - `router.refresh()`는 현재 URL의 segment 트리 전체를 무효화 (다른 URL은 미포함)
 - 쿠키는 `await login()` resolve 시점에 이미 저장 완료 — 타이밍 이슈 아님
+
+---
+
+## `router.refresh()`를 동기로 쓸 수 없는 이유
+
+`router.refresh()`는 Promise를 반환하지 않아 `await` 불가. 바로 아래 `router.push()`를 쓰면 refresh 완료 전에 push가 실행되어 stale 캐시를 그대로 사용함 → `initialUser=null` → 다시 `/login` 리다이렉트.
+
+백엔드로 치면 트랜잭션이어야 할 동작(캐시 무효화 + 페이지 이동)이 따로따로 실행되는 것.
+
+`window.location.href`는 JS 메모리 자체를 종료하고 브라우저가 새 요청을 보내기 때문에 Router Cache가 통째로 사라짐 → 타이밍 문제 없음.
+
+### 정석 대안
+
+1. **Server Action으로 로그인**: `revalidatePath('/')` 서버에서 직접 캐시 무효화 → `router.push()` 가능. 단, 백엔드가 별도 서버에서 쿠키를 세팅하는 구조면 Server Action에서 백엔드 API를 한번 더 거쳐야 해서 도입 복잡도 높음.
+2. **`window.location.href`**: Next.js 공식 문서도 auth 상태 변경 시 hard navigation을 권장. hack이 아닌 이 아키텍처의 정답.
+
+---
+
+## Middleware 도입 트레이드오프
+
+### Middleware 동작 방식
+
+모든 요청이 RSC 렌더링 전에 Edge Runtime에서 실행됨.
+
+```
+브라우저 요청 → middleware.ts (쿠키 확인) → (root)/layout → (protected)/layout → page
+```
+
+### 장점
+
+- RSC 렌더링 전에 미인증 요청 차단 → 불필요한 서버 렌더링 없음
+- 미들웨어가 쿠키만 보고 통과시키므로 `router.push()` 사용 가능 → `window.location.href` 제거 가능
+- redirect 로직을 한 곳으로 집중
+
+### 단점
+
+- **Edge Runtime 제약**: `axios` 등 Node.js 라이브러리 사용 불가, 쿠키 파싱 정도만 가능
+- **토큰 만료 검증 불가**: 쿠키 존재 여부만 체크 가능, 만료된 토큰도 통과시킴
+- 결국 `(protected)/layout`의 `getMyInfoServer()` catch redirect 로직이 여전히 필요 → 두 곳에서 관리
+
+### 결론
+
+|                | 현재                        | 미들웨어 도입                            |
+| -------------- | --------------------------- | ---------------------------------------- |
+| 인증 체크 위치 | `(protected)/layout` (RSC)  | middleware + `(protected)/layout` 둘 다  |
+| 로그인 후 이동 | `window.location.href` 필수 | `router.push()` 가능                     |
+| 만료 토큰 처리 | `getMyInfoServer()` catch   | middleware는 못 잡음, layout 여전히 필요 |
+| 코드 복잡도    | 단순                        | 두 곳에서 관리                           |
+
+**현재 구조에서 미들웨어 도입 실익 없음.** 토큰 만료 처리 때문에 `(protected)/layout`은 어차피 남겨야 하고, `window.location.href` 제거 목적 대비 복잡도가 높음. 미들웨어가 유효한 케이스는 JWT를 프론트에서 직접 검증할 수 있을 때 (예: NextAuth).
