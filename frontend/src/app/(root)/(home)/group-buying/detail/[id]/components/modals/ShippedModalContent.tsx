@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Box, Button, TextField, Stack, alpha, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, TextField, Stack, alpha, Typography } from "@mui/material";
 import { theme } from "@/styles/theme";
 
 interface ShippedModalContentProps {
   initialPlace?: string;
   initialTime?: string;
-  onSubmit: (data: { pickupPlace: string; pickupTime: string }) => void;
+  onSubmit: (data: { pickupPlace: string; pickupTime: string }) => Promise<void> | void;
 }
 
 export const ShippedModalContent: React.FC<ShippedModalContentProps> = ({
@@ -17,6 +17,19 @@ export const ShippedModalContent: React.FC<ShippedModalContentProps> = ({
 }) => {
   const [pickupPlace, setPickupPlace] = useState(initialPlace);
   const [pickupTime, setPickupTime] = useState(initialTime);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const isValid = pickupPlace.trim().length > 0 && pickupTime.trim().length > 0;
+
+  const handleClick = async () => {
+    if (!isValid) return;
+    setIsLoading(true);
+    try {
+      await onSubmit({ pickupPlace, pickupTime });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <Box sx={{ width: "100%", minWidth: "400px" }}>
@@ -75,11 +88,12 @@ export const ShippedModalContent: React.FC<ShippedModalContentProps> = ({
 
       <Box display="flex" justifyContent="flex-end" gap={2} mt={3}>
         <Button
-          onClick={() => onSubmit({ pickupPlace, pickupTime })}
+          onClick={handleClick}
           variant="contained"
+          disabled={!isValid || isLoading}
           sx={{ fontSize: "0.8rem" }}
         >
-          완료
+          {isLoading ? <CircularProgress size={16} color="inherit" /> : "완료"}
         </Button>
       </Box>
     </Box>

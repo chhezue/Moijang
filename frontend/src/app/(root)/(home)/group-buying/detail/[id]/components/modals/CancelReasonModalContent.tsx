@@ -5,6 +5,7 @@ import styled from "styled-components";
 import {
   Button,
   Box,
+  CircularProgress,
   Typography,
   RadioGroup,
   FormControlLabel,
@@ -47,10 +48,16 @@ const CancelReasonModalContent = ({
 }: Props) => {
   const [selectedReason, setSelectedReason] = useState<string>("");
   const [isAgreed, setIsAgreed] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!selectedReason || !isAgreed) return;
-    onConfirm(selectedReason);
+    setIsLoading(true);
+    try {
+      await onConfirm(selectedReason);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -136,14 +143,14 @@ const CancelReasonModalContent = ({
           color="error"
           fullWidth
           onClick={handleConfirm}
-          disabled={!selectedReason || !isAgreed}
+          disabled={!selectedReason || !isAgreed || isLoading}
           sx={{
             fontSize: "0.85rem",
             py: 1.2,
             fontWeight: 600,
           }}
         >
-          취소 진행하기
+          {isLoading ? <CircularProgress size={18} color="inherit" /> : "취소 진행하기"}
         </Button>
       </Box>
     </Container>

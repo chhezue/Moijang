@@ -87,13 +87,21 @@ export default function LeaderDashboard({ item, participants }: LeaderDashboardP
   }) => {
     try {
       await updateGroupBuyingStatus(item.id, "SHIPPED");
+    } catch {
+      showSnackbar("배송 상태 변경에 실패했습니다.", "error");
+      return;
+    }
+    try {
       await updateGroupBuying(item.id, { pickupPlace, pickupTime });
       showSnackbar("배송 완료 처리되었습니다.", "success");
-      setActiveModal(null);
-      router.refresh();
     } catch {
-      showSnackbar("배송 정보 저장에 실패했습니다.", "error");
+      showSnackbar(
+        "배송 완료 처리됐으나 픽업 정보 저장에 실패했습니다. 수정 버튼으로 다시 입력해주세요.",
+        "warning",
+      );
     }
+    setActiveModal(null);
+    router.refresh();
   };
 
   const handleEditShipped = async ({

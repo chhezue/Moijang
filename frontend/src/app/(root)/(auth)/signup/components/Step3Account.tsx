@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, TextField, Typography, Button } from "@mui/material";
+import { Box, CircularProgress, TextField, Typography, Button } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { usernameSchema, nameSchema, passwordSchema, getError } from "@/schemas/auth";
 
@@ -9,6 +9,7 @@ interface Props {
   onLoginIdChange: (v: string) => void;
   loginIdAvailable: boolean | null;
   onCheckLoginId: () => void;
+  idCheckLoading?: boolean;
   name: string;
   onNameChange: (v: string) => void;
   password: string;
@@ -22,6 +23,7 @@ export default function Step3Account({
   onLoginIdChange,
   loginIdAvailable,
   onCheckLoginId,
+  idCheckLoading = false,
   name,
   onNameChange,
   password,
@@ -73,10 +75,10 @@ export default function Step3Account({
         <Button
           variant="outlined"
           onClick={onCheckLoginId}
-          disabled={!!loginIdError || loginId.length === 0}
+          disabled={!!loginIdError || loginId.length === 0 || idCheckLoading}
           sx={{ whiteSpace: "nowrap", height: 56, px: 2.5, alignSelf: "flex-start" }}
         >
-          중복 확인
+          {idCheckLoading ? <CircularProgress size={18} /> : "중복 확인"}
         </Button>
       </Box>
 

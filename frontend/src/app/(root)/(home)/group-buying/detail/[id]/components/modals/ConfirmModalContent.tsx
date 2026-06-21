@@ -1,11 +1,12 @@
 "use client";
 
-import { Box, Button, Typography } from "@mui/material";
+import { useState } from "react";
+import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { ReactNode } from "react";
 
 interface ConfirmModalContentProps {
   message: ReactNode;
-  onConfirm: () => void;
+  onConfirm: () => Promise<void> | void;
   confirmLabel?: string;
 }
 
@@ -14,6 +15,17 @@ const ConfirmModalContent: React.FC<ConfirmModalContentProps> = ({
   onConfirm,
   confirmLabel = "확인",
 }) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleClick = async () => {
+    setIsLoading(true);
+    try {
+      await onConfirm();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Box>
       {/* 메시지 섹션 */}
@@ -32,8 +44,14 @@ const ConfirmModalContent: React.FC<ConfirmModalContentProps> = ({
 
       {/* 버튼 영역 */}
       <Box display="flex" justifyContent="end" gap={1}>
-        <Button variant="contained" color="error" size="small" onClick={onConfirm}>
-          {confirmLabel}
+        <Button
+          variant="contained"
+          color="error"
+          size="small"
+          onClick={handleClick}
+          disabled={isLoading}
+        >
+          {isLoading ? <CircularProgress size={16} color="inherit" /> : confirmLabel}
         </Button>
       </Box>
     </Box>

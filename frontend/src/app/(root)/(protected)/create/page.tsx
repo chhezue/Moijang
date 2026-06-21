@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { Box, Button, Typography, Paper } from "@mui/material";
+import { Box, Button, CircularProgress, Typography, Paper } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Stepper from "@/components/Stepper";
@@ -57,7 +57,12 @@ export default function CreatePage() {
       leaderCount: "",
     },
   });
-  const { trigger, handleSubmit, getValues } = methods;
+  const {
+    trigger,
+    handleSubmit,
+    getValues,
+    formState: { isSubmitting },
+  } = methods;
 
   const handleNext = async () => {
     if (activeStep === 1) {
@@ -83,14 +88,9 @@ export default function CreatePage() {
       const res = await createGroupBuying(data);
       const gbId = res.id;
       showSnackbar("공구 신청이 완료되었습니다.", "success");
-
-      // 그냥 리스트로 이동 (예: /group-buying)
-      setTimeout(() => {
-        router.push(`group-buying/detail/${gbId}`);
-      }, 1000);
-    } catch (error) {
+      router.push(`/group-buying/detail/${gbId}`);
+    } catch {
       showSnackbar("공구 생성에 실패했습니다. 다시 시도해주세요.", "error");
-      console.error(error);
     }
   };
   const renderStepContent = (step: number) => {
@@ -142,9 +142,15 @@ export default function CreatePage() {
             <Button
               variant="contained"
               onClick={handleNext}
-              disabled={activeStep === steps.length - 1 && !agree}
+              disabled={(activeStep === steps.length - 1 && !agree) || isSubmitting}
             >
-              {activeStep === steps.length - 1 ? "완료" : "다음"}
+              {isSubmitting ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : activeStep === steps.length - 1 ? (
+                "완료"
+              ) : (
+                "다음"
+              )}
             </Button>
           </Box>
         </FormProvider>

@@ -109,12 +109,17 @@ export default function SignupClient() {
     setLoginIdAvailable(null);
   };
 
+  const [idCheckLoading, setIdCheckLoading] = useState(false);
+
   const handleCheckLoginId = async () => {
+    setIdCheckLoading(true);
     try {
       const available = await checkLoginId(loginId);
       setLoginIdAvailable(available);
     } catch {
       showSnackbar("중복 확인에 실패했습니다. 다시 시도해주세요.", "error", 3000);
+    } finally {
+      setIdCheckLoading(false);
     }
   };
 
@@ -175,6 +180,7 @@ export default function SignupClient() {
               onLoginIdChange={handleLoginIdChange}
               loginIdAvailable={loginIdAvailable}
               onCheckLoginId={handleCheckLoginId}
+              idCheckLoading={idCheckLoading}
               name={name}
               onNameChange={setName}
               password={password}

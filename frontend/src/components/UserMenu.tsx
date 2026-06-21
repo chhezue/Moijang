@@ -57,8 +57,9 @@ const UserMenu: React.FC<UserMenuProps> = ({ displayName }) => {
       await logout();
       clearUser();
       router.refresh();
-    } catch (error) {
-      console.error("로그아웃 실패:", error);
+    } catch {
+      // 로그아웃 실패해도 클라이언트 상태는 초기화
+      clearUser();
     }
     handleClose();
   };
