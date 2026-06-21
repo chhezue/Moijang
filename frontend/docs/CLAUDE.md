@@ -1,17 +1,107 @@
 -- <frontend> --
-운영 방법: 새로운 결정을 내릴 때마다 한 줄씩 추가. "이렇게 하기로 했다"가 생길 때 즉시 기록. 처음부터 완성된 문서 만들려고
-하지 말고, 의사결정 로그
-미완: 도메인 구조, 컴포넌트 규칙 등 아직 패턴 안 잡힌 것들
+운영 방법: 새로운 결정을 내릴 때마다 한 줄씩 추가. "이렇게 하기로 했다"가 생길 때 즉시 기록.
 
-Providers -> theme, snackbar 같은 UI 설정 담당
-UI 라이브러리 -> MUI,
-전역 상태도구
+---
 
-- user 정보 -> zustand 팩토리 + react context
-  라우팅 : Next.js App Router, route groups (root)/(home)/(auth)/(protected)
-- (root)/layout.tsx : getMyInfoServer + AuthStoreProvider + Providers 공유 (1회만 호출)
-- (auth)/layout.tsx : 로그인 상태면 / redirect, UI만
-- (home)/layout.tsx : Header만
-- (protected)/layout.tsx : 미로그인 시 /login?redirect=<path> redirect, ProtectedClient만
-  API: axios + withCredentials
-  서버데이터: SSR layout에서 fetch (React cache()로 중복 제거), CSR은 store/router.refresh()
+## 기술 스택
+
+- **프레임워크**: Next.js 14.2.5 (App Router)
+- **UI**: MUI v7 (`@mui/material ^7.1.2`, `@mui/icons-material ^7.3.1`)
+- **스타일**: Emotion (MUI 기본), styled-components (일부 레거시 컴포넌트)
+- **상태관리**: Zustand (팩토리 패턴, singleton 아님)
+- **폼**: react-hook-form + zod
+- **HTTP**: axios + withCredentials
+- **기타**: Mantine (일부), Redux (일부) — 정리 예정
+
+---
+
+## 라우팅 구조 (App Router route groups)
+
+```
+src/app/
+  (root)/
+    layout.tsx          ← getMyInfoServer() + AuthStoreProvider + Providers (전역 1회)
+    (auth)/
+      layout.tsx        ← 로그인 상태면 / redirect
+      login/
+      signup/
+    (home)/
+      layout.tsx        ← Header만 렌더
+      group-buying/
+        list/all/       ← 공구 목록
+        detail/[id]/    ← 공구 상세
+      payment/success/ fail/
+    (protected)/
+      layout.tsx        ← 미로그인 시 /login?redirect=<path> redirect → ProtectedClient 렌더
+      protectedClient.tsx ← "use client", Header + children 렌더
+      create/           ← 공구 생성 폼 (3단계)
+      my/
+        layout.tsx      ← "use client", TabMenu (참여중/만든거)
+        created/
+        participating/
+      dashboard/        ← 대시보드
+        layout.tsx
+        leading/        ← 총대 대시보드
+        participating/  ← 참여자 대시보드
+```
+
+### 레이아웃 동작 방식
+
+- `(home)`, `(auth)`, `(protected)`, `(root)` 는 URL에 영향 없음 (route group)
+- `(root)/layout.tsx`가 유저 정보 한 번만 fetch → AuthStoreProvider로 주입
+- Header.tsx는 독립적 — `useAuthStore`로 유저 상태만 읽음, 페이지에 의존 없음
+- Header는 두 곳에서 렌더됨: `(home)/layout.tsx` + `protectedClient.tsx`
+
+---
+
+## 대시보드 (`/dashboard`)
+
+→ 상세 내용: `docs/domain/dashboard.md`
+
+---
+
+## 공구 도메인 (GroupBuying)
+
+→ 상세 내용: `docs/domain/Groupbuying.md`
+
+---
+
+## API 패턴
+
+### 서버사이드 (SSR)
+
+```ts
+// *.server.ts 파일, withServerCookies() 필수
+import { withServerCookies } from '@/apis/utils/withServerCookies';
+const res = await apiServer.get('/api/...', { headers: withServerCookies() });
+```
+
+### 클라이언트사이드
+
+```ts
+import api from '@/apis/apiClient'; // withCredentials: true 자동
+const res = await api.get('/api/...');
+```
+
+---
+
+## 인증
+
+- Access Token: 5분, Refresh Token: 14일, 쿠키 기반 (`httpOnly`)
+- 로그인 후 리다이렉트: `window.location.href` 필수 — `router.push` 사용 금지 (router cache 문제)
+- Zustand 팩토리 패턴 유지 (singleton으로 되돌리지 말 것)
+
+---
+
+## 참고 문서
+
+- 공구 도메인: `docs/domain/Groupbuying.md`
+- 대시보드: `docs/domain/dashboard.md`
+- MUI v7 SSR 버그: `docs/issues/mui-v7-ssr-bug.md`
+- E2E 테스트: `docs/test/group-buying-e2e.md`
+
+---
+
+## 절대 건들지 말 것
+
+- **백엔드 코드** (`/backend/` 하위 모든 파일)

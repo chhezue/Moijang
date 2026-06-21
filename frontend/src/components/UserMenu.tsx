@@ -18,6 +18,7 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
+import DashboardIcon from "@mui/icons-material/Dashboard";
 import { logout } from "@/apis/services/auth";
 import { useAuthStore } from "@/store/authStore";
 
@@ -27,13 +28,18 @@ interface UserMenuProps {
 
 const MENU_ITEMS = [
   {
+    label: "대시보드",
+    path: "/dashboard",
+    icon: <DashboardIcon sx={{ fontSize: "1rem" }} />,
+  },
+  {
     label: "참여 중인 공동구매",
-    path: "/my/participating",
+    path: "/dashboard/participating",
     icon: <PersonOutlineIcon sx={{ fontSize: "1rem" }} />,
   },
   {
     label: "내가 만든 공동구매",
-    path: "/my/created",
+    path: "/dashboard/leading",
     icon: <FolderOpenIcon sx={{ fontSize: "1rem" }} />,
   },
 ] as const;
