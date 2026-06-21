@@ -5,9 +5,7 @@ import { Box, Container } from "@mui/material";
 import { GroupBuyingItem, IParticipant } from "@/types/groupBuying";
 
 import DetailInfoSection from "./DetailInfoSection";
-import Stepper from "@/components/Stepper";
 import Sidebar from "@/app/(root)/(home)/group-buying/detail/[id]/components/sidebar/Sidebar";
-import { useStatusContext } from "@/providers/StatusProvider";
 import CustomModal from "@/components/CustomModal";
 import ParticipationModalContent from "@/app/(root)/(home)/group-buying/detail/[id]/components/modals/ParticipationModalContent";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -23,7 +21,6 @@ interface ClientPageProps {
 
 const DetailClientPage: React.FC<ClientPageProps> = ({ item, participants }) => {
   const { showSnackbar } = useSnackbar();
-  const { statusList, statusToStepIndex } = useStatusContext();
   const user = useAuthStore((s) => s.user);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -49,12 +46,6 @@ const DetailClientPage: React.FC<ClientPageProps> = ({ item, participants }) => 
         }}
       >
         <Container maxWidth="lg" sx={{ py: 4 }}>
-          {!isCancelled && (
-            <Box sx={{ mb: 4 }}>
-              <Stepper steps={statusList} activeStep={statusToStepIndex[item.groupBuyingStatus]} />
-            </Box>
-          )}
-
           {isCancelled && <CancelledBanner item={item} />}
 
           {/* 2. 메인 콘텐츠 영역 */}

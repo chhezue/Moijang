@@ -1,7 +1,17 @@
 "use client";
 
-import React from "react";
-import { Box, Chip, List, ListItemButton, Stack, Typography } from "@mui/material";
+import React, { useState } from "react";
+import {
+  Box,
+  Chip,
+  InputAdornment,
+  List,
+  ListItemButton,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 import { usePathname, useRouter } from "next/navigation";
 import { GroupBuyingItem } from "@/types/groupBuying";
 import { useStatusContext } from "@/providers/StatusProvider";
@@ -62,8 +72,9 @@ function GbListCard({
             height: 20,
             fontSize: "0.68rem",
             fontWeight: 600,
-            bgcolor: colorMap[item.groupBuyingStatus] ?? "#9CA3AF",
-            color: "#fff",
+            bgcolor: colorMap[item.groupBuyingStatus]?.bg ?? "#F1F3F4",
+            color: colorMap[item.groupBuyingStatus]?.color ?? "#5F6368",
+            "& .MuiChip-label": { color: "inherit" },
             borderRadius: "6px",
           }}
         />
@@ -82,6 +93,11 @@ export default function GbListPanel({
 }: GbListPanelProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const [query, setQuery] = useState("");
+
+  const filtered = query.trim()
+    ? items.filter((item) => item.title.toLowerCase().includes(query.toLowerCase()))
+    : items;
 
   return (
     <Box
@@ -101,19 +117,36 @@ export default function GbListPanel({
     >
       <Box
         sx={{
-          px: 2,
+          px: 1.5,
           py: 1.5,
           borderBottom: "1px solid",
           borderColor: "divider",
-          bgcolor: "background.paper",
+          bgcolor: "#FAFAFA",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
-        <Typography variant="caption" color="text.secondary" fontWeight={600}>
-          총 {items.length}개
-        </Typography>
+        <TextField
+          size="small"
+          placeholder="상품명 검색"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ fontSize: 16, color: "text.disabled" }} />
+                </InputAdornment>
+              ),
+            },
+          }}
+          sx={{
+            "& .MuiOutlinedInput-root": { borderRadius: 1.5, fontSize: "0.8rem" },
+          }}
+        />
       </Box>
 
-      {items.length === 0 ? (
+      {filtered.length === 0 ? (
         <Box sx={{ p: 3, textAlign: "center", mt: 4 }}>
           <Typography variant="body2" color="text.disabled">
             {emptyLabel}
@@ -121,7 +154,7 @@ export default function GbListPanel({
         </Box>
       ) : (
         <List dense sx={{ p: 1 }}>
-          {items.map((item) => (
+          {filtered.map((item) => (
             <GbListCard
               key={item.id}
               item={item}
