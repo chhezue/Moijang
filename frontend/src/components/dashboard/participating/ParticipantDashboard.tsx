@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { Avatar, Box, Chip, Link, Paper, Stack, Typography } from "@mui/material";
+import { Box, Chip, Link, Paper, Stack, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import LeaderInfoCard from "@/components/LeaderInfoCard";
 import { GroupBuyingItem } from "@/types/groupBuying";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "@/providers/SnackbarProvider";
@@ -80,19 +80,7 @@ export default function ParticipantDashboard({ item }: ParticipantDashboardProps
             <Typography variant="subtitle2" fontWeight={700} mb={1.5}>
               총대 정보
             </Typography>
-            <Stack direction="row" alignItems="center" spacing={1.5}>
-              <Avatar sx={{ bgcolor: "#7C3AED", width: 40, height: 40 }}>
-                <AccountCircleIcon />
-              </Avatar>
-              <Box>
-                <Typography variant="body2" fontWeight={600}>
-                  {item.leaderId.name}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  구매 수량: {item.leaderCount}개
-                </Typography>
-              </Box>
-            </Stack>
+            <LeaderInfoCard name={item.leaderId.name} count={item.leaderCount} variant="plain" />
           </Paper>
 
           {/* 공지사항 */}

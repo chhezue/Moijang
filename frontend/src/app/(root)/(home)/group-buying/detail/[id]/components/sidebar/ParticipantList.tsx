@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { IParticipant } from "@/types/groupBuying";
+import LeaderInfoCard from "@/components/LeaderInfoCard";
 
 interface ParticipantListProps {
   participants: IParticipant[];
@@ -42,55 +43,9 @@ const ParticipantList: React.FC<ParticipantListProps> = ({ participants, leaderI
 
       <List dense sx={{ p: 0 }}>
         {/* 총대 (항상 첫 번째) */}
-        <ListItem
-          sx={{
-            border: "1px solid",
-            borderColor: "primary.main",
-            borderRadius: "12px",
-            mb: 1,
-            p: 1.5,
-            backgroundColor: "primary.50",
-          }}
-        >
-          <ListItemAvatar sx={{ minWidth: "auto", mr: 1.5 }}>
-            <Avatar sx={{ bgcolor: "#7C3AED", width: 36, height: 36 }}>
-              <AccountCircleIcon fontSize="small" />
-            </Avatar>
-          </ListItemAvatar>
-          <ListItemText
-            disableTypography
-            primary={
-              <Box display="flex" justifyContent="space-between" alignItems="flex-start">
-                <Box>
-                  <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
-                    <Typography
-                      variant="body2"
-                      fontWeight={600}
-                      color="text.primary"
-                      sx={{ fontSize: "0.85rem" }}
-                    >
-                      {leaderInfo.name}
-                    </Typography>
-                  </Box>
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    component="div"
-                    sx={{ fontSize: "0.75rem", opacity: 0.8 }}
-                  >
-                    구매 수량: {leaderInfo.count}개
-                  </Typography>
-                </Box>
-                <Chip
-                  size="small"
-                  label="총대"
-                  color="primary"
-                  sx={{ height: "22px", fontSize: "0.7rem", fontWeight: 600, mt: "1px" }}
-                />
-              </Box>
-            }
-          />
-        </ListItem>
+        <Box mb={1}>
+          <LeaderInfoCard name={leaderInfo.name} count={leaderInfo.count} />
+        </Box>
 
         {/* 일반 참여자 */}
         {participants.map((p) => (
