@@ -134,24 +134,19 @@ const Header: React.FC = () => {
           </Box>
         </Box>
 
-        {/* 우측 사용자 메뉴 */}
+        {/* 우측 영역 */}
         <Stack direction="row" alignItems="center" spacing={1.5}>
-          {user && <UserMenu displayName={user.name} />}
+          {/*<CreateButton />*/}
 
-          {/* 공구 생성 버튼 */}
-          <CreateButton />
-
-          {!user && (
+          {user ? (
+            <UserMenu displayName={user.name} />
+          ) : (
             <Button
               variant="outlined"
               size="small"
               onClick={onLogin}
               startIcon={<LoginIcon />}
-              sx={{
-                fontSize: "0.75rem",
-                padding: "6px 10px",
-                borderRadius: 999,
-              }}
+              sx={{ fontSize: "0.75rem", padding: "6px 10px", borderRadius: 999 }}
             >
               로그인
             </Button>
