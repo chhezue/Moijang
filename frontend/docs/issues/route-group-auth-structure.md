@@ -1,92 +1,57 @@
-# Route Group 구조 개선 — Auth 상태 공유 문제
+# Route Group 구조 — Auth 상태 공유 & Login Redirect Loop
 
-## 문제
+## 현재 구조 (적용 완료)
 
-로그인 후 `router.push()`로 페이지 이동 시 헤더에 로그인 버튼이 그대로 남음.
+```
+app/layout.tsx            ← html/body만
+(root)/layout.tsx         ← getMyInfoServer() + AuthStoreProvider (전역 1회)
+  (auth)/layout.tsx       ← 로그인 상태면 / redirect
+  (home)/layout.tsx       ← Header만
+  (protected)/layout.tsx  ← 미로그인 시 /login?redirect=<path> redirect
+```
+
+`(root)/layout.tsx`가 모든 route group의 공유 segment. `getMyInfoServer()` 호출을 1번으로 집중.
+
+---
+
+## Login Redirect Loop 문제
+
+### 증상
+
+비로그인 상태에서 protected 페이지 접근 → `/login?redirect=<path>` 리다이렉트 → 로그인 성공 → 원래 페이지로 이동했는데 → **다시 `/login`으로 튕김**
 
 ### 원인
 
-Next.js Router Cache는 route segment 단위로 RSC payload를 저장한다.  
-현재 구조에서 `(auth)/layout`과 `(home)/layout`은 공유하는 segment가 없어서,  
-`/login`에서 `router.refresh()`를 호출해도 `/group-buying/list/all`의 캐시는 무효화되지 않는다.
+Zustand **팩토리 패턴**은 `AuthStoreProvider`가 mount될 때 `initialUser` prop으로 새 store 인스턴스를 생성한다.
 
 ```
-/login 의 segment 트리:        /group-buying/list/all 의 segment 트리:
-  app/layout                     app/layout
-  (auth)/layout       ↕ 공유 없음  (home)/layout  ← getMyInfoServer() 여기
-  login/page                     ...
+router.refresh()  →  (root)/layout 캐시 무효화 시작 (비동기, await 불가)
+router.push()     →  즉시 실행 → 캐시가 아직 살아있음 → initialUser=null
+                      → 새 store가 user=null로 생성
+                      → (protected)/layout이 미인증 판단 → /login 리다이렉트
 ```
 
-`(home)/layout.tsx`에만 `getMyInfoServer()` + `AuthStoreProvider`가 있고,  
-이 segment는 `(auth)` 라우트의 refresh 범위 밖이라 캐시가 그대로 남아 `initialUser=null`로 렌더링된다.
+`router.refresh()`는 Promise를 반환하지 않아 완료를 기다릴 수 없음. "캐시 무효화 + 페이지 이동"이 원자적으로 이루어져야 하는데 따로따로 실행됨.
 
-### 임시 해결책 (현재 적용)
+> **싱글톤이면 이 문제가 없는 이유**: 전역 store가 하나라 `setUser()`가 즉시 반영됨. 캐시된 RSC가 `initialUser=null`을 내려줘도 store에는 이미 user가 있어서 문제없음.  
+> **팩토리 패턴으로 바꾼 이유**: 싱글톤은 SSR에서 여러 요청이 같은 store를 공유해 유저 데이터 오염 위험. 팩토리는 요청마다 독립 인스턴스.
+
+### 해결책 (현재 적용)
 
 ```ts
-// LoginForm.tsx
-window.location.href = redirectTo; // 전체 페이지 리로드 → Router Cache 전체 무효화
+// loginForm.tsx
+window.location.href = redirectTo; // hard navigation → JS 메모리 초기화 → Router Cache 전부 삭제
 ```
 
-`window.location.href`는 JS 메모리의 Router Cache를 날려버려서 항상 서버에서 새로 fetch한다.  
-`router.refresh() + router.push()` 조합으로는 안 됨 — refresh는 현재 URL segment만 무효화하고 목적지 URL은 건드리지 않는다.
+`window.location.href`는 JS 프로세스를 종료하고 브라우저가 새 요청을 보내기 때문에 Router Cache가 통째로 사라짐. 타이밍 문제 없음.
 
----
+`router.push()`, `<a>` 태그, `location.replace()` 등 hard navigation은 모두 캐시를 날림.  
+`router.push()`만 Next.js 내부에서 처리하는 soft navigation이라 캐시가 살아있음.
 
-## 올바른 구조
+### 정석 대안 (미적용)
 
-### 핵심 원칙
-
-- `getMyInfoServer()` + `AuthStoreProvider`는 **모든 페이지가 공유하는 단 하나의 layout**에 있어야 한다.
-- 인증 redirect 체크는 **middleware**가 담당한다.
-
-### 제안 구조
-
-```
-app/
-  layout.tsx              ← html/body만 (최소)
-  (root)/
-    layout.tsx            ← getMyInfoServer() + AuthStoreProvider (전체 공유)
-    (auth)/
-      layout.tsx          ← UI만 (middleware가 redirect 처리)
-      login/
-      signup/
-    (home)/
-      layout.tsx          ← Header만
-      group-buying/
-      payment/
-    (protected)/
-      layout.tsx          ← UI만 (middleware가 redirect 처리)
-      my/
-      create/
-  middleware.ts           ← 쿠키 확인 → protected 미인증 시 /login?redirect=<path>
-                                       → auth 인증 시 /로 redirect
-```
-
-### 현재 vs 개선 후
-
-|                               | 현재                                 | 개선 후                            |
-| ----------------------------- | ------------------------------------ | ---------------------------------- |
-| `getMyInfoServer()` 호출 횟수 | 라우트 그룹마다 따로 (최대 3번)      | `(root)/layout.tsx` 1번            |
-| 인증 redirect                 | 각 layout 서버 컴포넌트              | middleware                         |
-| 로그인 후 이동                | `window.location.href` (full reload) | `router.refresh() + router.push()` |
-| 공유 segment                  | `app/layout.tsx`만 (auth 정보 없음)  | `(root)/layout.tsx` (전체 공유)    |
-
-### 개선 후 로그인 흐름
-
-```
-await login()                     ← 쿠키 저장 완료 (타이밍 문제 아님)
-router.refresh()                  ← (root)/layout.tsx 공유 캐시 무효화
-router.push(redirectTo)           ← 신선한 캐시 + 쿠키로 RSC fetch → user 있음 ✓
-```
-
----
-
-## 참고
-
-- Router Cache는 URL별이 아닌 route segment 단위로 저장됨
-- 공유 segment가 있으면 하나의 캐시 항목을 여러 URL이 참조
-- `router.refresh()`는 현재 URL의 segment 트리 전체를 무효화 (다른 URL은 미포함)
-- 쿠키는 `await login()` resolve 시점에 이미 저장 완료 — 타이밍 이슈 아님
+1. **Server Action + `revalidatePath`**: 서버에서 직접 캐시 무효화 → `router.push()` 가능. 백엔드가 별도 서버인 구조에서 도입 복잡도 높음.
+2. **Middleware auth**: 매 요청마다 쿠키만 보고 판단 → RSC 캐시 무관. 단, 토큰 만료 검증 불가라 `(protected)/layout`의 catch redirect도 유지해야 함 → 두 곳 관리. 현재 구조에서 실익 없음.
 
 ---
 
