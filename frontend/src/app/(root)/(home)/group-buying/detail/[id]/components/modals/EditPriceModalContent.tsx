@@ -71,13 +71,7 @@ const EditPriceModalContent = ({ item, onSuccess }: Props) => {
   };
 
   return (
-    <Box
-      component="form"
-      onSubmit={handleSubmit(onSubmit, (err) => {
-        console.log("❌ 유효성 검증 실패", err);
-      })}
-      noValidate
-    >
+    <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
       {/* 가격 정보 */}
       <Box mb={3}>
         <Grid container spacing={2} mt={2}>

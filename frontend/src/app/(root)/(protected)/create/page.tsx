@@ -78,7 +78,6 @@ export default function CreatePage() {
   const onSubmit = async (raw: CreateGroupBuyingInput) => {
     try {
       const data: CreateGroupBuyingOutput = createGroupBuyingSchema.parse(raw);
-      console.log("payload to POST", data); // 여기서 leaderCount 확인 가능
 
       // API 요청만 수행 (응답은 안 씀)
       const res = await createGroupBuying(data);

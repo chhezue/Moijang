@@ -33,7 +33,6 @@ export default function CreateButton({
   const [open, setOpen] = useState(false);
 
   const handleClick = () => {
-    console.log("user clicked:", user);
     if (user) router.push(redirectPath);
     else setOpen(true);
   };

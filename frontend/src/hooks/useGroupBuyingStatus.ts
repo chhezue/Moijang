@@ -18,7 +18,6 @@ export function useGroupBuyingStatus() {
 
   useEffect(() => {
     api.get("/api/group-buying/enums").then((res) => {
-      console.log("🔍 /api/group-buying/enums response:", res.data);
       setStatusList(res.data.status);
       setIsLoading(false);
     });

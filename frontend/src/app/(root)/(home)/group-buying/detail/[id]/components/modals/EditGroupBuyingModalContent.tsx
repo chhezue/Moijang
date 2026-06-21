@@ -40,8 +40,6 @@ const EditGroupBuyingModalContent = ({ item, close, onlyPrice = false }: Props) 
   const { showSnackbar } = useSnackbar();
   const { isLoading, categoryList, categoryIconMap } = useCategoryContext();
   const router = useRouter();
-  console.log(item);
-
   const schema = useMemo(
     () => makeUpdateGroupBuyingSchema(item.fixedCount, item.currentCount, item.leaderCount),
     [item],
@@ -93,19 +91,12 @@ const EditGroupBuyingModalContent = ({ item, close, onlyPrice = false }: Props) 
       close();
       router.refresh();
     } catch (e: any) {
-      console.log("수정 실패:", e.response?.data || e);
       showSnackbar("수정 실패", "error");
     }
   };
 
   return (
-    <Box
-      component="form"
-      onSubmit={handleSubmit(onSubmit, (err) => {
-        console.log("❌ 유효성 검증 실패", err);
-      })}
-      noValidate
-    >
+    <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
       {/* 상품 정보 */}
       <Box mb={3}>
         <Box
@@ -436,7 +427,6 @@ const EditGroupBuyingModalContent = ({ item, close, onlyPrice = false }: Props) 
           variant="contained"
           type="submit"
           disabled={isSubmitting}
-          onClick={() => console.log("버튼 클릭됨")}
           sx={{
             fontSize: "0.85rem",
             py: 1.2,
