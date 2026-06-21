@@ -78,7 +78,7 @@ const handleConfirm = () => {
   onConfirm(selectedReason); // async인데 await 없음
 };
 
-<Button onClick={handleConfirm} ...>취소 진행하기</Button>
+<Button onClick={handleConfirm}>취소 진행하기</Button>;
 ```
 
 `onConfirm`이 실행 중인지 알 수 없어 중복 제출 가능.
@@ -162,25 +162,18 @@ try {
 
 ---
 
-## 5. handleProceedOrder — 팝업 차단기 (낮음)
+## 5. handleProceedOrder — 팝업 차단기 — 완료
 
-### 현재 상태
+### 수정 전
 
 ```tsx
 await updateGroupBuyingStatus(item.id, 'ORDERED');
-window.open(item.productUrl, '_blank'); // async 콜백 안에서 호출
+window.open(item.productUrl, '_blank'); // async 콜백 안에서 팝업 차단 가능
 ```
 
-`window.open`이 직접 유저 클릭 응답이 아닌 async 콜백 안에 있어 Chrome 팝업 차단기에 걸릴 수 있음.
+### 수정 후
 
-### 해결책
-
-상태 변경 전에 `window.open` 먼저 호출하거나, 팝업 대신 링크로 안내:
-
-```tsx
-// 옵션 1: 상태 변경 성공 후 링크 버튼 노출
-// 옵션 2: 모달 메시지에 상품 URL 링크 포함
-```
+`window.open` 제거. 상태만 ORDERED로 변경하고 공지사항에서 URL 확인하도록 유도.
 
 ---
 

@@ -102,6 +102,34 @@ const res = await api.get('/api/...');
 
 ---
 
+## 비동기 핸들러 규칙
+
+버튼에 async API 호출이 연결될 때 반드시 아래 패턴 사용:
+
+```tsx
+const [isLoading, setIsLoading] = useState(false);
+
+const handleClick = async () => {
+  setIsLoading(true);
+  try {
+    await someApi();
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+<Button onClick={handleClick} disabled={isLoading}>
+  {isLoading ? <CircularProgress size={16} color="inherit" /> : '확인'}
+</Button>;
+```
+
+- `finally`로 isLoading 해제 — catch에서 return해도 반드시 해제됨
+- react-hook-form 사용 시 `formState.isSubmitting` 활용 (별도 state 불필요)
+- `onConfirm` 같은 prop으로 async 함수 받을 때도 내부에서 await + isLoading 처리
+- `console.log` / `console.error` 프로덕션 코드에 남기지 말 것
+
+---
+
 ## 절대 건들지 말 것
 
 - **백엔드 코드** (`/backend/` 하위 모든 파일)
