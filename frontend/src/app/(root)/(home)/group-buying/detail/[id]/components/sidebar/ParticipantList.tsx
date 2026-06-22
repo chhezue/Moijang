@@ -14,6 +14,7 @@ import {
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { IParticipant } from "@/types/groupBuying";
 import LeaderInfoCard from "@/components/LeaderInfoCard";
+import EmptyState from "@/components/EmptyState";
 
 interface ParticipantListProps {
   participants: IParticipant[];
@@ -48,6 +49,7 @@ const ParticipantList: React.FC<ParticipantListProps> = ({ participants, leaderI
         </Box>
 
         {/* 일반 참여자 */}
+        {participants.length === 0 && <EmptyState message="아직 참여자가 없습니다" />}
         {participants.map((p) => (
           <ListItem
             key={p.id}
