@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Box, Paper, Stack, Button, Skeleton } from "@mui/material";
@@ -9,7 +10,7 @@ import { useCategoryContext } from "@/providers/CategoryProvider";
 import SearchInput from "@/app/(root)/(home)/group-buying/list/component/SearchAndFilterBar/SearchInput";
 import FilterDropdown from "@/app/(root)/(home)/group-buying/list/component/SearchAndFilterBar/FilterDropdown";
 
-export default function SearchAndFilterHeader() {
+function SearchAndFilterHeaderContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -115,5 +116,13 @@ export default function SearchAndFilterHeader() {
         )}
       </Paper>
     </Box>
+  );
+}
+
+export default function SearchAndFilterHeader() {
+  return (
+    <Suspense>
+      <SearchAndFilterHeaderContent />
+    </Suspense>
   );
 }

@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { ViewByList } from "@/app/(root)/(home)/group-buying/list/component/ViewByList";
 import { getGroupBuying } from "@/apis/services/groupBuying";
 import { PaginationWrapper } from "@/app/(root)/(home)/group-buying/list/component/PaginationWrapper";
@@ -32,9 +31,7 @@ export default async function GroupBuyingPage({
           marginBottom: "2rem",
         }}
       >
-        <Suspense>
-          <PaginationWrapper page={meta.page} count={meta.totalPages} />
-        </Suspense>
+        <PaginationWrapper page={meta.page} count={meta.totalPages} />
       </div>
       <PushSubscriber></PushSubscriber>
     </div>
