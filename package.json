@@ -6,7 +6,7 @@
     "backend"
   ],
   "scripts": {
-    "prepare": "husky",
+    "prepare": "husky || true",
     "lint": "npm run lint -w backend && npm run lint -w frontend",
     "lint:fix": "npm run lint:fix -w backend && npm run lint:fix -w frontend",
     "format": "prettier --write .",
