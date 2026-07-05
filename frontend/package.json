@@ -21,7 +21,7 @@
     "@reduxjs/toolkit": "^2.2.6",
     "@tosspayments/tosspayments-sdk": "^2.7.0",
     "axios": "^1.7.2",
-    "next": "14.2.5",
+    "next": "^14.2.35",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.62.0",

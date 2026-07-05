@@ -15,7 +15,9 @@ export const LoginForm = () => {
   const { showSnackbar } = useSnackbar();
   const setUser = useAuthStore((s) => s.setUser);
 
-  const redirectTo = searchParams.get("redirect") ?? "/";
+  const rawRedirect = searchParams.get("redirect") ?? "/";
+  const redirectTo =
+    rawRedirect.startsWith("/") && !rawRedirect.startsWith("//") ? rawRedirect : "/";
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
