@@ -19,7 +19,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import { usePathname, useRouter } from "next/navigation";
 
 const NAV_ITEMS = [
-  { label: "만들기", icon: AddCircleOutlineIcon, href: "/create", external: true },
+  { label: "만들기", icon: AddCircleOutlineIcon, href: "/dashboard/create" },
   { label: "진행중인거", icon: TrendingUpIcon, href: "/dashboard/leading" },
   { label: "참여중인거", icon: ShoppingBagIcon, href: "/dashboard/participating" },
   { label: "문의사항", icon: HelpOutlineIcon, href: "/dashboard/inquiry", disabled: true },
@@ -62,8 +62,8 @@ export default function DashboardNav() {
       </Box>
 
       <List dense sx={{ px: 1, flex: 1 }}>
-        {NAV_ITEMS.map(({ label, icon: Icon, href, disabled, external }) => {
-          const isActive = !external && pathname.startsWith(href);
+        {NAV_ITEMS.map(({ label, icon: Icon, href, disabled }) => {
+          const isActive = pathname.startsWith(href);
           return (
             <ListItemButton
               key={href}

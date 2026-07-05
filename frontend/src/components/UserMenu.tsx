@@ -19,6 +19,7 @@ import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import DashboardIcon from "@mui/icons-material/Dashboard";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { logout } from "@/apis/services/auth";
 import { useAuthStore } from "@/store/authStore";
 
@@ -26,23 +27,32 @@ interface UserMenuProps {
   displayName: string;
 }
 
-const MENU_ITEMS = [
-  {
-    label: "대시보드",
-    path: "/dashboard",
-    icon: <DashboardIcon sx={{ fontSize: "1rem" }} />,
-  },
-  {
-    label: "참여 중인 공동구매",
-    path: "/dashboard/participating",
-    icon: <PersonOutlineIcon sx={{ fontSize: "1rem" }} />,
-  },
-  {
-    label: "내가 만든 공동구매",
-    path: "/dashboard/leading",
-    icon: <FolderOpenIcon sx={{ fontSize: "1rem" }} />,
-  },
-] as const;
+const MENU_GROUPS = [
+  [
+    {
+      label: "공동구매 생성하기",
+      path: "/dashboard/create",
+      icon: <AddCircleOutlineIcon sx={{ fontSize: "1rem" }} />,
+    },
+    {
+      label: "참여 중인 공동구매",
+      path: "/dashboard/participating",
+      icon: <PersonOutlineIcon sx={{ fontSize: "1rem" }} />,
+    },
+    {
+      label: "내가 만든 공동구매",
+      path: "/dashboard/leading",
+      icon: <FolderOpenIcon sx={{ fontSize: "1rem" }} />,
+    },
+  ],
+  [
+    {
+      label: "대시보드",
+      path: "/dashboard",
+      icon: <DashboardIcon sx={{ fontSize: "1rem" }} />,
+    },
+  ],
+];
 
 const UserMenu: React.FC<UserMenuProps> = ({ displayName }) => {
   const theme = useTheme();
@@ -166,69 +176,59 @@ const UserMenu: React.FC<UserMenuProps> = ({ displayName }) => {
               >
                 {/* 메뉴 아이템들 */}
                 <MenuList sx={{ py: 0.5 }}>
-                  {MENU_ITEMS.map((item) => {
-                    const isActive = isCurrentPath(item.path);
-
-                    return (
-                      <MenuItem
-                        key={item.path}
-                        onClick={() => handleMenuItemClick(item.path)}
-                        sx={{
-                          py: 1,
-                          px: 2,
-                          mx: 0.5,
-                          my: 0.25,
-                          borderRadius: 1.5,
-                          transition: "all 120ms ease-out",
-
-                          ...(isActive && {
-                            backgroundColor: "rgba(139, 92, 246, 0.08)",
-                            color: theme.palette.primary.main,
-
-                            "& .menu-icon": {
-                              color: theme.palette.primary.main,
-                            },
-                          }),
-
-                          "&:hover": {
-                            backgroundColor: isActive
-                              ? "rgba(139, 92, 246, 0.12)"
-                              : "rgba(139, 92, 246, 0.04)",
-                            color: theme.palette.primary.main,
-
-                            "& .menu-icon": {
-                              color: theme.palette.primary.main,
-                            },
-                          },
-                        }}
-                      >
-                        <Box
-                          className="menu-icon"
-                          sx={{
-                            mr: 1.5,
-                            color: isActive
-                              ? theme.palette.primary.main
-                              : theme.palette.text.secondary,
-                            transition: "color 120ms ease-out",
-                          }}
-                        >
-                          {item.icon}
-                        </Box>
-
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            fontWeight: isActive ? 500 : 400,
-                            fontSize: "0.875rem",
-                          }}
-                        >
-                          {item.label}
-                        </Typography>
-                      </MenuItem>
-                    );
-                  })}
-
-                  <Divider sx={{ my: 0.5 }} />
+                  {MENU_GROUPS.map((group, gi) => (
+                    <React.Fragment key={gi}>
+                      {group.map((item) => {
+                        const isActive = isCurrentPath(item.path);
+                        return (
+                          <MenuItem
+                            key={item.path}
+                            onClick={() => handleMenuItemClick(item.path)}
+                            sx={{
+                              py: 1,
+                              px: 2,
+                              mx: 0.5,
+                              my: 0.25,
+                              borderRadius: 1.5,
+                              transition: "all 120ms ease-out",
+                              ...(isActive && {
+                                backgroundColor: "rgba(139, 92, 246, 0.08)",
+                                color: theme.palette.primary.main,
+                                "& .menu-icon": { color: theme.palette.primary.main },
+                              }),
+                              "&:hover": {
+                                backgroundColor: isActive
+                                  ? "rgba(139, 92, 246, 0.12)"
+                                  : "rgba(139, 92, 246, 0.04)",
+                                color: theme.palette.primary.main,
+                                "& .menu-icon": { color: theme.palette.primary.main },
+                              },
+                            }}
+                          >
+                            <Box
+                              className="menu-icon"
+                              sx={{
+                                mr: 1.5,
+                                color: isActive
+                                  ? theme.palette.primary.main
+                                  : theme.palette.text.secondary,
+                                transition: "color 120ms ease-out",
+                              }}
+                            >
+                              {item.icon}
+                            </Box>
+                            <Typography
+                              variant="body2"
+                              sx={{ fontWeight: isActive ? 500 : 400, fontSize: "0.875rem" }}
+                            >
+                              {item.label}
+                            </Typography>
+                          </MenuItem>
+                        );
+                      })}
+                      <Divider sx={{ my: 0.5 }} />
+                    </React.Fragment>
+                  ))}
 
                   <MenuItem
                     onClick={handleLogout}

@@ -111,6 +111,8 @@ interface NoticeBoardProps {
   item: GroupBuyingItem;
 }
 
+export { getNoticeMessage };
+
 const NoticeBoard: React.FC<NoticeBoardProps> = ({ item }) => {
   const notice = getNoticeMessage(item);
   if (!notice) return null;

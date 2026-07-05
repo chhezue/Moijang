@@ -10,7 +10,9 @@ import { useStatusContext } from "@/providers/StatusProvider";
 import Stepper from "@/components/Stepper";
 import ParticipantList from "@/app/(root)/(home)/group-buying/detail/[id]/components/sidebar/ParticipantList";
 import ActionButtons from "@/app/(root)/(home)/group-buying/detail/[id]/components/sidebar/ActionButtons";
-import NoticeBoard from "@/app/(root)/(home)/group-buying/detail/[id]/components/sidebar/NoticeBoard";
+import NoticeBoard, {
+  getNoticeMessage,
+} from "@/app/(root)/(home)/group-buying/detail/[id]/components/sidebar/NoticeBoard";
 import CustomModal from "@/components/CustomModal";
 import ParticipationModalContent from "@/app/(root)/(home)/group-buying/detail/[id]/components/modals/ParticipationModalContent";
 import EditGroupBuyingModalContent from "@/app/(root)/(home)/group-buying/detail/[id]/components/modals/EditGroupBuyingModalContent";
@@ -191,15 +193,18 @@ export default function LeaderDashboard({ item, participants }: LeaderDashboardP
 
           {/* 우: 진행사항 관리 */}
           <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 3 }}>
-            {/* 공지사항 */}
-            <Box>
-              <Typography variant="subtitle2" fontWeight={700} mb={1.5}>
-                공지사항
-              </Typography>
-              <NoticeBoard item={item} />
-            </Box>
-
-            <Divider />
+            {/* 공지사항 - 내용 있을 때만 표시 */}
+            {getNoticeMessage(item) && (
+              <>
+                <Box>
+                  <Typography variant="subtitle2" fontWeight={700} mb={1.5}>
+                    공지사항
+                  </Typography>
+                  <NoticeBoard item={item} />
+                </Box>
+                <Divider />
+              </>
+            )}
 
             {/* 진행사항 액션 버튼 */}
             <Box>
