@@ -66,7 +66,7 @@ const EditPriceModalContent = ({ item, onSuccess }: Props) => {
       onSuccess?.();
     } catch (e: any) {
       console.error("가격 수정 실패:", e.response?.data || e);
-      showSnackbar("가격 수정 실패", "error");
+      showSnackbar("가격 수정에 실패했습니다. 다시 시도해주세요.", "error");
     }
   };
 

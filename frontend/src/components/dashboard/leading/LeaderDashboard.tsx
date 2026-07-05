@@ -43,7 +43,7 @@ export default function LeaderDashboard({ item, participants }: LeaderDashboardP
   const handleCancelParticipation = async () => {
     try {
       await refundPayment({ gbId: item.id, cancelReason: "LEADER_CANCELLED" });
-      showSnackbar("참여가 취소되고 환불이 처리되었습니다.", "success");
+      showSnackbar("참여가 취소되었습니다. 환불은 영업일 기준 3~5일 내 처리됩니다.", "success");
       router.refresh();
       setActiveModal(null);
     } catch {
@@ -56,9 +56,15 @@ export default function LeaderDashboard({ item, participants }: LeaderDashboardP
       const result = await cancelGroupBuying(item.id, reason);
       const refundStatus = result?.refundStatus;
       if (refundStatus === "allSuccess") {
-        showSnackbar("공동구매가 취소되고 전체 환불이 완료되었습니다.", "success");
+        showSnackbar(
+          "공동구매가 취소되었습니다. 환불은 영업일 기준 3~5일 내 처리됩니다.",
+          "success",
+        );
       } else if (refundStatus === "partialSuccess") {
-        showSnackbar("공동구매가 취소되었으나 일부 환불에 실패했습니다.", "warning");
+        showSnackbar(
+          "공동구매가 취소되었습니다. 일부 환불은 수동으로 처리될 수 있습니다.",
+          "warning",
+        );
       } else {
         showSnackbar("공동구매가 취소되었습니다.", "success");
       }
@@ -129,7 +135,7 @@ export default function LeaderDashboard({ item, participants }: LeaderDashboardP
       setActiveModal(null);
       router.refresh();
     } catch {
-      showSnackbar("공구 완료 처리 실패", "error");
+      showSnackbar("공구 완료 처리에 실패했습니다. 다시 시도해주세요.", "error");
     }
   };
 

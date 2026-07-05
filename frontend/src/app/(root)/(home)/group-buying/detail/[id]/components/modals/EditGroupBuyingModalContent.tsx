@@ -91,7 +91,7 @@ const EditGroupBuyingModalContent = ({ item, close, onlyPrice = false }: Props) 
       close();
       router.refresh();
     } catch (e: any) {
-      showSnackbar("수정 실패", "error");
+      showSnackbar("공동구매 수정에 실패했습니다. 다시 시도해주세요.", "error");
     }
   };
 

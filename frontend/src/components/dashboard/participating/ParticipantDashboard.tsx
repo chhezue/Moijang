@@ -29,7 +29,7 @@ export default function ParticipantDashboard({ item }: ParticipantDashboardProps
   const handleCancelParticipation = async () => {
     try {
       await refundPayment({ gbId: item.id, cancelReason: "LEADER_CANCELLED" });
-      showSnackbar("참여가 취소되고 환불이 처리되었습니다.", "success");
+      showSnackbar("참여가 취소되었습니다. 환불은 영업일 기준 3~5일 내 처리됩니다.", "success");
       router.push("/dashboard/participating");
     } catch {
       showSnackbar("참여 취소에 실패했습니다.", "error");
