@@ -48,6 +48,7 @@ const Sidebar: React.FC<SidebarProps> = ({ participants, item, onOpenModal, user
           fullWidth
           startIcon={<DashboardIcon />}
           onClick={() => router.push(dashboardPath)}
+          data-testid="btn-dashboard"
         >
           {isOwner ? "대시보드에서 관리하기" : "진행사항 확인하기"}
         </Button>

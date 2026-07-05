@@ -68,6 +68,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ item, onOpenModal }) => {
               color="secondary"
               onClick={() => onOpenModal("order")}
               fullWidth
+              data-testid="btn-order"
             >
               공구 상품 주문하기
             </Button>
@@ -80,6 +81,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ item, onOpenModal }) => {
                 color="warning"
                 onClick={() => onOpenModal("shipped")}
                 fullWidth
+                data-testid="btn-shipped"
               >
                 배송 완료 및 공지
               </Button>
@@ -109,6 +111,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ item, onOpenModal }) => {
                 color="secondary"
                 onClick={() => onOpenModal("completeGroupBuying")}
                 fullWidth
+                data-testid="btn-complete"
               >
                 수령 확인 및 공구 완료
               </Button>

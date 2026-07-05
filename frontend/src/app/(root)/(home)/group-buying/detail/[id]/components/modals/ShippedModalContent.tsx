@@ -66,6 +66,7 @@ export const ShippedModalContent: React.FC<ShippedModalContentProps> = ({
           fullWidth
           value={pickupTime}
           onChange={(e) => setPickupTime(e.target.value)}
+          slotProps={{ htmlInput: { "data-testid": "input-pickup-time" } }}
           sx={{
             "& .MuiInputLabel-root": { fontSize: "0.9rem" },
             "& .MuiInputBase-input": { fontSize: "0.9rem" },
@@ -78,6 +79,7 @@ export const ShippedModalContent: React.FC<ShippedModalContentProps> = ({
           fullWidth
           value={pickupPlace}
           onChange={(e) => setPickupPlace(e.target.value)}
+          slotProps={{ htmlInput: { "data-testid": "input-pickup-place" } }}
           sx={{
             "& .MuiInputLabel-root": { fontSize: "0.9rem" },
             "& .MuiInputBase-input": { fontSize: "0.9rem" },
@@ -92,6 +94,7 @@ export const ShippedModalContent: React.FC<ShippedModalContentProps> = ({
           variant="contained"
           disabled={!isValid || isLoading}
           sx={{ fontSize: "0.8rem" }}
+          data-testid="btn-shipped-submit"
         >
           {isLoading ? <CircularProgress size={16} color="inherit" /> : "완료"}
         </Button>
