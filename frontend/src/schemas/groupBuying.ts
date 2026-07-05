@@ -6,7 +6,12 @@ today.setHours(0, 0, 0, 0);
 // Zod 4: refine이 붙은 스키마에는 .omit()을 쓸 수 없으므로, object 단계를 분리합니다.
 const createGroupBuyingFieldsSchema = z.object({
   title: z.string().min(1, "제목을 입력해주세요.").max(20, "제목은 20자 이하로 입력해주세요."),
-  productUrl: z.string().url("유효한 URL을 입력해주세요."),
+  productUrl: z
+    .string()
+    .url("유효한 URL을 입력해주세요.")
+    .refine((url) => url.startsWith("https://") || url.startsWith("http://"), {
+      message: "http:// 또는 https://로 시작하는 URL을 입력해주세요.",
+    }),
   description: z
     .string()
     .min(1, "설명을 적어주세요.")

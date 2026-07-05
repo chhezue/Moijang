@@ -1,6 +1,7 @@
 "use client";
 
-import { Box, Typography, Divider, Link as MuiLink, Stack, Skeleton } from "@mui/material";
+import { Box, Typography, Divider, Stack, Skeleton } from "@mui/material";
+import ExternalLink from "@/components/ExternalLink";
 import StatusTag from "@/components/StatusTag";
 import { GroupBuyingItem } from "@/types/groupBuying";
 import { useStatusContext } from "@/providers/StatusProvider";
@@ -141,16 +142,7 @@ const DetailInfoSection: React.FC<DetailInfoSectionProps> = ({ item }) => {
         <Typography variant="h4" fontWeight={700} gutterBottom sx={{ mb: 1 }}>
           {item.title}
         </Typography>
-        <MuiLink
-          href={item.productUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          underline="hover"
-          color="primary"
-          fontWeight={500}
-        >
-          원본 상품 페이지 보기 ↗
-        </MuiLink>
+        <ExternalLink href={item.productUrl}>원본 상품 페이지 보기</ExternalLink>
       </Box>
 
       <Divider sx={{ my: 4, opacity: 0.6 }} />
