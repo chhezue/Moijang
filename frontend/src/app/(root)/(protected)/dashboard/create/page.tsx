@@ -5,9 +5,9 @@ import { Box, Button, CircularProgress, Divider, Typography } from "@mui/materia
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Stepper from "@/components/Stepper";
-import Step1Content from "../../create/components/Step1Content";
-import Step2Content from "../../create/components/Step2Content";
-import Step3Content from "../../create/components/Step3Content";
+import Step1Content from "./components/Step1Content";
+import Step2Content from "./components/Step2Content";
+import Step3Content from "./components/Step3Content";
 import { createGroupBuying } from "@/apis/services/groupBuying";
 import {
   createGroupBuyingSchema,

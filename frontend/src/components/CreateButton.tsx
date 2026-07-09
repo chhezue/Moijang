@@ -17,14 +17,14 @@ import AddIcon from "@mui/icons-material/Add";
 
 type Props = {
   /** 로그인 후 이동할 생성 페이지 경로 */
-  redirectPath?: string; // 기본: "/create"
+  redirectPath?: string; // 기본: "/dashboard/create"
   /** 로그인 페이지 경로 (백엔드가 복귀 처리하면 그대로 두면 됨) */
   loginPath?: string; // 기본: "/login"
   size?: "small" | "medium" | "large";
 };
 
 export default function CreateButton({
-  redirectPath = "/create",
+  redirectPath = "/dashboard/create",
   loginPath = "/login",
   size = "small",
 }: Props) {
