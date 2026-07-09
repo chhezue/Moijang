@@ -84,6 +84,13 @@
 
 **핵심 원인이었던 것**: 팩토리 패턴 전환 후 Router Cache 문제가 드러남. 구 싱글톤은 `setUser()`가 전역 store를 바꿔서 캐시된 `initialUser=null`이 와도 덮어썼지만, 팩토리는 mount마다 `initialUser` prop으로 새 store를 만들어서 캐시된 null이 그대로 user=null store를 생성했음
 
+**보충 설명 (2026-07-10) — Router Cache가 정확히 뭔지**:
+
+- App Router의 soft navigation(`<Link>`, `router.push`)은 페이지 이동 시 전체 HTML을 다시 안 받고 **RSC payload**(직렬화된 서버 컴포넌트 트리)만 fetch해서 DOM을 부분 패치함
+- 이 RSC payload를 클라이언트가 잠깐 들고 있는 게 Router Cache. Static/ISR 라우트는 이걸 미리 prefetch해서 캐싱해두고(그래서 클릭하는 순간 네트워크 요청 없이 즉시 전환됨), dynamic 라우트는 짧은 유효시간만 두고 매번 새로 받아옴
+- 이번 로그인 버그는 이 캐시가 **무효화가 안 돼서** 로그인 이후에도 로그인 전 RSC payload(`user=null`)를 재사용해버린 케이스. `router.refresh()`로 해당 segment 캐시를 강제 무효화해서 해결
+- 반대로 "전 라우트가 dynamic이라 캐싱이 아예 없다"는 성능 이슈(→ `7. 성능 측정 및 개선` 참고)는 **같은 메커니즘의 반대쪽 문제** — 캐시가 없어서 매번 네트워크 왕복이 생기는 케이스. 나중에 static/ISR을 도입하게 되면 이번에 겪은 "캐시 무효화 실패로 stale 데이터 노출" 버그가 재발하지 않도록 무효화 전략을 같이 설계해야 함
+
 ---
 
 ## async 처리
