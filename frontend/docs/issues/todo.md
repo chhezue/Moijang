@@ -16,6 +16,7 @@
    - 상세: `docs/test/group-buying-e2e.md`
 
 2. **create 페이지 대시보드 구조에 맞게 재작성**
+   - ⬜ 구 경로 `(protected)/create/` 삭제 (dashboard/create/로 이전 완료됐는데 중복 라우트로 남아있음)
 
 3. **CSR/SSR 구조 정리 + Suspense 사용처 문서화**
    - 현재 Suspense 위치 일관성 확인
@@ -29,7 +30,7 @@
 ## 우선순위 중간
 
 5. **보안**
-   - `NEXT_PUBLIC_VAPID_PRIVATE_KEY` 제거 (private key 클라이언트 노출)
+   - ✅ `NEXT_PUBLIC_VAPID_PRIVATE_KEY` 제거 (private key 클라이언트 노출) — 참조 코드 없어 `.env`에서 삭제만으로 해결 (2026-07-10)
    - XSS 점검
 
 6. **디자인 컴포넌트 정리 + 번들 크기 감소**
@@ -40,6 +41,7 @@
 7. **성능 측정 및 개선**
    - Web Vitals 측정 (LCP, CLS, FID)
    - 번들 분석
+   - `group-buying/detail/[id]/page.tsx` API 순차 await → `Promise.all` 병렬화 (dashboard/leading/[gbId]는 이미 병렬 처리 중, detail만 워터폴 남음)
 
 ## 우선순위 낮음
 

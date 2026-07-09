@@ -125,6 +125,23 @@
 
 ---
 
+## 환경 변수
+
+### `NEXT_PUBLIC_VAPID_PRIVATE_KEY` 오발급 (2026-07-10) — 삭제 완료 ✅
+
+**발견한 것**: frontend `.env`에 `NEXT_PUBLIC_VAPID_PRIVATE_KEY`가 들어있었음. 코드에서 실제 참조하는 곳은 0건 (private key는 백엔드 `web-push.service.ts`가 자체 `VAPID_PRIVATE_KEY`로 따로 사용 중 — 발급할 때 프론트 `.env`에도 잘못 복붙된 것으로 추정).
+
+**일반 규칙 (다음에 또 헷갈리지 않기 위해)**:
+
+- `NEXT_PUBLIC_` 접두사가 붙은 변수는 `next build` 시점에 webpack이 `process.env.NEXT_PUBLIC_X` 코드를 실제 값 **문자열로 그대로 치환**해서 클라이언트 JS 번들에 박아 넣음 (런타임 조회 아님, 컴파일 타임 텍스트 치환)
+- `.env`에 있다고 안전한 게 아님 — 브라우저 노출 여부는 오직 변수 **이름의 접두사**로 결정됨. `.env` 자체는 하드코딩 방지 + 환경별 값 주입 용도일 뿐, 비밀 유지를 보장하는 장치가 아님
+- 구조 분해 할당(`const { NEXT_PUBLIC_X } = process.env`)이나 동적 접근(`process.env[key]`)은 치환 안 됨 — 반드시 `process.env.NEXT_PUBLIC_X` 형태로 직접 접근해야 인라인됨
+- 새 환경변수 만들 때: 접두사 붙이기 전에 "브라우저 devtools에 이 값이 그대로 보여도 되는가"부터 자문할 것
+
+**해결**: `.env`에서 해당 라인 삭제 (코드에 참조가 없어 다른 파일 수정은 불필요했음)
+
+---
+
 ## 삭제된 개념들 (왜 없앴는지)
 
 | 파일/훅                          | 삭제 시점 | 이유                                                   |
