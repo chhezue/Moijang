@@ -20,8 +20,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import { logout } from "@/apis/services/auth";
-import { useAuthStore } from "@/store/authStore";
+import { logoutAction } from "@/apis/actions/auth.actions";
 
 interface UserMenuProps {
   displayName: string;
@@ -58,19 +57,12 @@ const UserMenu: React.FC<UserMenuProps> = ({ displayName }) => {
   const theme = useTheme();
   const router = useRouter();
   const pathname = usePathname();
-  const clearUser = useAuthStore((s) => s.clearUser);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [open, setOpen] = useState(false);
 
   const handleLogout = async () => {
-    try {
-      await logout();
-      clearUser();
-      router.refresh();
-    } catch {
-      // 로그아웃 실패해도 클라이언트 상태는 초기화
-      clearUser();
-    }
+    await logoutAction(pathname);
+    router.refresh(); // dashboard였다면 redirect()가 이미 처리, 공개 페이지였다면 그 자리에서 게스트로 갱신
     handleClose();
   };
 

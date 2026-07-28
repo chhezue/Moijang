@@ -1,20 +1,13 @@
 import apiClient from "@/apis/apiClient";
 import type {
-  LoginRequest,
   SignupRequest,
   SignupResponse,
   SendCodeRequest,
   ConfirmCodeRequest,
-  UserDto,
   University,
   ConfirmCodeResponse,
   SendCodeResponse,
 } from "@/types/auth";
-
-export const login = async (data: LoginRequest): Promise<UserDto> => {
-  const res = await apiClient.post("/api/auth/login", data);
-  return res.data;
-};
 
 export const signup = async (data: SignupRequest): Promise<SignupResponse> => {
   const res = await apiClient.post("/api/auth/signup", data);
@@ -40,8 +33,4 @@ export const confirmCode = async (data: ConfirmCodeRequest): Promise<ConfirmCode
 export const searchUniversity = async (keyword: string): Promise<University[]> => {
   const res = await apiClient.get("/api/university", { params: { keyword } });
   return res.data;
-};
-
-export const logout = async (): Promise<void> => {
-  await apiClient.post("/api/auth/logout");
 };

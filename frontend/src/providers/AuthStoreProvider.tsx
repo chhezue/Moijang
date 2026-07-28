@@ -42,6 +42,20 @@ export function AuthStoreProvider({
     storeRef.current = createAuthStore(initialUser ?? null);
   }
 
+  // (root)/layout.tsx가 soft navigation(redirect()) 이후 새 initialUser로 재렌더될 때,
+  // 이 Provider 인스턴스는 그대로 유지되므로 위 useRef 가드만으로는 store가 갱신되지 않음.
+  // 로그인/로그아웃으로 유저 식별자가 실제로 바뀐 경우에만 store에 반영한다.
+  useEffect(() => {
+    const store = storeRef.current!;
+    if (initialUser?.id !== store.getState().user?.id) {
+      if (initialUser) {
+        store.getState().setUser(initialUser);
+      } else {
+        store.getState().clearUser();
+      }
+    }
+  }, [initialUser]);
+
   return (
     <AuthStoreContext.Provider value={storeRef.current}>
       <AxiosInterceptorSetup />

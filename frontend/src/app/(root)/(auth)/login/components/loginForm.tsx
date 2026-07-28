@@ -5,15 +5,13 @@ import { Box, TextField, Button, Typography, CircularProgress } from "@mui/mater
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { GradientTitle } from "@/components/GradientTitle";
-import { login } from "@/apis/services/auth";
 import { useSnackbar } from "@/providers/SnackbarProvider";
 import { usernameSchema, passwordSchema, getError } from "@/schemas/auth";
-import { useAuthStore } from "@/store/authStore";
+import { loginAction } from "../actions";
 
 export const LoginForm = () => {
   const searchParams = useSearchParams();
   const { showSnackbar } = useSnackbar();
-  const setUser = useAuthStore((s) => s.setUser);
 
   const rawRedirect = searchParams.get("redirect") ?? "/";
   const redirectTo =
@@ -37,11 +35,10 @@ export const LoginForm = () => {
     if (!username || !password) return;
     setLoading(true);
     try {
-      const user = await login({ loginId: username, password });
-      setUser(user);
-      window.location.href = redirectTo;
-    } catch {
-      showSnackbar("아이디 또는 비밀번호가 올바르지 않습니다.", "error", 3000);
+      const result = await loginAction({ loginId: username, password }, redirectTo);
+      if (result?.error) {
+        showSnackbar("아이디 또는 비밀번호가 올바르지 않습니다.", "error", 3000);
+      }
     } finally {
       setLoading(false);
     }
