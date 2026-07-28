@@ -88,8 +88,10 @@ const res = await api.get('/api/...');
 ## 인증
 
 - Access Token: 5분, Refresh Token: 14일, 쿠키 기반 (`httpOnly`)
-- 로그인 후 리다이렉트: `window.location.href` 필수 — `router.push` 사용 금지 (router cache 문제)
+- 로그인/로그아웃: Server Action(`src/app/(root)/(auth)/login/actions.ts`, `src/apis/actions/auth.actions.ts`) 사용 — 백엔드 Set-Cookie를 `applySetCookies`로 재설정 → `revalidatePath('/', 'layout')` → `redirect()`. `window.location.href`/`router.push` 직접 호출 금지 (아래 이유 참고)
 - Zustand 팩토리 패턴 유지 (singleton으로 되돌리지 말 것)
+- `AuthStoreProvider`는 soft navigation 이후 `initialUser`가 바뀌어도 `useRef` 가드 때문에 자동 반영 안 됨 → `useEffect`로 유저 id 비교 후 동기화 중, 이 로직 건드릴 때 주의
+- 상세: `docs/issues/route-group-auth-structure.md`
 
 ---
 

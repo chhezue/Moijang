@@ -95,6 +95,27 @@
 
 ---
 
+### Server Action + revalidatePath로 최종 전환 (2026-07-29) ✅
+
+**결정**: `window.location.href` 하드 리로드를 제거하고 `loginAction`/`logoutAction`(Server Action)으로 교체.
+
+**변경 내용**:
+
+- `src/app/(root)/(auth)/login/actions.ts` — 로그인: `apiServer` 호출 → 백엔드 `Set-Cookie` 파싱(`applySetCookies`)해서 Next 쿠키로 재설정 → `revalidatePath('/', 'layout')` → `redirect()`
+- `src/apis/actions/auth.actions.ts` — 로그아웃: 같은 패턴, `pathname`이 `/dashboard`(protected 전부 여기 하위)로 시작하면 홈으로 리다이렉트, 아니면 제자리 유지
+- `AuthStoreProvider.tsx` — `useRef` 가드가 soft navigation 이후 새 `initialUser`를 못 받는 버그 발견 → `useEffect`로 유저 id 비교 후 `setUser`/`clearUser` 동기화 추가
+
+**측정 결과**: 클릭→목적지 도달 시간 하드 리로드 대비 약 3.6배 개선 (~2653ms → ~730ms).
+
+**발견한 버그 2개** (하드 리로드가 가리고 있었던 것들):
+
+1. 로그인 성공해도 헤더가 로그아웃 상태로 남음 — `AuthStoreProvider`의 `useRef` 가드 때문. 하드 리로드는 매번 컴포넌트를 통째로 재마운트시켜서 이 문제가 드러날 기회가 없었음. **이거 `4fb9563`(2026-06-11, `Providers.tsx`의 useEffect→useRef 패치)랑 완전히 같은 종류의 패턴 — "초기값을 useRef로 한 번만 반영하고 이후 prop 변화는 무시"하는 방식이 자리만 옮겨서 재발한 것.**
+2. protected 페이지(`/dashboard/*`)에서 로그아웃하면 `router.refresh()`가 그 자리를 유지하려다 `(protected)/layout`의 재인증 체크가 실패해서 `/login`으로 튕김. pathname 분기로 수정.
+
+**redirect loop 재현 조건 재검증**: `router.push()`만 쓰거나 `router.refresh()+push()`를 콜드 진입(`page.goto`)으로 재현 시도 → 둘 다 실패. Next.js 소스(`prefetch-cache-utils.js`) 직접 확인 결과 dynamic staleTime 기본값(30초)은 설치된 `14.2.35`에서도 그대로라 프레임워크 변경 때문은 아님. 실제로는 **"이미 hydrate된 상태에서 `<Link>` 클릭으로 그 protected URL 진입을 먼저 시도해야" Router Cache에 stale 엔트리가 생기는** 조건이 필요 — 이 조건으로 재현 성공(2/2), Server Action 버전은 같은 조건에서 통과(5/5). 상세: `docs/issues/route-group-auth-structure.md`
+
+---
+
 ## async 처리
 
 ### 모달 비동기 버그 수정 (2026-06-21)

@@ -36,22 +36,24 @@ router.push()     →  즉시 실행 → 캐시가 아직 살아있음 → initi
 > **싱글톤이면 이 문제가 없는 이유**: 전역 store가 하나라 `setUser()`가 즉시 반영됨. 캐시된 RSC가 `initialUser=null`을 내려줘도 store에는 이미 user가 있어서 문제없음.  
 > **팩토리 패턴으로 바꾼 이유**: 싱글톤은 SSR에서 여러 요청이 같은 store를 공유해 유저 데이터 오염 위험. 팩토리는 요청마다 독립 인스턴스.
 
-### 해결책 (현재 적용)
+### 해결책 (2026-07-29 기준, 최종 적용)
 
 ```ts
-// loginForm.tsx
-window.location.href = redirectTo; // hard navigation → JS 메모리 초기화 → Router Cache 전부 삭제
+// src/app/(root)/(auth)/login/actions.ts (Server Action)
+const res = await apiServer.post('/api/auth/login', data, { validateStatus: () => true });
+applySetCookies(res.headers['set-cookie']); // Set-Cookie 파싱 후 cookies().set()으로 재설정
+revalidatePath('/', 'layout'); // (root) 공유 segment 무효화
+redirect(redirectTo); // 소프트 네비게이션
 ```
 
-`window.location.href`는 JS 프로세스를 종료하고 브라우저가 새 요청을 보내기 때문에 Router Cache가 통째로 사라짐. 타이밍 문제 없음.
+`window.location.href`(하드 리로드)를 걷어내고 Server Action + `revalidatePath`로 교체. 서버 액션 안에서 캐시 무효화와 리다이렉트가 같은 함수 실행 안에서 순차 진행되므로, `router.refresh()`+`router.push()` 조합에서 있었던 "무효화 완료 전에 다음 라인이 실행되는" 레이스 자체가 구조적으로 발생 불가.
 
-`router.push()`, `<a>` 태그, `location.replace()` 등 hard navigation은 모두 캐시를 날림.  
-`router.push()`만 Next.js 내부에서 처리하는 soft navigation이라 캐시가 살아있음.
+**측정 결과**: 클릭→목적지 도달 시간이 하드 리로드 대비 약 3.6배 개선 (~2653ms → ~730ms, 각 4~5회 측정 중앙값).
 
-### 정석 대안 (미적용)
+### 이전에 "미적용"으로 남겨뒀던 대안들 — 이제 1번 적용, 2번은 여전히 기각
 
-1. **Server Action + `revalidatePath`**: 서버에서 직접 캐시 무효화 → `router.push()` 가능. 백엔드가 별도 서버인 구조에서 도입 복잡도 높음.
-2. **Middleware auth**: 매 요청마다 쿠키만 보고 판단 → RSC 캐시 무관. 단, 토큰 만료 검증 불가라 `(protected)/layout`의 catch redirect도 유지해야 함 → 두 곳 관리. 현재 구조에서 실익 없음.
+1. **Server Action + `revalidatePath`**: ✅ 적용 완료 (위 참고)
+2. **Middleware auth**: 여전히 기각. redirect loop과는 애초에 무관한 대안이었음(아래 "재현 조건 검증" 참고) — middleware는 로그인 _전_ 접근 제어 문제고, redirect loop은 로그인 _후_ 캐시 무효화 문제라 서로 다른 축.
 
 ---
 
@@ -63,10 +65,34 @@ window.location.href = redirectTo; // hard navigation → JS 메모리 초기화
 
 `window.location.href`는 JS 메모리 자체를 종료하고 브라우저가 새 요청을 보내기 때문에 Router Cache가 통째로 사라짐 → 타이밍 문제 없음.
 
-### 정석 대안
+### 정석 대안 → 2026-07-29 적용 완료
 
-1. **Server Action으로 로그인**: `revalidatePath('/')` 서버에서 직접 캐시 무효화 → `router.push()` 가능. 단, 백엔드가 별도 서버에서 쿠키를 세팅하는 구조면 Server Action에서 백엔드 API를 한번 더 거쳐야 해서 도입 복잡도 높음.
-2. **`window.location.href`**: Next.js 공식 문서도 auth 상태 변경 시 hard navigation을 권장. hack이 아닌 이 아키텍처의 정답.
+1. **Server Action으로 로그인**: ✅ 적용. `revalidatePath('/')` 서버에서 직접 캐시 무효화 → `redirect()`로 소프트 네비게이션. 백엔드가 별도 서버라 Set-Cookie를 수동으로 파싱해서 재설정하는 헬퍼(`applySetCookies`)를 추가해서 해결.
+2. **`window.location.href`**: 더 이상 안 씀. 위 대안으로 대체.
+
+---
+
+## 재현 조건 검증 (2026-07-29)
+
+이 문서 초안에서 "확인함"이라고 적어뒀던 redirect loop을, 실제로는 지금 코드(`(root)` 통합 이후) 기준으로 재현 안 되는 걸 뒤늦게 발견해서 다시 검증함.
+
+### 1차 시도: 실패 — `page.goto()`로 protected URL 직접 진입 후 로그인
+
+`router.push()`만 쓰는 버전으로 되돌려서 테스트했는데 재현 안 됨. Next.js 소스(`node_modules/next/dist/client/components/router-reducer/prefetch-cache-utils.js`)를 직접 열어 확인한 결과, dynamic 세그먼트 기본 staleTime은 지금 설치된 `14.2.35`에서도 30초로 그대로임 — 프레임워크가 캐시 자체를 없앤 게 아님.
+
+**진짜 이유**: Router Cache(`prefetchCache`)는 클라이언트 사이드 소프트 네비게이션이 그 URL로 실제 시도됐을 때만 엔트리가 생김. `page.goto()`는 브라우저 하드 네비게이션이라 JS가 로드되기도 전에 서버가 307을 보내버려서, 애초에 그 URL에 대한 캐시 엔트리 자체가 안 생김.
+
+### 2차 시도: 성공 — `<Link>` 클릭(소프트 네비)으로 재현
+
+```
+1. 공개 페이지(hydrate된 상태)에서 protected URL로 가는 <Link> 클릭 (소프트 네비, prefetch 캐시 엔트리 생성됨)
+2. (protected)/layout이 서버에서 redirect() → /login?redirect=X
+3. 로그인 성공
+4. 순수 router.push(X) → 2번에서 생긴 stale 캐시 엔트리를 재사용 → 다시 /login으로 튕김 (재현됨, 2/2)
+5. 같은 조건에서 Server Action 버전 → 정상 도달 (5/5, 회귀 없음 확인)
+```
+
+즉 redirect loop의 정확한 트리거 조건은 **"이미 hydrate된 상태에서 소프트 네비게이션으로 그 protected URL 진입을 한 번 시도한 이력이 있어야 함"** — 콜드 진입(북마크, 주소창 직접 입력, 하드 리프레시)으로는 재현 안 됨. 재현 테스트는 `tests/e2e/specs/redirect-loop-link-repro.spec.ts`에 남겨뒀으나, 실행하려면 protected URL로 가는 `<Link>`가 필요해서 임시로 공개 페이지에 심었다가 제거함 — 정식 회귀 테스트로 유지하려면 격리된 테스트 전용 fixture 페이지가 별도로 필요함 (미정).
 
 ---
 
@@ -94,11 +120,11 @@ window.location.href = redirectTo; // hard navigation → JS 메모리 초기화
 
 ### 결론
 
-|                | 현재                        | 미들웨어 도입                            |
-| -------------- | --------------------------- | ---------------------------------------- |
-| 인증 체크 위치 | `(protected)/layout` (RSC)  | middleware + `(protected)/layout` 둘 다  |
-| 로그인 후 이동 | `window.location.href` 필수 | `router.push()` 가능                     |
-| 만료 토큰 처리 | `getMyInfoServer()` catch   | middleware는 못 잡음, layout 여전히 필요 |
-| 코드 복잡도    | 단순                        | 두 곳에서 관리                           |
+|                | 현재                                              | 미들웨어 도입                            |
+| -------------- | ------------------------------------------------- | ---------------------------------------- |
+| 인증 체크 위치 | `(protected)/layout` (RSC)                        | middleware + `(protected)/layout` 둘 다  |
+| 로그인 후 이동 | Server Action + `revalidatePath` (2026-07-29부터) | `router.push()` 가능                     |
+| 만료 토큰 처리 | `getMyInfoServer()` catch                         | middleware는 못 잡음, layout 여전히 필요 |
+| 코드 복잡도    | 단순                                              | 두 곳에서 관리                           |
 
-**현재 구조에서 미들웨어 도입 실익 없음.** 토큰 만료 처리 때문에 `(protected)/layout`은 어차피 남겨야 하고, `window.location.href` 제거 목적 대비 복잡도가 높음. 미들웨어가 유효한 케이스는 JWT를 프론트에서 직접 검증할 수 있을 때 (예: NextAuth).
+**현재 구조에서 미들웨어 도입 실익 없음.** 토큰 만료 처리 때문에 `(protected)/layout`은 어차피 남겨야 하고, 이미 Server Action으로 로그인 후 이동 문제를 해결했기 때문에 미들웨어 도입의 남은 이점(하드 네비 제거)도 더 이상 유효하지 않음. 미들웨어가 유효한 케이스는 JWT를 프론트에서 직접 검증할 수 있을 때 (예: NextAuth).
