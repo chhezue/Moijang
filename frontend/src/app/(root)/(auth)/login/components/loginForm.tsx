@@ -7,15 +7,14 @@ import { useSearchParams } from "next/navigation";
 import { GradientTitle } from "@/components/GradientTitle";
 import { useSnackbar } from "@/providers/SnackbarProvider";
 import { usernameSchema, passwordSchema, getError } from "@/schemas/auth";
+import { resolveRedirectTarget } from "@/utils/redirect";
 import { loginAction } from "../actions";
 
 export const LoginForm = () => {
   const searchParams = useSearchParams();
   const { showSnackbar } = useSnackbar();
 
-  const rawRedirect = searchParams.get("redirect") ?? "/";
-  const redirectTo =
-    rawRedirect.startsWith("/") && !rawRedirect.startsWith("//") ? rawRedirect : "/";
+  const redirectTo = resolveRedirectTarget(searchParams.get("redirect"));
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");

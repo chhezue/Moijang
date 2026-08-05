@@ -52,7 +52,7 @@ Next.js 소스(`node_modules/next/dist/client/components/router-reducer/prefetch
 - **측정값**: 클릭→목적지 도달 시간, 하드 리로드 대비 약 3.6배 개선 (~2653ms → ~730ms)
 - **측정 조건**: 각 4~5회 측정한 중앙값(median). 표본이 작아서 통계적으로 엄밀한 신뢰구간은 아님.
 - **이 숫자가 말해주지 않는 것**: 캐시 무효화 자체의 속도가 아니라 "하드 리로드 vs 소프트 네비게이션"의 체감 이동 시간 차이. 네트워크 상태, 서버 부하에 따라 달라질 수 있음.
-- **회귀 테스트**: `tests/e2e/specs/redirect-loop-link-repro.spec.ts`에 재현 시나리오를 남겨둠. 다만 실행하려면 protected URL로 가는 `<Link>`가 필요해서 임시로 공개 페이지에 심었다가 제거함 — 정식 회귀 테스트로 상시 유지하려면 격리된 테스트 전용 fixture 페이지가 별도로 필요함 (미정).
+- **회귀 테스트**: `tests/e2e/specs/redirect-loop-link-repro.spec.ts`에 재현 시나리오를 남겨둠. 다만 실행하려면 protected URL로 가는 `<Link>`가 필요해서 임시로 공개 페이지에 심었다가 제거함 — 정식 회귀 테스트로 상시 유지하려면 격리된 테스트 전용 fixture 페이지가 별도로 필요함 (미정). 2026-08-05 재확인: 여전히 fixture가 없어서 이 스펙만 타임아웃 실패 — 즉 이 문서의 "5/5 재현 안 됨"은 자동 회귀가 아니라 그때의 수동 확인 결과에 머물러 있음. `docs/issues/todo.md` 6번에 추적 중.
 
 ## 셀프 체크 4문항
 

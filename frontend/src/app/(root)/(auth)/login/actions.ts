@@ -4,12 +4,17 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import apiServer from "@/apis/apiServer";
 import { applySetCookies } from "@/apis/utils/applySetCookies";
+import { resolveRedirectTarget } from "@/utils/redirect";
 import type { LoginRequest } from "@/types/auth";
 
 export async function loginAction(
   data: LoginRequest,
   redirectTo: string,
 ): Promise<{ error: true } | never> {
+  // Server Action은 UI를 거치지 않고도 직접 호출 가능한 엔드포인트라
+  // loginForm.tsx의 클라이언트 검증과 별개로 여기서도 재검증 필요 (open-redirect 방지)
+  const safeRedirectTo = resolveRedirectTarget(redirectTo);
+
   const res = await apiServer.post("/api/auth/login", data, {
     validateStatus: () => true,
   });
@@ -20,5 +25,5 @@ export async function loginAction(
 
   applySetCookies(res.headers["set-cookie"]);
   revalidatePath("/", "layout");
-  redirect(redirectTo);
+  redirect(safeRedirectTo);
 }

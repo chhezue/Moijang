@@ -36,12 +36,13 @@
    - 도메인별 상태 소유권 지도(Zustand vs React Query 역할 분리 이유): `docs/domain/state-ownership.md`
 
 6. **route group 인증 구조 정리** (GitHub #29, 2026-08-05 이슈화 — `docs/issues/route-group-auth-structure.md`, `docs/issues/redirect-loop.md`)
-   - ⬜ `loginAction`(`login/actions.ts`)에 `redirectTo` 서버측 재검증 추가 — 클라이언트 open-redirect 가드(`startsWith("/") && !startsWith("//")`)만으론 Server Action 자체 방어 안 됨. Server Action은 UI 안 거치고 직접 호출 가능한 엔드포인트라 액션 내부 재검증 필요
-   - ⬜ `(auth)/layout.tsx`가 `?redirect=` 쿼리 무시하고 이미 로그인된 유저를 무조건 `/`로 보내는 문제 수정 — `loginForm.tsx`의 redirectTo 계산 로직과 분리되어 있어 불일치
+   - ✅ `loginAction`(`login/actions.ts`)에 `redirectTo` 서버측 재검증 추가 (2026-08-05) — `src/utils/redirect.ts`의 `resolveRedirectTarget()`으로 통합, `loginForm.tsx`/`loginAction`/`(auth)/layout.tsx` 전부 이 함수 하나만 참조하도록 정리. e2e 2건(정상 케이스 + open-redirect 방어) 통과
+   - ✅ `(auth)/layout.tsx`가 `?redirect=` 쿼리 무시하는 문제 수정 (2026-08-05) — middleware의 `x-pathname`에 search까지 실어서 layout이 읽게 함. `tests/e2e/specs/auth-already-logged-in-redirect.spec.ts` 통과
    - ⬜ `getMyInfoServer()` 실패 시 에러 종류(네트워크/5xx vs 401) 구분해서 처리 — 지금은 백엔드 순단도 전부 "비로그인"으로 취급되어 로그인 유저가 강제로 `/login`으로 튕길 수 있음
    - ⬜ 세션 유지 중 소프트 네비게이션 시 인증 재검증 케이스 검증 — 로그인 흐름 자체의 redirect loop은 해결 완료(`redirect-loop.md`), 로그인 유지한 채 돌아다니다 토큰 만료되는 일반 케이스는 미검증
    - ⬜ `not-found.tsx`를 `(root)` 그룹 안으로 이동 — 지금 MUI 테마/Header/Provider 미적용, `(root)/error.tsx`와 톤 다름
    - ⬜ `dashboard/leading`/`participating` layout 중복 제거 — `getMyCreateGroupBuying`/`getMyParticipant` + `basePath`/`emptyLabel`만 다르고 구조 동일
+   - ⬜ `redirect-loop-link-repro.spec.ts` 회귀 테스트 fixture 페이지 — protected URL로 가는 `<Link>`가 소스에 없어서(`temp-repro-link` 제거된 채로 남음) 이 스펙만 계속 타임아웃 실패함 (2026-08-05 재확인). redirect loop의 실제 트리거 조건(소프트 네비게이션)을 자동 회귀로 못 잡고 있는 유일한 갭 — `auth-consistency-measurement.spec.ts`는 하드 진입(`page.goto()`)이라 이 트리거를 안 거침. 전용 fixture 페이지 추가가 정석 대안이나 보류
    - 8번(전 라우트 dynamic 렌더링) 항목도 이 이슈 범위에 포함됨
 
 ## 우선순위 중간

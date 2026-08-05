@@ -156,6 +156,15 @@ redirect(redirectTo); // 소프트 네비게이션
 - 리스크: 낮음 — 변경 범위가 auth 흐름 안에 갇혀 있고 공구/대시보드 도메인은 안 건드림
 - 참고로 본질적 복잡도 쪽은 "없앨 방법"이 아니라 구현 방식만 재검토 가능 — 예: `applySetCookies` 손파싱 → `set-cookie-parser` 라이브러리 교체(`docs/issues/todo.md` 6번, 우선순위 낮음으로 이미 기록됨)
 
+### 결과 (2026-08-05 적용 완료)
+
+- `src/utils/redirect.ts` 신규 — `resolveRedirectTarget()` 하나로 통합, `middleware.ts`/`login/actions.ts`/`loginForm.tsx`/`(auth)/layout.tsx` 4곳이 이 함수만 참조하도록 수정 (계획대로 3곳 수정 + 신규 1개, 예상 비용과 일치)
+- `middleware.ts`는 `x-pathname`에 pathname만이 아니라 `+ search`까지 실어주도록 확장 — `(auth)/layout.tsx`는 App Router 제약상 `searchParams` prop을 못 받는 layout이라, 기존에 구축된 x-pathname 릴레이 메커니즘을 재사용해서 `?redirect=`를 읽음 (새 메커니즘 도입 안 하고 기존 것 확장 — 본질적 복잡도를 늘리지 않음)
+- `tsc --noEmit`, `eslint` 통과
+- e2e 신규 2건(`tests/e2e/specs/auth-already-logged-in-redirect.spec.ts`) 통과: `?redirect=` 정상 반영 케이스, `//evil.com` open-redirect 방어 케이스
+- 기존 회귀 스펙 3건(`auth-consistency-measurement`, `auth-login-failure`, `auth-logout-from-protected`) 통과 — 이번 수정이 기존 로그인/로그아웃 흐름을 깨지 않음
+- `redirect-loop-link-repro.spec.ts`는 여전히 실패 — `temp-repro-link` fixture가 소스에 없어서(원래도 없었음, 오늘 수정과 무관) 타임아웃. redirect loop의 실제 트리거(소프트 네비게이션)를 검증하는 유일한 자동 테스트가 지금 동작 안 하고 있다는 뜻이라, "5/5 재현 안 됨"은 여전히 그때의 수동 확인에만 의존 중 — `docs/issues/todo.md` 6번에 별도 항목으로 추적
+
 ### 사전 스코핑이었으면 어땠을지
 
 지금 순서는 리팩터 도중 하나씩 발견(②는 오늘 리팩터 전부터 있던 버그, ①은 리팩터가 새로 만든 구멍)한 것 — 착수 전 스코핑 단계 자체가 없었음. 만약 Server Action 전환 착수 전에 `redirectTo`/`redirect=` 참조 지점을 먼저 grep으로 다 뽑았다면, 위 분류표가 구현 전에 나왔을 것이고 `(auth)/layout`의 누락도 코드 작성 시점에 바로 잡혔을 가능성이 높음. 다음 리팩터부터는 착수 전에 영향 범위표를 먼저 만드는 걸 프로세스로 남김.
