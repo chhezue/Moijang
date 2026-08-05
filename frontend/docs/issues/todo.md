@@ -13,6 +13,7 @@
    - ⬜ successSelector 수정 (상태 전이 후 나타나는 요소 기준)
    - ⬜ ship-flow: pickupPlace/Time fill 검증
    - ⬜ `tests/integration/`: Toss sandbox 외부 의존성 테스트 — **얇은 스모크 테스트로만** (테스트 카드로 confirm 1~2건, "연동 자체가 살아있나"만 확인). 예외 케이스 전수 검증은 아래 #2에서 mock으로
+   - ⬜ Toss 결제 흐름 중 access token(5분) 만료 교차 리스크 검증 — 결제 페이지 체류가 5분 넘으면 `/payment/success` 복귀 시 로그아웃된 것처럼 보일 가능성. 아직 코드/테스트 없음, 예측만 해둔 상태 (2026-08-05 논의)
    - ⬜ 프론트 예외 UI 검증 — `page.route()`로 API 응답 가로채서 400/500/timeout 강제 → 에러 메시지/버튼 비활성화 등 확인 (현재 happy path만 있음, 같은 Playwright 하네스 확장)
    - 상세: `docs/test/group-buying-e2e.md`
 
@@ -32,6 +33,16 @@
    - 참여자 목록 (`invalidateQueries`로 목록만 재fetch)
    -
    - 뮤테이션 후 `router.refresh()` 대체
+   - 도메인별 상태 소유권 지도(Zustand vs React Query 역할 분리 이유): `docs/domain/state-ownership.md`
+
+6. **route group 인증 구조 정리** (GitHub #29, 2026-08-05 이슈화 — `docs/issues/route-group-auth-structure.md`, `docs/issues/redirect-loop.md`)
+   - ⬜ `loginAction`(`login/actions.ts`)에 `redirectTo` 서버측 재검증 추가 — 클라이언트 open-redirect 가드(`startsWith("/") && !startsWith("//")`)만으론 Server Action 자체 방어 안 됨. Server Action은 UI 안 거치고 직접 호출 가능한 엔드포인트라 액션 내부 재검증 필요
+   - ⬜ `(auth)/layout.tsx`가 `?redirect=` 쿼리 무시하고 이미 로그인된 유저를 무조건 `/`로 보내는 문제 수정 — `loginForm.tsx`의 redirectTo 계산 로직과 분리되어 있어 불일치
+   - ⬜ `getMyInfoServer()` 실패 시 에러 종류(네트워크/5xx vs 401) 구분해서 처리 — 지금은 백엔드 순단도 전부 "비로그인"으로 취급되어 로그인 유저가 강제로 `/login`으로 튕길 수 있음
+   - ⬜ 세션 유지 중 소프트 네비게이션 시 인증 재검증 케이스 검증 — 로그인 흐름 자체의 redirect loop은 해결 완료(`redirect-loop.md`), 로그인 유지한 채 돌아다니다 토큰 만료되는 일반 케이스는 미검증
+   - ⬜ `not-found.tsx`를 `(root)` 그룹 안으로 이동 — 지금 MUI 테마/Header/Provider 미적용, `(root)/error.tsx`와 톤 다름
+   - ⬜ `dashboard/leading`/`participating` layout 중복 제거 — `getMyCreateGroupBuying`/`getMyParticipant` + `basePath`/`emptyLabel`만 다르고 구조 동일
+   - 8번(전 라우트 dynamic 렌더링) 항목도 이 이슈 범위에 포함됨
 
 ## 우선순위 중간
 
@@ -49,7 +60,12 @@
    - Web Vitals 측정 (LCP, CLS, FID)
    - 번들 분석
    - `group-buying/detail/[id]/page.tsx` API 순차 await → `Promise.all` 병렬화 (dashboard/leading/[gbId]는 이미 병렬 처리 중, detail만 워터폴 남음)
-   - 전 라우트가 `ƒ Dynamic` (정적/ISR 캐싱 0건) — `(root)/layout.tsx`의 `getMyInfoServer()`가 매 요청 쿠키를 읽어서 하위 전체가 강제 dynamic됨. React Query(클라이언트 캐시)와는 별개 레이어, 고치려면 인증 체크 구조 자체를 손봐야 함 — 우선 원인 파악만 해둔 상태
+   - 전 라우트가 `ƒ Dynamic` (정적/ISR 캐싱 0건) — `(root)/layout.tsx`의 `getMyInfoServer()`가 매 요청 쿠키를 읽어서 하위 전체가 강제 dynamic됨. React Query(클라이언트 캐시)와는 별개 레이어, 고치려면 인증 체크 구조 자체를 손봐야 함 — 우선 원인 파악만 해둔 상태 (GitHub #29에도 포함)
+
+9. **대학별 접근 권한(인가) 설계** — 2026-08-05 논의, 아직 미착수
+   - 지금까지 다룬 건 전부 인증(로그인 여부)이고, 대학별 가드는 인가(로그인한 이 유저가 이 자원에 접근 가능한가) — 다른 축
+   - `(protected)/layout.tsx`는 로그인 여부만 확인하고 대학 소속은 안 봄 — route group 레벨이 아니라 리소스를 반환하는 지점(API 응답/Server Action)에서 체크하는 패턴이 필요할 가능성 높음
+   - 상세: `docs/domain/state-ownership.md` "교차 이슈" 섹션
 
 ## 우선순위 낮음
 
@@ -64,11 +80,13 @@
 
 오늘 Router Cache(로그인/로그아웃) 이슈를 판 게 "캐시 무효화" 문제의 한 인스턴스였을 뿐 —
 분산 시스템 캐시 정합성(Redis 클러스터, replica lag, cache stampede 등)까지 이해했다고
-하면 오버클레임. 다음에 파볼 만한 것들, 프론트/백엔드 갈림:
+하면 오버클레임. 다음에 파볼 만한 것들, 프론트/백엔드 갈림. (전체 상태 소유권 지도는 `docs/domain/state-ownership.md` 참고)
+
+> redirect loop 자체는 정리 완료 — `docs/issues/redirect-loop.md` (현상/재현 조건/대안 비교/효과와 한계까지 문서화됨)
 
 **프론트에 남는 경우 (추천 — 오늘 거랑 자연스럽게 이어짐)**
 
-1. **멀티탭 동기화** — 탭 A에서 로그아웃해도 탭 B는 모름(각자 독립 JS 메모리). `BroadcastChannel`/`storage` 이벤트로 auth 상태 탭 간 동기화. 여러 독립 실행 컨텍스트가 하나의 진짜 상태에 정합성을 맞추는 문제라 미니어처 분산 시스템 문제에 가까움. 지금 전혀 안 돼 있음 — 재현부터 해볼 것.
+1. **멀티탭 동기화** — 다음 스텝으로 확정 (2026-08-05). 탭 A에서 로그아웃해도 탭 B는 모름(각자 독립 JS 메모리). `BroadcastChannel`/`storage` 이벤트로 auth 상태 탭 간 동기화. 여러 독립 실행 컨텍스트가 하나의 진짜 상태에 정합성을 맞추는 문제라 미니어처 분산 시스템 문제에 가까움. 지금 전혀 안 돼 있음 — 재현부터 해볼 것.
 2. **React Query 낙관적 업데이트 + 롤백** (5번과 연결) — 뮤테이션 실패 시 UI 되돌리기까지 구현하면 정합성 문제로 깊어짐.
 3. **Next.js Data Cache + `revalidateTag`** — 지금 axios라서 Data Cache 자체가 적용 안 됨. 일부러 `fetch()` + ISR로 바꿔서 캐시 만들고, 공구 상태 변경 시 `revalidateTag`로 무효화하는 것까지 구현.
 

@@ -97,6 +97,7 @@ const res = await api.get('/api/...');
 
 ## 참고 문서
 
+- 도메인별 상태 소유권 지도(인증/공구/교차 이슈): `docs/domain/state-ownership.md`
 - 공구 도메인: `docs/domain/Groupbuying.md`
 - 대시보드: `docs/domain/dashboard.md`
 - MUI v7 SSR 버그: `docs/issues/mui-v7-ssr-bug.md`
