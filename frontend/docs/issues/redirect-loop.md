@@ -18,7 +18,9 @@
 
 `page.goto()`로 protected URL에 직접 진입 → 재현 안 됨.
 
-Next.js 소스(`node_modules/next/dist/client/components/router-reducer/prefetch-cache-utils.js`)를 직접 확인: dynamic 세그먼트 기본 staleTime은 설치된 버전(`14.2.35`)에서도 30초 그대로 — 프레임워크가 캐시 정책을 바꾼 게 아니었음.
+Next.js 소스(`node_modules/next/dist/client/components/router-reducer/prefetch-cache-utils.js`)를 직접 확인: dynamic 세그먼트 기본 staleTime은 설치된 버전(`14.2.35`)에서도 30초 그대로 — 프레임워크가 캐시 정책을 바꾼 게 아니었음.[^staletime]
+
+[^staletime]: **2026-08-10 재검증 필요 표시**: v14.2.35 공식 문서(GitHub `v14.2.35` 태그로 직접 확인)엔 `dynamic` 기본값이 **0초(캐시 안 함)**로 적혀 있어 이 30초와 안 맞음. 이 프로젝트 `next.config.mjs`엔 `staleTimes` 오버라이드가 없어서 설정 차이도 아님. 문서가 말하는 "공개 설정값의 선언된 기본값"과 그때 읽은 "런타임 내부 구현"이 다를 가능성이 있으나 확정 못 함 — 재검증 필요. 단, 이 숫자 불일치가 아래 해결책 선택(대안 비교, 채택 이유)의 타당성을 바꾸진 않음: Server Action + `revalidatePath`는 staleTime이 몇 초든 무효화·이동 순서를 구조적으로 보장하는 방식이라 이 숫자와 무관하게 유효함.
 
 **이유**: Router Cache(`prefetchCache`)는 클라이언트 사이드 **소프트 네비게이션**이 그 URL로 실제 시도됐을 때만 엔트리가 생김. `page.goto()`는 하드 네비게이션이라 JS가 로드되기도 전에 서버가 307을 보내버려서, 애초에 그 URL에 대한 캐시 엔트리 자체가 안 생김.
 

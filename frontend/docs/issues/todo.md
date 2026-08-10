@@ -30,10 +30,12 @@
    - useSearchParams 사용 컴포넌트 내부 Suspense 패턴 정리
 
 5. **React Query 부분 도입**
+   - ⬜ **정합성 버그**: 참여/참여취소 등 뮤테이션 핸들러에 `isPending` 상태가 없어서 더블클릭 방어가 안 됨 — 같은 공구에 두 번 참여하거나 두 번 취소되는 등 실제 데이터 정합성이 깨질 수 있는 버그 (`docs/domain/groupbuying-getList-react-query.md`에 이미 지적됨). React Query 도입 이유가 단순 깜빡임 제거(UX)뿐 아니라 이 정합성 버그 수정(정확성)이라는 점이 핵심 — `useMutation`의 `isPending`으로 버튼 비활성화하면 해결됨
    - 참여자 목록 (`invalidateQueries`로 목록만 재fetch)
    -
    - 뮤테이션 후 `router.refresh()` 대체
    - 도메인별 상태 소유권 지도(Zustand vs React Query 역할 분리 이유): `docs/domain/state-ownership.md`
+   - 로그인 케이스와 대조되는 지점 (2026-08-06 논의): 로그인(정밀 소프트 갱신 도입)은 실익 대비 과했다는 결론이었는데, 참여자 목록(지금 블런트한 `router.refresh()`)은 반대로 정밀화(React Query)가 맞는 케이스. 판단 기준은 **"빈도 × 영향 범위"** — 로그인은 세션당 1회 + 영향 범위 전역이라 정밀화 손해, 참여자 목록은 자주 바뀜 + 영향 범위 국소적이라 정밀화 이득. 이 프레임을 다른 캐시 판단에도 재사용할 것
 
 6. **route group 인증 구조 정리** (GitHub #29, 2026-08-05 이슈화 — `docs/issues/route-group-auth-structure.md`, `docs/issues/redirect-loop.md`)
    - ✅ `loginAction`(`login/actions.ts`)에 `redirectTo` 서버측 재검증 추가 (2026-08-05) — `src/utils/redirect.ts`의 `resolveRedirectTarget()`으로 통합, `loginForm.tsx`/`loginAction`/`(auth)/layout.tsx` 전부 이 함수 하나만 참조하도록 정리. e2e 2건(정상 케이스 + open-redirect 방어) 통과
@@ -43,6 +45,14 @@
    - ⬜ `not-found.tsx`를 `(root)` 그룹 안으로 이동 — 지금 MUI 테마/Header/Provider 미적용, `(root)/error.tsx`와 톤 다름
    - ⬜ `dashboard/leading`/`participating` layout 중복 제거 — `getMyCreateGroupBuying`/`getMyParticipant` + `basePath`/`emptyLabel`만 다르고 구조 동일
    - ⬜ `redirect-loop-link-repro.spec.ts` 회귀 테스트 fixture 페이지 — protected URL로 가는 `<Link>`가 소스에 없어서(`temp-repro-link` 제거된 채로 남음) 이 스펙만 계속 타임아웃 실패함 (2026-08-05 재확인). redirect loop의 실제 트리거 조건(소프트 네비게이션)을 자동 회귀로 못 잡고 있는 유일한 갭 — `auth-consistency-measurement.spec.ts`는 하드 진입(`page.goto()`)이라 이 트리거를 안 거침. 전용 fixture 페이지 추가가 정석 대안이나 보류
+   - ⬜ 로그인 후 이동을 다시 `window.location.href`(하드)로 되돌리는 것 검토 (2026-08-06 논의) — Next.js 공식 가이드도 auth 상태 변경엔 하드 네비를 권장. 되돌리면:
+     - **없어지는 것**: `loginAction`(Server Action) 자체, `applySetCookies`(클라이언트 직접 호출로 돌아가면 브라우저가 Set-Cookie 알아서 처리), `revalidatePath`, `AuthStoreProvider`의 sync `useEffect`, redirect loop 위험 자체 → `redirect-loop-link-repro.spec.ts` fixture 갭(바로 위 항목)도 구현 없이 자동 해소됨
+     - **유지**: `resolveRedirectTarget()`(오히려 `location.href` 대입 전 검증이라 더 중요해짐), `(auth)/layout.tsx`의 `?redirect=` 반영, `x-pathname` search 확장 — 로그인 방식과 무관한 별개 버그 수정이라 그대로 둠
+   - ⬜ Server Action 이관 후보 (2026-08-06 논의) — 지금 `"use server"`는 로그인/로그아웃 2곳뿐(`grep` 확인), 나머지 폼은 전부 `"use client"` + axios. 아래는 이미 있는 쿠키를 **읽기만** 하면 되는 액션들이라, 새로 쿠키를 발급하는 로그인/로그아웃과 달리 `applySetCookies` 같은 브릿지 복잡도 없이 옮길 수 있는 후보:
+     - 공구 생성 (`/dashboard/create`)
+     - 참여하기 / 참여취소
+     - 공구 정보 수정
+     - 총대 상태 변경 (CONFIRMED→ORDERED→SHIPPED)
    - 8번(전 라우트 dynamic 렌더링) 항목도 이 이슈 범위에 포함됨
 
 ## 우선순위 중간
