@@ -34,7 +34,10 @@
 5. **캐시/상태 정합성 전략** (2026-08-26 정리 — 레이어별로 다른 문제, 섞어 쓰지 말 것)
    - **Router Cache(클라이언트) 문제 → Server Action + `revalidatePath`**
      - 로그인/로그아웃: ✅ 완료 (`2026-07-29`, 3.6배 개선 측정함)
-     - ⚠️ `ParticipantDashboard.tsx`의 `handleCancelParticipation` — 무효화 없이 `router.push()`만 함, 로그인 예전 버그(`5a6b104` 이전)와 동일 패턴. 같은 방식으로 전환 필요
+     - ✅ `ParticipantDashboard.tsx`의 `handleCancelParticipation` — [이슈 #30](https://github.com/chhezue/Moijang/issues/30), 커밋 `39dd3f8` (`frontend/fix/30-participant-cancel-stale-cache`)
+       - Playwright로 재현: mock 응답 + DB 직접 삭제로 격리 → `router.push` 직후 stale, `reload` 후 정상 → Router Cache 단독 문제 확인 (`apiServer`가 axios라 Data Cache는 애초에 미적용, React Query도 미사용)
+       - `cancelParticipationAction`(Server Action) 신설, 성공 시 `revalidatePath("/dashboard/participating")` 호출 후 이동하도록 전환
+       - 실제 Toss 성공 경로까지의 e2e 검증은 보류(테스트 계정에 실결제 없음) — 무효화 위치는 코드 리뷰로 확인 완료
 
    - **Data Cache/ISR(서버, 공개 콘텐츠) 문제 → 상태별 무효화 전략**
      - 지금 전 라우트가 `ƒ Dynamic`이라 공구 목록/상세도 캐싱 0건 (`(root)/layout.tsx`의 `getMyInfoServer()`가 원인, #8과 연결)
