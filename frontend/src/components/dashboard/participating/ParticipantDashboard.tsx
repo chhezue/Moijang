@@ -12,7 +12,7 @@ import Stepper from "@/components/Stepper";
 import NoticeBoard from "@/app/(root)/(home)/group-buying/detail/[id]/components/sidebar/NoticeBoard";
 import CustomModal from "@/components/CustomModal";
 import ConfirmModalContent from "@/app/(root)/(home)/group-buying/detail/[id]/components/modals/ConfirmModalContent";
-import { refundPayment } from "@/apis/services/payment";
+import { cancelParticipationAction } from "@/apis/actions/participant.actions";
 
 interface ParticipantDashboardProps {
   item: GroupBuyingItem;
@@ -27,13 +27,18 @@ export default function ParticipantDashboard({ item }: ParticipantDashboardProps
   const isCancelled = item.groupBuyingStatus === "CANCELLED";
 
   const handleCancelParticipation = async () => {
-    try {
-      await refundPayment({ gbId: item.id, cancelReason: "LEADER_CANCELLED" });
-      showSnackbar("참여가 취소되었습니다. 환불은 영업일 기준 3~5일 내 처리됩니다.", "success");
-      router.push("/dashboard/participating");
-    } catch {
+    const result = await cancelParticipationAction({
+      gbId: item.id,
+      cancelReason: "LEADER_CANCELLED",
+    });
+
+    if (result.error) {
       showSnackbar("참여 취소에 실패했습니다.", "error");
+      return;
     }
+
+    showSnackbar("참여가 취소되었습니다. 환불은 영업일 기준 3~5일 내 처리됩니다.", "success");
+    router.push("/dashboard/participating");
   };
 
   return (
