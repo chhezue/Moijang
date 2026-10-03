@@ -10,17 +10,9 @@ function AxiosInterceptorSetup() {
 
   useEffect(() => {
     const id = api.interceptors.response.use(null, async (error) => {
-      const originalRequest = error.config;
-
-      if (error.response?.status === 401 && !originalRequest._isRetry) {
-        originalRequest._isRetry = true;
-        try {
-          await api.get("/api/auth/refresh_token");
-          return api(originalRequest);
-        } catch {
-          clearUser();
-          window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
-        }
+      if (error.response?.status === 401) {
+        clearUser();
+        window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
       }
       return Promise.reject(error);
     });

@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { getMyInfoServer } from "@/apis/services/auth.server";
 
 export default async function AuthLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const user = await getMyInfoServer().catch(() => null);
+  const user = await getMyInfoServer();
   if (user) redirect("/");
 
   return (
