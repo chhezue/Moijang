@@ -1,0 +1,18 @@
+services:
+  backend:
+    build: .
+    container_name: moijang-backend
+    restart: always
+    ports:
+      - '3001:3001'
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    container_name: moijang-redis
+    restart: always
