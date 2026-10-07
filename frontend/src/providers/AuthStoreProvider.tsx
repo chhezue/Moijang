@@ -10,17 +10,12 @@ function AxiosInterceptorSetup() {
 
   useEffect(() => {
     const id = api.interceptors.response.use(null, async (error) => {
-      const originalRequest = error.config;
-
-      if (error.response?.status === 401 && !originalRequest._isRetry) {
-        originalRequest._isRetry = true;
-        try {
-          await api.get("/api/auth/refresh_token");
-          return api(originalRequest);
-        } catch {
-          clearUser();
-          window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
-        }
+      // 백엔드가 세션(토큰) 자체가 무효할 때만 SESSION_INVALID를 내려줌 —
+      // 로그인 실패(INVALID_CREDENTIALS)/가입 토큰 만료(INVALID_SIGNUP_TOKEN) 등
+      // 세션과 무관한 401은 각 폼의 자체 에러 처리에 맡기고 여기서 반응하지 않음
+      if (error.response?.data?.code === "SESSION_INVALID") {
+        clearUser();
+        window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
       }
       return Promise.reject(error);
     });

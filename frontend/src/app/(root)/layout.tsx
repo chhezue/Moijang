@@ -3,7 +3,7 @@ import Providers from "@/providers/Providers";
 import { getMyInfoServer } from "@/apis/services/auth.server";
 
 export default async function RootGroupLayout({ children }: { children: React.ReactNode }) {
-  const user = await getMyInfoServer().catch(() => null);
+  const user = await getMyInfoServer();
 
   return (
     <AuthStoreProvider initialUser={user}>

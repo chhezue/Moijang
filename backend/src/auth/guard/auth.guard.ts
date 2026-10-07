@@ -31,7 +31,11 @@ export class JwtAuthGuard implements CanActivate {
         return true;
       } catch {
         // 리프레시 토큰도 유효하지 않은 경우 인증 실패
-        throw new UnauthorizedException('인증이 필요합니다. 다시 로그인해 주세요.');
+        throw new UnauthorizedException({
+          message: '인증이 필요합니다. 다시 로그인해 주세요.',
+          statusCode: 401,
+          code: 'SESSION_INVALID',
+        });
       }
     }
   }

@@ -32,14 +32,22 @@ export class AuthService {
         secret: this.configService.get('JWT_SECRET'),
       });
     } catch {
-      throw new UnauthorizedException('유효하지 않은 회원가입 토큰입니다.');
+      throw new UnauthorizedException({
+        message: '유효하지 않은 회원가입 토큰입니다.',
+        statusCode: 401,
+        code: 'INVALID_SIGNUP_TOKEN',
+      });
     }
 
     const { universityId, universityEmail, typ } = payload;
 
     // 2) 토큰 용도 검증
     if (typ !== 'signup') {
-      throw new UnauthorizedException('잘못된 회원가입 토큰입니다.');
+      throw new UnauthorizedException({
+        message: '잘못된 회원가입 토큰입니다.',
+        statusCode: 401,
+        code: 'INVALID_SIGNUP_TOKEN',
+      });
     }
 
     // 3) 필수 값 검증
@@ -66,12 +74,20 @@ export class AuthService {
     const user = await this.userService.getUserByLoginIdWithPassword(dto.loginId);
 
     if (!user) {
-      throw new UnauthorizedException('아이디 또는 비밀번호가 올바르지 않습니다.');
+      throw new UnauthorizedException({
+        message: '아이디 또는 비밀번호가 올바르지 않습니다.',
+        statusCode: 401,
+        code: 'INVALID_CREDENTIALS',
+      });
     }
 
     const isMatch = await bcrypt.compare(dto.password, user.password);
     if (!isMatch) {
-      throw new UnauthorizedException('아이디 또는 비밀번호가 올바르지 않습니다.');
+      throw new UnauthorizedException({
+        message: '아이디 또는 비밀번호가 올바르지 않습니다.',
+        statusCode: 401,
+        code: 'INVALID_CREDENTIALS',
+      });
     }
 
     // res 응답에 쿠키 삽입
@@ -134,7 +150,11 @@ export class AuthService {
       });
 
       if (decodedAccessToken.typ !== 'access') {
-        throw new UnauthorizedException('유효하지 않은 토큰입니다.');
+        throw new UnauthorizedException({
+          message: '유효하지 않은 토큰입니다.',
+          statusCode: 401,
+          code: 'SESSION_INVALID',
+        });
       }
 
       // 검증 후 사용자 정보 반환 -> 가드에서 Request 객체에 할당
@@ -143,7 +163,11 @@ export class AuthService {
         name: decodedAccessToken.name,
       };
     } catch {
-      throw new UnauthorizedException('유효하지 않은 토큰입니다.');
+      throw new UnauthorizedException({
+        message: '유효하지 않은 토큰입니다.',
+        statusCode: 401,
+        code: 'SESSION_INVALID',
+      });
     }
   }
 
@@ -152,18 +176,30 @@ export class AuthService {
     try {
       const { refreshToken } = req.cookies;
       if (!refreshToken) {
-        throw new UnauthorizedException('유효하지 않은 토큰입니다.');
+        throw new UnauthorizedException({
+          message: '유효하지 않은 토큰입니다.',
+          statusCode: 401,
+          code: 'SESSION_INVALID',
+        });
       }
 
       const decodedRefreshToken = this.jwtService.verify<RefreshTokenPayload>(refreshToken, {
         secret: this.configService.get('JWT_SECRET'),
       });
       if (!decodedRefreshToken) {
-        throw new UnauthorizedException('유효하지 않은 토큰입니다.');
+        throw new UnauthorizedException({
+          message: '유효하지 않은 토큰입니다.',
+          statusCode: 401,
+          code: 'SESSION_INVALID',
+        });
       }
 
       if (decodedRefreshToken.typ !== 'refresh') {
-        throw new UnauthorizedException('유효하지 않은 토큰입니다.');
+        throw new UnauthorizedException({
+          message: '유효하지 않은 토큰입니다.',
+          statusCode: 401,
+          code: 'SESSION_INVALID',
+        });
       }
 
       const userId = decodedRefreshToken.sub;
@@ -190,7 +226,11 @@ export class AuthService {
         name: decodedRefreshToken.name,
       };
     } catch {
-      throw new UnauthorizedException('유효하지 않은 토큰입니다.');
+      throw new UnauthorizedException({
+        message: '유효하지 않은 토큰입니다.',
+        statusCode: 401,
+        code: 'SESSION_INVALID',
+      });
     }
   }
 
