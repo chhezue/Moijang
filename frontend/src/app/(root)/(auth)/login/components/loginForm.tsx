@@ -1,14 +1,24 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Box, TextField, Button, Typography, CircularProgress } from "@mui/material";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { GradientTitle } from "@/components/GradientTitle";
 import { login } from "@/apis/services/auth";
 import { useSnackbar } from "@/providers/SnackbarProvider";
-import { usernameSchema, passwordSchema, getError } from "@/schemas/auth";
+import { usernameSchema, passwordSchema } from "@/schemas/auth";
 import { useAuthStore } from "@/store/authStore";
+
+const loginSchema = z.object({
+  username: usernameSchema,
+  password: passwordSchema,
+});
+
+type LoginFormInput = z.infer<typeof loginSchema>;
 
 export const LoginForm = () => {
   const searchParams = useSearchParams();
@@ -17,10 +27,15 @@ export const LoginForm = () => {
 
   const redirectTo = searchParams.get("redirect") ?? "/";
 
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [touched, setTouched] = useState({ username: false, password: false });
+  const {
+    control,
+    handleSubmit,
+    formState: { isValid, isSubmitting },
+  } = useForm<LoginFormInput>({
+    resolver: zodResolver(loginSchema),
+    mode: "onChange",
+    defaultValues: { username: "", password: "" },
+  });
 
   useEffect(() => {
     if (searchParams.get("error") === "login_failed") {
@@ -28,26 +43,22 @@ export const LoginForm = () => {
     }
   }, []);
 
-  const usernameError = touched.username ? getError(usernameSchema, username) : null;
-  const passwordError = touched.password ? getError(passwordSchema, password) : null;
-
-  const handleLogin = async () => {
-    if (!username || !password) return;
-    setLoading(true);
+  const onSubmit = async (data: LoginFormInput) => {
     try {
-      const user = await login({ loginId: username, password });
+      const user = await login({ loginId: data.username, password: data.password });
       setUser(user);
       window.location.href = redirectTo;
     } catch {
       showSnackbar("아이디 또는 비밀번호가 올바르지 않습니다.", "error", 3000);
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
     <Box display="flex" justifyContent="center" alignItems="center">
       <Box
+        component="form"
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
         sx={{
           width: 400,
           display: "flex",
@@ -67,40 +78,47 @@ export const LoginForm = () => {
         </GradientTitle>
 
         <Box sx={{ width: "100%", display: "flex", flexDirection: "column", gap: 2 }}>
-          <TextField
-            label="아이디"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            onBlur={() => setTouched((t) => ({ ...t, username: true }))}
-            fullWidth
-            autoComplete="username"
-            disabled={loading}
-            error={!!usernameError}
-            helperText={usernameError ?? " "}
+          <Controller
+            name="username"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField
+                {...field}
+                label="아이디"
+                fullWidth
+                autoComplete="username"
+                disabled={isSubmitting}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message ?? " "}
+              />
+            )}
           />
-          <TextField
-            label="비밀번호"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onBlur={() => setTouched((t) => ({ ...t, password: true }))}
-            fullWidth
-            autoComplete="current-password"
-            disabled={loading}
-            error={!!passwordError}
-            helperText={passwordError ?? " "}
-            onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+          <Controller
+            name="password"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField
+                {...field}
+                label="비밀번호"
+                type="password"
+                fullWidth
+                autoComplete="current-password"
+                disabled={isSubmitting}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message ?? " "}
+              />
+            )}
           />
         </Box>
 
         <Button
+          type="submit"
           variant="contained"
           fullWidth
           size="large"
-          onClick={handleLogin}
-          disabled={!username || !password || loading}
+          disabled={!isValid || isSubmitting}
         >
-          {loading ? <CircularProgress size={24} color="inherit" /> : "로그인"}
+          {isSubmitting ? <CircularProgress size={24} color="inherit" /> : "로그인"}
         </Button>
 
         <Typography variant="body2" color="text.secondary">
