@@ -26,11 +26,12 @@ export class GetUserDto {
   @IsEmail()
   universityEmail: string;
 
-  @ApiProperty({ description: '은행' })
-  @IsString()
-  bankName: string;
+  // 계좌이체 결제 방식 때 쓰던 필드. Toss PG 연동(#20) 이후 어디서도 참조 안 됨 — 주석 처리
+  // @ApiProperty({ description: '은행' })
+  // @IsString()
+  // bankName: string;
 
-  @ApiProperty({ description: '계좌' })
-  @IsString()
-  bankAccount: string;
+  // @ApiProperty({ description: '계좌' })
+  // @IsString()
+  // bankAccount: string;
 }

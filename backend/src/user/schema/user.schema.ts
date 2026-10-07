@@ -41,11 +41,12 @@ export class User extends Document {
   })
   universityId: MongooseSchema.Types.ObjectId;
 
-  @Prop()
-  bankName: string;
+  // 계좌이체 결제 방식 때 쓰던 필드. Toss PG 연동(#20) 이후 어디서도 참조 안 됨 — 주석 처리
+  // @Prop()
+  // bankName: string;
 
-  @Prop()
-  bankAccount: string;
+  // @Prop()
+  // bankAccount: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -18,11 +18,13 @@ export class SignupDto {
   @IsString()
   signupToken: string; // 토큰 해독 시 universityId, universityEmail 얻을 수 있음.
 
-  @ApiProperty({ description: '은행' })
-  @IsString()
-  bankName: string;
+  // 계좌이체 결제 방식 때 쓰던 필드. Toss PG 연동(#20) 이후 환불도 paymentKey 기반으로 바뀌어
+  // 더 이상 어디서도 참조되지 않음 — 주석 처리, 당분간 복구 필요 없으면 완전히 삭제할 것
+  // @ApiProperty({ description: '은행' })
+  // @IsString()
+  // bankName: string;
 
-  @ApiProperty({ description: '계좌' })
-  @IsString()
-  bankAccount: string;
+  // @ApiProperty({ description: '계좌' })
+  // @IsString()
+  // bankAccount: string;
 }
