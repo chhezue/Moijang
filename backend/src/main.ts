@@ -20,7 +20,11 @@ async function bootstrap() {
   );
 
   // CORS 설정 - 운영 프론트 도메인 + Vercel 프리뷰 배포 + 로컬 개발만 허용
-  const allowedOrigins = ['https://moijang.vercel.app', 'http://localhost:3000'];
+  const allowedOrigins = [
+    'https://moijang.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:3003', // 로컬에서 3000/3001이 다른 프로젝트(moijang_v2)에 쓰여 3003으로 띄울 때 사용
+  ];
   const vercelPreviewPattern = /^https:\/\/moijang-[a-z0-9-]+-ysson\.vercel\.app$/;
 
   app.enableCors({
