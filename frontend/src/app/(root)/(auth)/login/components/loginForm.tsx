@@ -33,7 +33,7 @@ export const LoginForm = () => {
     formState: { isValid, isSubmitting },
   } = useForm<LoginFormInput>({
     resolver: zodResolver(loginSchema),
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: { username: "", password: "" },
   });
 
