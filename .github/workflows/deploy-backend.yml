@@ -17,6 +17,9 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd ~/Moijang/backend
-            git pull origin main
+            set -e
+            cd ~/Moijang
+            git fetch origin main
+            git reset --hard origin/main
+            cd backend
             docker compose up -d --build
