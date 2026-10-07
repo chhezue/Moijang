@@ -19,9 +19,18 @@ async function bootstrap() {
     }),
   );
 
-  // CORS 설정
+  // CORS 설정 - 운영 프론트 도메인 + Vercel 프리뷰 배포 + 로컬 개발만 허용
+  const allowedOrigins = ['https://moijang.vercel.app', 'http://localhost:3000'];
+  const vercelPreviewPattern = /^https:\/\/moijang-[a-z0-9-]+-ysson\.vercel\.app$/;
+
   app.enableCors({
-    origin: true,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin) || vercelPreviewPattern.test(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
     credentials: true,
   });
