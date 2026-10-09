@@ -12,6 +12,7 @@ import { login } from "@/apis/services/auth";
 import { useSnackbar } from "@/providers/SnackbarProvider";
 import { usernameSchema, passwordSchema } from "@/schemas/auth";
 import { useAuthStore } from "@/store/authStore";
+import { resolveRedirectTarget } from "@/utils/redirect";
 
 const loginSchema = z.object({
   username: usernameSchema,
@@ -25,7 +26,7 @@ export const LoginForm = () => {
   const { showSnackbar } = useSnackbar();
   const setUser = useAuthStore((s) => s.setUser);
 
-  const redirectTo = searchParams.get("redirect") ?? "/";
+  const redirectTo = resolveRedirectTarget(searchParams.get("redirect"));
 
   const {
     control,
