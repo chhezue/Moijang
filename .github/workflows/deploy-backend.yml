@@ -79,6 +79,10 @@ jobs:
             export DOCKER_CONFIG
             DOCKER_CONFIG=$(mktemp -d)
             trap 'rm -rf "$DOCKER_CONFIG"' EXIT
+            mkdir -p "$DOCKER_CONFIG/cli-plugins"
+            if [ -d "$HOME/.docker/cli-plugins" ]; then
+              cp "$HOME/.docker/cli-plugins/"* "$DOCKER_CONFIG/cli-plugins/"
+            fi
             printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
             unset GHCR_TOKEN
             export BACKEND_IMAGE
