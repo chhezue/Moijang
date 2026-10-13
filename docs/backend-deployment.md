@@ -79,6 +79,7 @@ EC2에는 Python 3, Git, Docker, Docker Compose, `~/Moijang` 체크아웃과 `ba
 
 ```bash
 docker builder prune -f --filter "until=72h"
+PREVIOUS_IMAGE=$(docker container inspect --format '{{.Image}}' moijang-backend 2>/dev/null || true)
 docker compose -p backend -f docker-compose.prod.yml pull
 docker compose -p backend -f docker-compose.prod.yml up -d --no-build --wait --wait-timeout 120
 docker compose -p backend -f docker-compose.prod.yml ps
