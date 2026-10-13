@@ -67,7 +67,7 @@ BuildKit 레이어 캐시는 GitHub Actions 캐시(`type=gha`, scope `backend`)�
 
 빌드 작업의 토큰 권한은 `contents: read`, `packages: write`이고, 배포 작업은 `contents: read`, `packages: read`입니다. GHCR 패키지를 공개로 바꿀 필요는 없습니다. 기존 동명 패키지가 있다면 패키지 설정에서 이 저장소의 Actions 접근 권한을 확인해야 합니다.
 
-배포 작업의 토큰은 SSH 환경변수로 EC2에 전달하고 `--password-stdin`으로 로그인합니다. Docker 인증 파일은 임시 디렉터리에 저장하고 SSH 스크립트 종료 시 제거합니다. 개인 키·토큰·`.env` 실제 값은 문서나 로그에 기록하지 않습니다.
+배포 작업의 토큰은 SSH 환경변수로 EC2에 전달하고 `--password-stdin`으로 로그인합니다. Docker 인증 파일은 임시 디렉터리에 저장하고 SSH 스크립트 종료 시 제거합니다. 이 임시 디렉터리를 `DOCKER_CONFIG`로 지정하면 기존 `~/.docker/cli-plugins`(compose 등)를 찾지 못하므로, 로그인 전에 해당 플러그인 디렉터리를 복사해 둡니다. 개인 키·토큰·`.env` 실제 값은 문서나 로그에 기록하지 않습니다.
 
 EC2에는 Python 3, Git, Docker, Docker Compose, `~/Moijang` 체크아웃과 `backend/.env`가 필요합니다. SSH 계정은 Git fetch 및 Docker 실행 권한이 있어야 하고, 서버에서 GHCR에 접근할 수 있어야 합니다. Compose는 `up --wait --wait-timeout`을 지원해야 합니다. EC2에 Buildx를 설치할 필요는 없습니다.
 
@@ -79,6 +79,7 @@ EC2에는 Python 3, Git, Docker, Docker Compose, `~/Moijang` 체크아웃과 `ba
 
 ```bash
 docker builder prune -f --filter "until=72h"
+PREVIOUS_IMAGE=$(docker container inspect --format '{{.Image}}' moijang-backend 2>/dev/null || true)
 docker compose -p backend -f docker-compose.prod.yml pull
 docker compose -p backend -f docker-compose.prod.yml up -d --no-build --wait --wait-timeout 120
 docker compose -p backend -f docker-compose.prod.yml ps
