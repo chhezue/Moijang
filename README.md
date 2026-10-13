@@ -70,6 +70,8 @@
 
 ## 🌐 서비스 URL (Production)
 
+현재 백엔드 배포 흐름과 설정 위치는 [백엔드 배포 파이프라인](docs/backend-deployment.md)을 참고하세요.
+
 | 구분                   | URL                                                                  |
 | ---------------------- | -------------------------------------------------------------------- |
 | **웹 서비스**          | [https://moijang.app](https://moijang.app)                           |
@@ -305,6 +307,15 @@ npm run format    # Prettier
 2. 기능 브랜치를 생성해 작업합니다.
 3. `npm run lint` 로 검증합니다.
 4. [PR 템플릿](.github/pull_request_template.md)에 맞춰 설명을 작성합니다.
+
+커밋 메시지는 `타입 - 내용` 또는 `타입[#이슈번호] - 내용` 형식을 사용합니다.
+
+```text
+chore - 백엔드 빌드를 GitHub Actions로 이전
+fix[#33] - 로그인 폼 검증 수정
+```
+
+허용 타입은 `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`입니다. 이슈 번호는 선택이며 내용은 한국어·영어 모두 가능합니다. `npm install` 후 Husky의 `commit-msg` 훅이 새 커밋 메시지를 검사합니다. Git이 자동 생성하는 merge/revert 메시지 등은 commitlint 기본 예외를 따릅니다. 과거 커밋이나 GitHub 웹에서 생성한 커밋은 이 로컬 훅으로 검사하지 않습니다.
 
 ---
 
