@@ -115,21 +115,24 @@ export class AuthService {
     return this.userService.getUserById(userId);
   }
 
+  // 프론트(Vercel)와 백엔드(EC2)가 서로 다른 사이트라 쿠키가 cross-site로 오간다.
+  // SameSite=Lax는 cross-site fetch/XHR에는 안 실림 — None이어야 실제로 전달됨.
+  // SameSite=None은 Secure 없이는 브라우저가 거부하므로 운영 환경에서만 쓰고,
+  // 로컬(http, same-site localhost)에서는 기존처럼 Lax+Secure:false 유지.
+  private getAuthCookieOptions(maxAge: number) {
+    const isProd = this.configService.get<string>('NODE_ENV') === 'production';
+    return {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: (isProd ? 'none' : 'lax') as 'none' | 'lax',
+      maxAge,
+    };
+  }
+
   // 생성된 쿠키를 응답의 cookie로 설정
   setTokenCookies(res: Response, accessToken: string, refreshToken: string) {
-    res.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      secure: this.configService.get<string>('NODE_ENV') === 'production',
-      sameSite: 'lax',
-      maxAge: 5 * 60 * 1000, // 5분
-    });
-
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: this.configService.get<string>('NODE_ENV') === 'production',
-      sameSite: 'lax',
-      maxAge: 14 * 24 * 60 * 60 * 1000, // 14일
-    });
+    res.cookie('accessToken', accessToken, this.getAuthCookieOptions(5 * 60 * 1000)); // 5분
+    res.cookie('refreshToken', refreshToken, this.getAuthCookieOptions(14 * 24 * 60 * 60 * 1000)); // 14일
   }
 
   // 로그아웃 시 쿠키에서 토큰 삭제
@@ -213,12 +216,7 @@ export class AuthService {
         { expiresIn: '5m' },
       );
 
-      res.cookie('accessToken', accessToken, {
-        httpOnly: true,
-        secure: this.configService.get<string>('NODE_ENV') === 'production',
-        sameSite: 'lax',
-        maxAge: 5 * 60 * 1000,
-      });
+      res.cookie('accessToken', accessToken, this.getAuthCookieOptions(5 * 60 * 1000));
 
       // 검증 후 사용자 정보 반환 -> 가드에서 Request 객체에 할당
       return {
