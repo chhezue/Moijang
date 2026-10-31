@@ -13,6 +13,7 @@ export function useGroupBuyingViewer(gbId: string): GroupBuyingViewer {
   const { data, isPending, isError } = useQuery({
     queryKey: ["group-buying-viewer", gbId],
     queryFn: () => getGroupBuyingById(gbId),
+    staleTime: 60 * 1000,
   });
 
   if (isPending) return { status: "pending" };
