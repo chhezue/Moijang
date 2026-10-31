@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { Box, TextField, Button, Typography, CircularProgress } from "@mui/material";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -11,7 +11,7 @@ import { GradientTitle } from "@/components/GradientTitle";
 import { login } from "@/apis/services/auth";
 import { useSnackbar } from "@/providers/SnackbarProvider";
 import { usernameSchema, passwordSchema } from "@/schemas/auth";
-import { useAuthStore } from "@/store/authStore";
+import { useSetMe } from "@/hooks/useSetMe";
 
 const loginSchema = z.object({
   username: usernameSchema,
@@ -23,7 +23,8 @@ type LoginFormInput = z.infer<typeof loginSchema>;
 export const LoginForm = () => {
   const searchParams = useSearchParams();
   const { showSnackbar } = useSnackbar();
-  const setUser = useAuthStore((s) => s.setUser);
+  const setMe = useSetMe();
+  const router = useRouter();
 
   const redirectTo = searchParams.get("redirect") ?? "/";
 
@@ -46,8 +47,8 @@ export const LoginForm = () => {
   const onSubmit = async (data: LoginFormInput) => {
     try {
       const user = await login({ loginId: data.username, password: data.password });
-      setUser(user);
-      window.location.href = redirectTo;
+      await setMe(user);
+      router.push(redirectTo);
     } catch {
       showSnackbar("아이디 또는 비밀번호가 올바르지 않습니다.", "error", 3000);
     }

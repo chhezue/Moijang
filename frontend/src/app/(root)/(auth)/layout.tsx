@@ -1,14 +1,12 @@
 import { Suspense } from "react";
-import { redirect } from "next/navigation";
-import { getMyInfoServer } from "@/apis/services/auth.server";
+import AuthGate from "@/components/AuthGate";
 
-export default async function AuthLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const user = await getMyInfoServer();
-  if (user) redirect("/");
-
+export default function AuthLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <main className="grid min-h-screen w-full place-items-center overflow-hidden py-10">
-      <Suspense>{children}</Suspense>
-    </main>
+    <AuthGate mode="require-guest">
+      <main className="grid min-h-screen w-full place-items-center overflow-hidden py-10">
+        <Suspense>{children}</Suspense>
+      </main>
+    </AuthGate>
   );
 }

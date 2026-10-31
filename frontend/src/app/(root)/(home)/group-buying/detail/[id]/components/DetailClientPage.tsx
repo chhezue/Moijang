@@ -11,7 +11,7 @@ import ParticipationModalContent from "@/app/(root)/(home)/group-buying/detail/[
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSnackbar } from "@/providers/SnackbarProvider";
 import { ModalType } from "./types";
-import { useAuthStore } from "@/store/authStore";
+import { useMe } from "@/hooks/useMe";
 import CancelledBanner from "@/app/(root)/(home)/group-buying/detail/[id]/components/CancelledBanner";
 
 interface ClientPageProps {
@@ -21,7 +21,7 @@ interface ClientPageProps {
 
 const DetailClientPage: React.FC<ClientPageProps> = ({ item, participants }) => {
   const { showSnackbar } = useSnackbar();
-  const user = useAuthStore((s) => s.user);
+  const { data: user } = useMe();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [activeModal, setActiveModal] = useState<ModalType>(null);
@@ -94,7 +94,7 @@ const DetailClientPage: React.FC<ClientPageProps> = ({ item, participants }) => 
                 <Box sx={{ position: "sticky", top: "2rem", p: "2rem" }}>
                   <Sidebar
                     item={item}
-                    user={user}
+                    user={user ?? null}
                     participants={participants}
                     onOpenModal={(type) => {
                       setActiveModal(type);

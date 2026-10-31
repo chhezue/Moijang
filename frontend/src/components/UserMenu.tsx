@@ -20,7 +20,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import { logout } from "@/apis/services/auth";
-import { useAuthStore } from "@/store/authStore";
+import { useSetMe } from "@/hooks/useSetMe";
 
 interface UserMenuProps {
   displayName: string;
@@ -48,18 +48,17 @@ const UserMenu: React.FC<UserMenuProps> = ({ displayName }) => {
   const theme = useTheme();
   const router = useRouter();
   const pathname = usePathname();
-  const clearUser = useAuthStore((s) => s.clearUser);
+  const setMe = useSetMe();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [open, setOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
-      await logout();
-      clearUser();
-      router.refresh();
+      await logout(); // 백엔드 쿠키 정리까지 확인한 다음에 캐시를 비움
+      await setMe(null);
     } catch {
-      // 로그아웃 실패해도 클라이언트 상태는 초기화
-      clearUser();
+      // 로그아웃 요청 실패해도 클라이언트 상태는 일단 정리
+      await setMe(null);
     }
     handleClose();
   };
