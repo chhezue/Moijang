@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import LoginIcon from "@mui/icons-material/Login";
 import CreateButton from "@/components/CreateButton";
 import UserMenu from "@/components/UserMenu";
-import { useAuthStore } from "@/store/authStore";
+import { useMe } from "@/hooks/useMe";
 
 const useScrollFlag = (threshold = 8) => {
   const [scrolled, setScrolled] = useState(false);
@@ -45,7 +45,7 @@ const Header: React.FC = () => {
   const pathname = usePathname();
   const styles = useHeaderStyles();
   const theme = useTheme();
-  const user = useAuthStore((s) => s.user);
+  const { data: user } = useMe();
 
   const onLogin = () => {
     router.push(`/login?redirect=${encodeURIComponent(pathname)}`);

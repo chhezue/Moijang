@@ -76,7 +76,7 @@ const CancelReasonModalContent = ({
               <Box key={reason} ml={2}>
                 <FormControlLabel
                   value={reason}
-                  control={<Radio />}
+                  control={<Radio data-testid={`cancel-reason-${reason}`} />}
                   label={
                     <Typography sx={{ fontSize: "0.85rem", lineHeight: 1.4 }}>
                       {config.label}
@@ -125,6 +125,7 @@ const CancelReasonModalContent = ({
               checked={isAgreed}
               onChange={(e) => setIsAgreed(e.target.checked)}
               color="primary"
+              data-testid="cancel-reason-agree"
             />
           }
           label={
@@ -144,6 +145,7 @@ const CancelReasonModalContent = ({
           fullWidth
           onClick={handleConfirm}
           disabled={!selectedReason || !isAgreed || isLoading}
+          data-testid="btn-cancel-reason-submit"
           sx={{
             fontSize: "0.85rem",
             py: 1.2,

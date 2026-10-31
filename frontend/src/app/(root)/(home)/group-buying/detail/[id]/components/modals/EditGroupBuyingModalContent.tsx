@@ -25,9 +25,8 @@ import {
   makeUpdateGroupBuyingSchema,
 } from "@/schemas/groupBuying";
 import { useSnackbar } from "@/providers/SnackbarProvider";
-import { updateGroupBuying } from "@/apis/services/groupBuying";
 import { useCategoryContext } from "@/providers/CategoryProvider";
-import { useRouter } from "next/navigation";
+import { useUpdateGroupBuyingInfo } from "@/hooks/groupBuyingMutations";
 import { theme } from "@/styles/theme";
 
 interface Props {
@@ -39,7 +38,7 @@ interface Props {
 const EditGroupBuyingModalContent = ({ item, close, onlyPrice = false }: Props) => {
   const { showSnackbar } = useSnackbar();
   const { isLoading, categoryList, categoryIconMap } = useCategoryContext();
-  const router = useRouter();
+  const updateInfoMutation = useUpdateGroupBuyingInfo(item.id);
   const schema = useMemo(
     () => makeUpdateGroupBuyingSchema(item.fixedCount, item.currentCount, item.leaderCount),
     [item],
@@ -86,10 +85,9 @@ const EditGroupBuyingModalContent = ({ item, close, onlyPrice = false }: Props) 
       const payload: UpdateGroupBuyingOutput = {
         ...parsedData,
       };
-      await updateGroupBuying(item.id, payload);
+      await updateInfoMutation.mutateAsync(payload);
       showSnackbar("공동구매가 수정되었습니다", "success");
       close();
-      router.refresh();
     } catch (e: any) {
       showSnackbar("수정 실패", "error");
     }
@@ -139,6 +137,7 @@ const EditGroupBuyingModalContent = ({ item, close, onlyPrice = false }: Props) 
                   label="공동구매 제목"
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
+                  inputProps={{ "data-testid": "input-edit-title" }}
                   sx={{
                     "& .MuiInputLabel-root": { fontSize: "0.85rem" },
                     "& .MuiInputBase-input": { fontSize: "0.85rem" },
@@ -427,6 +426,7 @@ const EditGroupBuyingModalContent = ({ item, close, onlyPrice = false }: Props) 
           variant="contained"
           type="submit"
           disabled={isSubmitting}
+          data-testid="btn-edit-groupbuying-submit"
           sx={{
             fontSize: "0.85rem",
             py: 1.2,

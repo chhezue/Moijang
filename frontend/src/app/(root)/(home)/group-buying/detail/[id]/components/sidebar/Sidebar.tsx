@@ -3,12 +3,13 @@
 import React from "react";
 import { GroupBuyingItem, IParticipant } from "@/types/groupBuying";
 import { UserDto } from "@/types/auth";
-import { Stack, Divider, Typography, Box, Button } from "@mui/material";
+import { Stack, Divider, Typography, Box, Button, Skeleton } from "@mui/material";
 import ProgressBar from "./ProgressBar";
 import ParticipantList from "./ParticipantList";
 import { ModalType } from "../types";
 import { useRouter } from "next/navigation";
 import DashboardIcon from "@mui/icons-material/Dashboard";
+import { useGroupBuyingViewer } from "@/hooks/useGroupBuyingViewer";
 
 interface SidebarProps {
   participants: IParticipant[];
@@ -19,11 +20,13 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ participants, item, onOpenModal, user }) => {
   const router = useRouter();
-  const { isOwner, isParticipant, groupBuyingStatus } = item;
+  const { groupBuyingStatus } = item;
+  const viewer = useGroupBuyingViewer(item.id);
 
-  const dashboardPath = isOwner
-    ? `/dashboard/leading/${item.id}`
-    : `/dashboard/participating/${item.id}`;
+  const dashboardPath =
+    viewer.status === "ready" && viewer.isOwner
+      ? `/dashboard/leading/${item.id}`
+      : `/dashboard/participating/${item.id}`;
 
   return (
     <Stack spacing={3}>
@@ -42,14 +45,16 @@ const Sidebar: React.FC<SidebarProps> = ({ participants, item, onOpenModal, user
         <Box>
           <Typography color="text.secondary">로그인 후 공구에 참여해 보세요!</Typography>
         </Box>
-      ) : isOwner || isParticipant ? (
+      ) : viewer.status !== "ready" ? (
+        <Skeleton variant="rectangular" height={42} sx={{ borderRadius: 1 }} />
+      ) : viewer.isOwner || viewer.isParticipant ? (
         <Button
           variant="outlined"
           fullWidth
           startIcon={<DashboardIcon />}
           onClick={() => router.push(dashboardPath)}
         >
-          {isOwner ? "대시보드에서 관리하기" : "진행사항 확인하기"}
+          {viewer.isOwner ? "대시보드에서 관리하기" : "진행사항 확인하기"}
         </Button>
       ) : (
         groupBuyingStatus === "RECRUITING" && (

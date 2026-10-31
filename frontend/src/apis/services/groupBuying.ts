@@ -1,6 +1,22 @@
 import api from "@/apis/apiClient";
 import { CreateGroupBuying, GroupBuyingItem } from "@/types/groupBuying";
-import { PaginationMeta, SearchParams } from "@/types/common";
+import { PaginationMeta, PaginationParams, SearchParams } from "@/types/common";
+
+// 내가 만든 공구 목록 (완전 개인화, CSR 전용)
+export const getMyCreateGroupBuying = async (
+  params?: PaginationParams,
+): Promise<{ items: GroupBuyingItem[]; meta: PaginationMeta }> => {
+  const res = await api.get("/api/group-buying/my-create", { params });
+  return { items: res.data.data, meta: res.data.meta };
+};
+
+// 내가 참여 중인 공구 목록 (완전 개인화, CSR 전용)
+export const getMyParticipant = async (
+  params?: PaginationParams,
+): Promise<{ items: GroupBuyingItem[]; meta: PaginationMeta }> => {
+  const res = await api.get("/api/group-buying/my-participant", { params });
+  return { items: res.data.data, meta: res.data.meta };
+};
 
 // 전체 목록 반환 (페이지네이션, 검색어 옵션)
 export const getGroupBuying = async (

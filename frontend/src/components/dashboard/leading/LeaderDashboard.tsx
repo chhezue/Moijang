@@ -12,25 +12,29 @@ import ParticipantList from "@/app/(root)/(home)/group-buying/detail/[id]/compon
 import ActionButtons from "@/app/(root)/(home)/group-buying/detail/[id]/components/sidebar/ActionButtons";
 import NoticeBoard from "@/app/(root)/(home)/group-buying/detail/[id]/components/sidebar/NoticeBoard";
 import CustomModal from "@/components/CustomModal";
-import ParticipationModalContent from "@/app/(root)/(home)/group-buying/detail/[id]/components/modals/ParticipationModalContent";
 import EditGroupBuyingModalContent from "@/app/(root)/(home)/group-buying/detail/[id]/components/modals/EditGroupBuyingModalContent";
 import ConfirmModalContent from "@/app/(root)/(home)/group-buying/detail/[id]/components/modals/ConfirmModalContent";
 import CancelReasonModalContent from "@/app/(root)/(home)/group-buying/detail/[id]/components/modals/CancelReasonModalContent";
 import { ShippedModalContent } from "@/app/(root)/(home)/group-buying/detail/[id]/components/modals/ShippedModalContent";
 import { ModalType } from "@/app/(root)/(home)/group-buying/detail/[id]/components/types";
 import {
-  cancelGroupBuying,
-  updateGroupBuying,
-  updateGroupBuyingStatus,
-} from "@/apis/services/groupBuying";
-import { refundPayment } from "@/apis/services/payment";
+  useCancelGroupBuying,
+  useShipGroupBuying,
+  useUpdateGroupBuyingInfo,
+  useUpdateGroupBuyingStatus,
+} from "@/hooks/groupBuyingMutations";
 
 interface LeaderDashboardProps {
   item: GroupBuyingItem;
   participants: IParticipant[];
+  isParticipantsLoading?: boolean;
 }
 
-export default function LeaderDashboard({ item, participants }: LeaderDashboardProps) {
+export default function LeaderDashboard({
+  item,
+  participants,
+  isParticipantsLoading = false,
+}: LeaderDashboardProps) {
   const { showSnackbar } = useSnackbar();
   const { statusList, statusToStepIndex } = useStatusContext();
   const router = useRouter();
@@ -38,20 +42,14 @@ export default function LeaderDashboard({ item, participants }: LeaderDashboardP
 
   const isCancelled = item.groupBuyingStatus === "CANCELLED";
 
-  const handleCancelParticipation = async () => {
-    try {
-      await refundPayment({ gbId: item.id, cancelReason: "LEADER_CANCELLED" });
-      showSnackbar("참여가 취소되고 환불이 처리되었습니다.", "success");
-      router.refresh();
-      setActiveModal(null);
-    } catch {
-      showSnackbar("공동구매 참여 취소에 실패했습니다.", "error");
-    }
-  };
+  const cancelMutation = useCancelGroupBuying(item.id);
+  const statusMutation = useUpdateGroupBuyingStatus(item.id);
+  const shipMutation = useShipGroupBuying(item.id);
+  const infoMutation = useUpdateGroupBuyingInfo(item.id);
 
   const handleCancelGroupBuying = async (reason: string) => {
     try {
-      const result = await cancelGroupBuying(item.id, reason);
+      const result = await cancelMutation.mutateAsync(reason);
       const refundStatus = result?.refundStatus;
       if (refundStatus === "allSuccess") {
         showSnackbar("공동구매가 취소되고 전체 환불이 완료되었습니다.", "success");
@@ -60,7 +58,6 @@ export default function LeaderDashboard({ item, participants }: LeaderDashboardP
       } else {
         showSnackbar("공동구매가 취소되었습니다.", "success");
       }
-      router.refresh();
       setActiveModal(null);
     } catch {
       showSnackbar("공동구매 취소가 실패했습니다.", "error");
@@ -69,8 +66,7 @@ export default function LeaderDashboard({ item, participants }: LeaderDashboardP
 
   const handleProceedOrder = async () => {
     try {
-      await updateGroupBuyingStatus(item.id, "ORDERED");
-      router.refresh();
+      await statusMutation.mutateAsync("ORDERED");
       setActiveModal(null);
     } catch (error: any) {
       showSnackbar(error.response?.data?.message || "상태 변경에 실패하였습니다.", "error");
@@ -84,23 +80,22 @@ export default function LeaderDashboard({ item, participants }: LeaderDashboardP
     pickupPlace: string;
     pickupTime: string;
   }) => {
+    let result: { pickupInfoSaved: boolean };
     try {
-      await updateGroupBuyingStatus(item.id, "SHIPPED");
+      result = await shipMutation.mutateAsync({ pickupPlace, pickupTime });
     } catch {
       showSnackbar("배송 상태 변경에 실패했습니다.", "error");
       return;
     }
-    try {
-      await updateGroupBuying(item.id, { pickupPlace, pickupTime });
+    if (result.pickupInfoSaved) {
       showSnackbar("배송 완료 처리되었습니다.", "success");
-    } catch {
+    } else {
       showSnackbar(
         "배송 완료 처리됐으나 픽업 정보 저장에 실패했습니다. 수정 버튼으로 다시 입력해주세요.",
         "warning",
       );
     }
     setActiveModal(null);
-    router.refresh();
   };
 
   const handleEditShipped = async ({
@@ -111,10 +106,9 @@ export default function LeaderDashboard({ item, participants }: LeaderDashboardP
     pickupTime: string;
   }) => {
     try {
-      await updateGroupBuying(item.id, { pickupPlace, pickupTime });
+      await infoMutation.mutateAsync({ pickupPlace, pickupTime });
       showSnackbar("수령 정보가 수정되었습니다.", "success");
       setActiveModal(null);
-      router.refresh();
     } catch {
       showSnackbar("수령 정보 수정에 실패했습니다.", "error");
     }
@@ -122,10 +116,9 @@ export default function LeaderDashboard({ item, participants }: LeaderDashboardP
 
   const handleComplete = async () => {
     try {
-      await updateGroupBuyingStatus(item.id, "COMPLETED");
+      await statusMutation.mutateAsync("COMPLETED");
       showSnackbar("공구가 완료되었습니다.", "success");
       setActiveModal(null);
-      router.refresh();
     } catch {
       showSnackbar("공구 완료 처리 실패", "error");
     }
@@ -184,6 +177,7 @@ export default function LeaderDashboard({ item, participants }: LeaderDashboardP
             <ParticipantList
               participants={participants}
               leaderInfo={{ name: item.leaderId.name, count: item.leaderCount }}
+              isLoading={isParticipantsLoading}
             />
           </Box>
 
@@ -232,29 +226,6 @@ export default function LeaderDashboard({ item, participants }: LeaderDashboardP
       </Box>
 
       {/* 모달 */}
-      <CustomModal
-        title="공동구매 참여"
-        open={activeModal === "participation"}
-        setOpen={() => setActiveModal(null)}
-      >
-        <ParticipationModalContent
-          gbId={item.id}
-          close={() => setActiveModal(null)}
-          remainingCount={item.fixedCount - item.currentCount}
-        />
-      </CustomModal>
-
-      <CustomModal
-        title="참여 취소"
-        open={activeModal === "cancelParticipation"}
-        setOpen={() => setActiveModal(null)}
-      >
-        <ConfirmModalContent
-          message="정말로 공동구매 참여를 취소하시겠어요?"
-          onConfirm={handleCancelParticipation}
-        />
-      </CustomModal>
-
       <CustomModal
         title="공동구매 수정"
         open={activeModal === "editGroupBuying"}

@@ -11,7 +11,7 @@ import { GradientTitle } from "@/components/GradientTitle";
 import { login } from "@/apis/services/auth";
 import { useSnackbar } from "@/providers/SnackbarProvider";
 import { usernameSchema, passwordSchema } from "@/schemas/auth";
-import { useAuthStore } from "@/store/authStore";
+import { useSetMe } from "@/hooks/useSetMe";
 
 const loginSchema = z.object({
   username: usernameSchema,
@@ -23,9 +23,7 @@ type LoginFormInput = z.infer<typeof loginSchema>;
 export const LoginForm = () => {
   const searchParams = useSearchParams();
   const { showSnackbar } = useSnackbar();
-  const setUser = useAuthStore((s) => s.setUser);
-
-  const redirectTo = searchParams.get("redirect") ?? "/";
+  const setMe = useSetMe();
 
   const {
     control,
@@ -46,8 +44,8 @@ export const LoginForm = () => {
   const onSubmit = async (data: LoginFormInput) => {
     try {
       const user = await login({ loginId: data.username, password: data.password });
-      setUser(user);
-      window.location.href = redirectTo;
+      await setMe(user);
+      // 이동은 AuthGate(require-guest)가 담당 — user 캐시 변경 감지 후 redirectTo로 이동
     } catch {
       showSnackbar("아이디 또는 비밀번호가 올바르지 않습니다.", "error", 3000);
     }

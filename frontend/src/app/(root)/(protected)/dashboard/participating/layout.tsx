@@ -1,10 +1,16 @@
+"use client";
+
 import React from "react";
-import { getMyParticipant } from "@/apis/services/groupBuying.server";
+import { useQuery } from "@tanstack/react-query";
+import { getMyParticipant } from "@/apis/services/groupBuying";
 import GbListPanel from "@/components/dashboard/GbListPanel";
 
-export default async function ParticipatingLayout({ children }: { children: React.ReactNode }) {
-  const { items } = await getMyParticipant({ page: 1 });
-  const participatingItems = items.filter((item) => !item.isOwner);
+export default function ParticipatingLayout({ children }: { children: React.ReactNode }) {
+  const { data } = useQuery({
+    queryKey: ["my-participant-group-buying", { page: 1 }],
+    queryFn: () => getMyParticipant({ page: 1 }),
+  });
+  const participatingItems = (data?.items ?? []).filter((item) => !item.isOwner);
 
   return (
     <div style={{ display: "flex" }}>
