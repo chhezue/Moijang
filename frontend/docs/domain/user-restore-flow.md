@@ -346,12 +346,13 @@ GH #37에서 Header를 CSR(`useMe()`)로 옮기면서 `(root)/layout.tsx`의 이
 
 frontend엔 기존에 Jest/Vitest가 전혀 없었음(E2E용 `@playwright/test`만 있었음). `vitest.config.mts` 추가하고 #36에서 만든 `getMyInfo()`/`useMe()`를 대상으로 작성:
 
-| 파일                             | 테스트                                                                | 결과     |
-| -------------------------------- | --------------------------------------------------------------------- | -------- |
-| `src/apis/services/auth.test.ts` | 로그인된 유저 → `UserDto` 반환 / 401 → `null` / 401 아닌 에러 → throw | 3개 pass |
-| `src/hooks/useMe.test.tsx`       | 성공/확인된 guest(`null`)/에러(`isError`) 세 상태 구분                | 3개 pass |
+| 파일                               | 테스트                                                                 | 결과     |
+| ---------------------------------- | ---------------------------------------------------------------------- | -------- |
+| `src/apis/services/auth.test.ts`   | 로그인된 유저 → `UserDto` 반환 / 401 → `null` / 401 아닌 에러 → throw  | 3개 pass |
+| `src/hooks/useMe.test.tsx`         | 성공/확인된 guest(`null`)/에러(`isError`) 세 상태 구분                 | 3개 pass |
+| `src/components/AuthGate.test.tsx` | `require-auth`/`require-guest` × 로딩/확인된미인증/에러/인증됨 7케이스 | 7개 pass |
 
-`npm run test`(`vitest run`)로 실행, 총 6/6 pass. 둘 다 기존 코드(SSR auth, Zustand)는 전혀 안 건드리는 신규 코드라 회귀 위험 없음.
+`npm run test`(`vitest run`)로 실행, 총 13/13 pass. `AuthGate.test.tsx`의 "require-guest는 401 아닌 에러에도 children을 막지 않는다" 케이스는 #37 구현 중 로컬에서 실제로 재현해서 고쳤던 버그의 회귀 테스트임(`09cf8d5`).
 
 ### Playwright 회귀 테스트 — 운영 도메인 대상, 의도대로 전부 fail
 
