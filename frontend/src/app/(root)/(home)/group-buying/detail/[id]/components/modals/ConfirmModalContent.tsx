@@ -50,6 +50,7 @@ const ConfirmModalContent: React.FC<ConfirmModalContentProps> = ({
           size="small"
           onClick={handleClick}
           disabled={isLoading}
+          data-testid="btn-modal-confirm"
         >
           {isLoading ? <CircularProgress size={16} color="inherit" /> : confirmLabel}
         </Button>

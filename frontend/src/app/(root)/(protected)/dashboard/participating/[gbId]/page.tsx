@@ -2,12 +2,13 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getGroupBuyingById } from "@/apis/services/groupBuying";
+import { groupBuyingKeys } from "@/hooks/groupBuyingMutations";
 import ParticipantDashboard from "@/components/dashboard/participating/ParticipantDashboard";
 import { Box, CircularProgress } from "@mui/material";
 
 export default function ParticipatingDetailPage({ params }: { params: { gbId: string } }) {
   const { data: item, isPending } = useQuery({
-    queryKey: ["group-buying", params.gbId],
+    queryKey: groupBuyingKeys.detail(params.gbId),
     queryFn: () => getGroupBuyingById(params.gbId),
   });
 

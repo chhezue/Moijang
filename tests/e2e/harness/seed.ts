@@ -12,6 +12,14 @@ async function withDb<T>(fn: (db: ReturnType<MongoClient["db"]>) => Promise<T>):
   }
 }
 
+export async function getGbTitle(gbId: string): Promise<string> {
+  return withDb(async (db) => {
+    const gb = await db.collection("groupbuyings").findOne({ _id: new ObjectId(gbId) });
+    if (!gb) throw new Error(`공구를 찾을 수 없음: ${gbId}`);
+    return gb.title;
+  });
+}
+
 export async function getUserIdByLoginId(loginId: string): Promise<string> {
   return withDb(async (db) => {
     const user = await db.collection("users").findOne({ loginId });

@@ -3,20 +3,21 @@
 import { useQuery } from "@tanstack/react-query";
 import { getGroupBuyingById } from "@/apis/services/groupBuying";
 import { getParticipantList } from "@/apis/services/participant";
+import { groupBuyingKeys } from "@/hooks/groupBuyingMutations";
 import LeaderDashboard from "@/components/dashboard/leading/LeaderDashboard";
 import { Box, CircularProgress } from "@mui/material";
 
 export default function LeadingDetailPage({ params }: { params: { gbId: string } }) {
   const { data: item, isPending: isItemPending } = useQuery({
-    queryKey: ["group-buying", params.gbId],
+    queryKey: groupBuyingKeys.detail(params.gbId),
     queryFn: () => getGroupBuyingById(params.gbId),
   });
   const { data: participantsResult, isPending: isParticipantsPending } = useQuery({
-    queryKey: ["participants", params.gbId],
+    queryKey: groupBuyingKeys.participants(params.gbId),
     queryFn: () => getParticipantList(params.gbId),
   });
 
-  if (isItemPending || isParticipantsPending || !item) {
+  if (isItemPending || !item) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
         <CircularProgress />
@@ -24,5 +25,11 @@ export default function LeadingDetailPage({ params }: { params: { gbId: string }
     );
   }
 
-  return <LeaderDashboard item={item} participants={participantsResult?.items ?? []} />;
+  return (
+    <LeaderDashboard
+      item={item}
+      participants={participantsResult?.items ?? []}
+      isParticipantsLoading={isParticipantsPending}
+    />
+  );
 }

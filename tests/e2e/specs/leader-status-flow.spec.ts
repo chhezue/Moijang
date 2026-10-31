@@ -13,7 +13,7 @@ import {
   deleteInitiatedPayments,
   type ParticipantSnapshot,
 } from "../harness/cleanup";
-import { setGbStatus, getUserIdByLoginId, seedParticipant } from "../harness/seed";
+import { setGbStatus, getUserIdByLoginId, seedParticipant, getGbTitle } from "../harness/seed";
 
 const USERS = {
   leader: { loginId: process.env.TEST_LEADER_ID!, password: process.env.TEST_LEADER_PW! },
@@ -29,11 +29,13 @@ test.describe("공구 전체 플로우 (UI)", () => {
   let leaderCtx: BrowserContext;
   let participantCtx: BrowserContext;
   let participantSnapshot: ParticipantSnapshot[] = [];
+  let originalTitle: string;
 
   test.beforeAll(async ({ browser }) => {
     test.setTimeout(120_000);
     participantSnapshot = await clearParticipants(GB_ID);
     await deleteInitiatedPayments(GB_ID);
+    originalTitle = await getGbTitle(GB_ID);
     await setGbStatus(GB_ID, "RECRUITING", { endDate: new Date("2027-12-31") });
 
     const participant1UserId = await getUserIdByLoginId(USERS.participant1.loginId);
@@ -48,6 +50,7 @@ test.describe("공구 전체 플로우 (UI)", () => {
   test.afterAll(async () => {
     await restoreParticipants(GB_ID, participantSnapshot);
     await resetGbToConfirmed(GB_ID);
+    await setGbStatus(GB_ID, "CONFIRMED", { title: originalTitle });
     await leaderCtx?.close();
     await participantCtx?.close();
   });
@@ -61,7 +64,30 @@ test.describe("공구 전체 플로우 (UI)", () => {
     await page.close();
   });
 
-  test("2. 총대 CONFIRMED → ORDERED", async () => {
+  test("2. 총대 RECRUITING - 공구 수정", async () => {
+    await setGbStatus(GB_ID, "RECRUITING");
+    const page = await leaderCtx.newPage();
+    await page.goto(DASHBOARD_URL);
+    await page.locator("[data-testid='btn-edit-groupbuying']").click();
+    const newTitle = `[수정됨] ${originalTitle}`;
+    await page.locator("[data-testid='input-edit-title']").fill(newTitle);
+    await page.locator("[data-testid='btn-edit-groupbuying-submit']").click();
+    await expect(page.getByText(newTitle).first()).toBeVisible({ timeout: 10000 });
+    await page.close();
+    await setGbStatus(GB_ID, "RECRUITING", { title: originalTitle });
+  });
+
+  test("3. 총대 RECRUITING - 인원 모집 취소", async () => {
+    await setGbStatus(GB_ID, "RECRUITING");
+    const page = await leaderCtx.newPage();
+    await page.goto(DASHBOARD_URL);
+    await page.locator("[data-testid='btn-cancel-recruiting']").click();
+    await page.locator('[role="dialog"]').locator("[data-testid='btn-modal-confirm']").click();
+    await expect(page.getByText("취소됨").first()).toBeVisible({ timeout: 10000 });
+    await page.close();
+  });
+
+  test("4. 총대 CONFIRMED → ORDERED", async () => {
     await setGbStatus(GB_ID, "CONFIRMED");
     const page = await leaderCtx.newPage();
     await page.goto(DASHBOARD_URL);
@@ -71,7 +97,19 @@ test.describe("공구 전체 플로우 (UI)", () => {
     await page.close();
   });
 
-  test("3. 총대 ORDERED → SHIPPED", async () => {
+  test("5. 총대 ORDERED - 공동구매 취소", async () => {
+    await setGbStatus(GB_ID, "ORDERED");
+    const page = await leaderCtx.newPage();
+    await page.goto(DASHBOARD_URL);
+    await page.locator("[data-testid='btn-cancel-ordered']").click();
+    await page.locator("[data-testid='cancel-reason-LEADER_CANCELLED']").click();
+    await page.locator("[data-testid='cancel-reason-agree']").click();
+    await page.locator("[data-testid='btn-cancel-reason-submit']").click();
+    await expect(page.getByText("취소됨").first()).toBeVisible({ timeout: 10000 });
+    await page.close();
+  });
+
+  test("6. 총대 ORDERED → SHIPPED", async () => {
     await setGbStatus(GB_ID, "ORDERED");
     const page = await leaderCtx.newPage();
     await page.goto(DASHBOARD_URL);
@@ -83,7 +121,22 @@ test.describe("공구 전체 플로우 (UI)", () => {
     await page.close();
   });
 
-  test("4. 총대 SHIPPED → COMPLETED", async () => {
+  test("7. 총대 SHIPPED - 배송정보 수정", async () => {
+    await setGbStatus(GB_ID, "SHIPPED", {
+      pickupPlace: "정문 앞",
+      pickupTime: "2026-12-01 18:00",
+    });
+    const page = await leaderCtx.newPage();
+    await page.goto(DASHBOARD_URL);
+    await page.locator("[data-testid='btn-edit-shipped']").click();
+    await page.locator("[data-testid='input-pickup-place']").fill("후문 편의점 앞");
+    await page.locator("[data-testid='input-pickup-time']").fill("2026-12-02 10:00");
+    await page.locator('[role="dialog"]').locator("[data-testid='btn-shipped-submit']").click();
+    await expect(page.getByText("후문 편의점 앞").first()).toBeVisible({ timeout: 10000 });
+    await page.close();
+  });
+
+  test("8. 총대 SHIPPED → COMPLETED", async () => {
     await setGbStatus(GB_ID, "SHIPPED");
     const page = await leaderCtx.newPage();
     await page.goto(DASHBOARD_URL);
