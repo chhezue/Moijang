@@ -1,12 +1,9 @@
 import apiServer from "@/apis/apiServer";
-import { withServerCookies } from "@/apis/utils/withServerCookies";
 import { GroupBuyingItem } from "@/types/groupBuying";
 
-// 공개 데이터 + 개인화 데이터(isOwner/isParticipant)가 아직 한 응답에 섞여있음.
-// 공개/개인화 분리는 GH #39에서 처리 — 그 전까지는 이 쿠키 forward가 그대로 남음.
+// 공개 데이터만 가져옴 — isOwner/isParticipant는 개인화 데이터라 여기서 신경 안 씀
+// (Client에서 useGroupBuyingViewer()로 따로 조회함, GH #39)
 export const getGroupBuyingByIdServer = async (id: string): Promise<GroupBuyingItem> => {
-  const res = await apiServer.get(`/api/group-buying/${id}`, {
-    headers: withServerCookies(),
-  });
+  const res = await apiServer.get(`/api/group-buying/${id}`);
   return res.data;
 };
