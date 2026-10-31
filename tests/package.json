@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "test:e2e": "playwright test e2e/specs",
+    "test:e2e:prod": "playwright test --config=playwright.prod.config.ts",
     "test:ai": "RUN_AI_AGENT=true playwright test e2e/specs/leader-status-flow.ai.spec.ts"
   },
   "dependencies": {
