@@ -9,9 +9,11 @@ vi.mock("@/hooks/useMe", () => ({
 }));
 
 const replace = vi.fn();
+const searchParamsGet = vi.fn().mockReturnValue(null);
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace }),
   usePathname: () => "/dashboard",
+  useSearchParams: () => ({ get: searchParamsGet }),
 }));
 
 const mockedUseMe = vi.mocked(useMe);
@@ -29,6 +31,7 @@ describe("AuthGate", () => {
   beforeEach(() => {
     replace.mockReset();
     mockedUseMe.mockReset();
+    searchParamsGet.mockReset().mockReturnValue(null);
   });
 
   it("로딩 중엔 children을 렌더하지 않고 로딩 UI를 보여준다", () => {
@@ -80,7 +83,7 @@ describe("AuthGate", () => {
   });
 
   describe("require-guest", () => {
-    it("로그인된 유저면 /로 redirect하고 children을 안 보여준다", () => {
+    it("로그인된 유저면 /로 redirect하고 children을 안 보여준다 (redirect 파라미터 없을 때)", () => {
       mockUseMe({ data: { id: "1", name: "테스트" } });
       render(
         <AuthGate mode="require-guest">
@@ -89,6 +92,22 @@ describe("AuthGate", () => {
       );
       expect(replace).toHaveBeenCalledWith("/");
       expect(screen.queryByText("login form")).not.toBeInTheDocument();
+    });
+
+    // 회귀 테스트: 로그인 페이지의 require-guest 가드와 로그인 폼이 같은 ['me'] 캐시를
+    // 보고 각자 다른 곳으로 이동하려던 경쟁(race) 버그. AuthGate가 redirect 파라미터를
+    // 읽어서 이동까지 전담하도록 고쳐서, 로그인 폼은 더 이상 네비게이션을 하지 않음.
+    it("redirect 파라미터가 있으면 /가 아니라 그 경로로 이동한다", () => {
+      searchParamsGet.mockImplementation((key: string) =>
+        key === "redirect" ? "/dashboard/leading/abc123" : null,
+      );
+      mockUseMe({ data: { id: "1", name: "테스트" } });
+      render(
+        <AuthGate mode="require-guest">
+          <div>login form</div>
+        </AuthGate>,
+      );
+      expect(replace).toHaveBeenCalledWith("/dashboard/leading/abc123");
     });
 
     it("확인된 미인증(null)이면 children(폼)을 보여준다", () => {

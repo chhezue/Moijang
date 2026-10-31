@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { useMe } from "@/hooks/useMe";
 
 interface AuthGateProps {
-  /** require-auth: 미인증이면 /login으로. require-guest: 인증돼있으면 /로. */
+  /** require-auth: 미인증이면 /login으로. require-guest: 인증돼있으면 redirect 또는 /로. */
   mode: "require-auth" | "require-guest";
   children: React.ReactNode;
 }
@@ -23,6 +23,8 @@ export default function AuthGate({ mode, children }: AuthGateProps) {
   const { data: user, isPending, isError } = useMe();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") ?? "/";
 
   useEffect(() => {
     if (isPending || isError) return;
@@ -30,9 +32,9 @@ export default function AuthGate({ mode, children }: AuthGateProps) {
       router.replace(`/login?redirect=${encodeURIComponent(pathname)}`);
     }
     if (mode === "require-guest" && user) {
-      router.replace("/");
+      router.replace(redirectTo);
     }
-  }, [mode, isPending, isError, user, pathname, router]);
+  }, [mode, isPending, isError, user, pathname, router, redirectTo]);
 
   if (isPending) {
     return (

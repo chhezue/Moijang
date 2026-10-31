@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { Box, TextField, Button, Typography, CircularProgress } from "@mui/material";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -24,9 +24,6 @@ export const LoginForm = () => {
   const searchParams = useSearchParams();
   const { showSnackbar } = useSnackbar();
   const setMe = useSetMe();
-  const router = useRouter();
-
-  const redirectTo = searchParams.get("redirect") ?? "/";
 
   const {
     control,
@@ -48,7 +45,7 @@ export const LoginForm = () => {
     try {
       const user = await login({ loginId: data.username, password: data.password });
       await setMe(user);
-      router.push(redirectTo);
+      // 이동은 AuthGate(require-guest)가 담당 — user 캐시 변경 감지 후 redirectTo로 이동
     } catch {
       showSnackbar("아이디 또는 비밀번호가 올바르지 않습니다.", "error", 3000);
     }
