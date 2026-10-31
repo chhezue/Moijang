@@ -266,6 +266,99 @@ export default async function ProtectedLayout({ children }) {
 
 Safari 체크를 앞단이 아니라 묶음 4(뒷단)에 둔 이유: third-party 쿠키 차단은 Safari ITP의 공개된 기본 정책이라 "해봐야 아는" 미지수가 아니고, 묶음 2·3 작업은 Safari 결과와 무관하게 그 자체로 가치가 있어서 미리 막을 이유가 약함.
 
+### 영향받는 세 영역 정리
+
+| 영역                                                                                            | 지금                                                                    | 전환 후                                                                                                                                                               |
+| ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **공개 데이터** (공구 상세의 제목/가격/상태/리더정보/참여자수, `getParticipantListServer`)      | SSR, 쿠키 안 씀                                                         | **안 바뀜** — 로그인 여부와 무관한 데이터라 옮길 이유 없음                                                                                                            |
+| **공동구매 개인화 목록** (`getMyCreateGroupBuying`, `getMyParticipant`)                         | SSR + `withServerCookies()`                                             | CSR로 완전 이동 (#37)                                                                                                                                                 |
+| **공동구매 상세의 뒤섞인 응답** (`getGroupBuyingByIdServer`의 `gb` + `isOwner`/`isParticipant`) | 한 함수에 공개+개인화가 같이 들어있어서 "렌더링이 인증에 의존"하는 상태 | **분리**(#39): `gb`는 SSR 그대로(인증 무관), `isOwner`/`isParticipant`만 Client 계산(이미 가진 `me`/participants 데이터 대조, 새 호출 불필요)                         |
+| **Protected 라우트 진입 판단** (`(protected)/layout.tsx`)                                       | SSR이 `getMyInfoServer()`로 판단 후 redirect                            | `AuthGate`(client)가 판단. **실제 데이터/뮤테이션 보호는 백엔드 `JwtAuthGuard`가 그대로 함** — 이건 UX(어디로 보여줄지)만 옮기는 거지 보안 경계 자체가 바뀌는 게 아님 |
+
+### UX 트레이드오프 — BFF와 비교
+
+전환 후에도 보호 페이지 진입 시 `/me` 응답 오기 전까지 **짧은 로딩 구간이 항상 생김** (AuthGate의 스켈레톤). 이걸 완전히 없애려면 Next 서버가 대신 백엔드를 호출해서 이미 완성된 HTML을 내려주는 BFF(Route Handler proxy) 패턴이 필요함 — 그러면 브라우저 입장에서 로딩 구간 자체가 없어짐.
+
+**근데 BFF를 못 쓰는 이유는 쿠키가 아니라 거리(리전) 문제임** — 오히려 BFF는 쿠키 문제를 해결해주는 쪽(Next 서버가 백엔드 쿠키를 받아 자기 도메인에 다시 심어줌). 못 쓰는 진짜 이유는 Vercel 함수가 버지니아(`iad1`)에서 돌고 백엔드는 서울에 있어서, Next→백엔드 호출마다 태평양 왕복 지연이 생기고 이게 **모든 요청**에 적용되기 때문.
+
+**실측 (2026-10-31, `curl`로 같은 위치에서 두 경로 직접 비교):**
+
+| 경로                                                     | TTFB (콜드) | TTFB (안정화 후) |
+| -------------------------------------------------------- | ----------- | ---------------- |
+| 백엔드 직접 호출 (`sslip.io`) — **CSR이 쓰는 경로**      | 174ms       | **31ms**         |
+| `moijang.vercel.app` 호출 — **SSR이 쓰는 경로의 진입점** | 2.80s       | **780~830ms**    |
+
+약 **25~90배 차이**. 측정 위치가 이 작업 환경(미국 리전 추정)이라 한국 실사용자 기준 절대값은 다를 수 있지만, 백엔드 직접 호출과 Vercel 호출을 **같은 위치에서 같이 측정**했기 때문에 둘 사이의 상대적 격차는 측정 위치와 무관하게 유효함 — 이 격차의 원인이 "Next 함수(버지니아)↔백엔드(서울) 왕복" 그 자체라서, 어디서 측정하든 이 구조적 차이는 없어지지 않음. (`x-vercel-id: icn1::iad1::...` 헤더로 실행 리전이 버지니아인 것도 재확인됨 — `[[project-known-issues]]`에 기록된 과거 측정치 0.8~3.6초와도 같은 범위로 일치함.)
+
+즉 CSR로 옮기면 "AuthGate 스켈레톤이 뜨는 짧은 구간"이 생기는 대신, 그 구간의 실제 길이는 **수십ms 단위**(백엔드 직접 호출)이고, BFF로 그 구간을 없애려면 그 대가로 **모든 요청에 수백ms~수초**(Vercel SSR 경로)를 추가하게 됨. 숫자로 보면 CSR 쪽이 압도적으로 쌈.
+
+스켈레톤 로딩 몇십ms를 없애려다 모든 API 호출에 몇백ms~몇 초씩 더하는 건 손해가 훨씬 큼. 그래서 지금은 CSR+짧은 로딩을 택하고, 리전 문제가 해결되면 BFF를 재검토할 수 있음.
+
+### #39가 벌어다주는 또 다른 UX — 속도가 아니라 정확성
+
+`getGroupBuyingByIdServer()`도 `getMyInfoServer()`랑 똑같이 `withServerCookies()`를 쓰기 때문에, cross-site 환경에서 **이 호출도 똑같이 쿠키를 못 읽음.** 백엔드의 `OptionalJwtAuthGuard`(`guard/optional-auth.guard.ts`)는 쿠키가 없으면 에러 없이 조용히 `request.user = null`로 넘어가게 짜여있어서, 지금 운영에서는 **로그인한 리더/참여자가 자기가 만든 공구의 공개 상세페이지에 들어가도 항상 게스트로 취급됨.** `isOwner`/`isParticipant`를 쓰는 유일한 컴포넌트가 `Sidebar.tsx`(#39 이슈 본문에 전수 확인됨)인데, 지금 리더 본인한테도 항상 "로그인 안 한 사람" 화면을 보여주고 있는 상태임.
+
+#39(+#37)로 `isOwner`/`isParticipant`를 Client에서 `me.id === gb.leaderId.id` 식으로 직접 계산하게 되면 이 버그가 **자동으로 같이 고쳐짐** — 리더가 자기 공구 상세페이지에서 드디어 리더용 UI를 제대로 보게 됨. 체감 속도 문제가 아니라 "제대로 작동하는가"의 문제라 오히려 더 직접적인 UX 개선임.
+
+부가적으로: 백엔드 `OptionalJwtAuthGuard`는 쿠키가 유효할 때 `userService.getUserById(id)`로 **DB 조회를 한 번 더** 함(실제로 필요한 건 `userId` 하나뿐인데 전체 유저 레코드를 가져옴). #39 이후엔 이 불필요한 DB 왕복이 없어짐 — 다만 테스트 계정이 없어서 정확히 몇 ms인지는 측정 못 했고, 정성적 효과로만 적어둠.
+
+### 전환 후에도 SSR이 남기는 가치 — "그냥 React SPA"는 아님
+
+전환이 끝나도 Next.js/SSR을 통째로 버리는 게 아님. **페이지 종류에 따라 SSR의 가치가 완전히 갈림:**
+
+| 영역                                          | SSR의 역할                                                                                   | 전환 후에도 남는 이유                                                                                                                                                                                                                                           |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 공개 페이지 (공구 목록 `list/all`, 공구 상세) | `getGroupBuying()`/`getGroupBuyingByIdServer()`로 Server Component가 직접 데이터 가져와 렌더 | **검색엔진 크롤링**(JS 안 돌리는 크롤러도 제목/가격을 그대로 봄), **카톡 등 소셜 공유 시 링크 미리보기(OG 태그)**(크롤러가 JS를 거의 안 돌려서 SSR 필수), **콜드 진입 시 로딩 스켈레톤 없이 바로 실제 내용이 보임**                                             |
+| 보호된 영역 (`/dashboard`, `/create`, `/my`)  | 지금까지는 "로그인 여부 판단"이 유일한 이유였음                                              | **그 이유가 없어짐.** 로그인 안 보장된 상태라 보여줄 공개 데이터도 없고, 크롤링할 이유도 없고(로그인해야 보이는 페이지), 콜드 진입 이점도 `AuthGate` 로딩 스켈레톤이 대신함 → **Next.js로 짜여있다는 것만 빼면 동작 방식이 일반 React SPA랑 구분이 거의 안 됨** |
+
+즉 "SSR을 아예 안 쓰게 되는 건 아니고, 보호된 영역에서만 SSR의 효용이 사라진다"가 정확한 표현임.
+
+### 추후 할 일 (이번 범위 밖)
+
+- GH #40: #36~#39 안정화 후 범위 확정 (`window.location.href`를 완전히 `router.push()`로 바꾸는 것 등)
+- Vercel 리전(`iad1` vs 서울) 불일치 — BFF 재검토의 전제조건, 별도 인프라 작업
+- 멀티탭 동기화(`BroadcastChannel`) — 위 "목표 아키텍처"의 불변식에서 이미 범위 밖으로 명시
+- 대시보드 크로스유저 접근(IDOR) — 백엔드 담당 영역, `frontend/docs/issues/`에 별도 기록돼있음 (이번 인증 리팩토링과 무관)
+
+---
+
+## 테스트 현황 (2026-10-31, GH #43)
+
+### Vitest 유닛테스트 — frontend에 처음 도입
+
+frontend엔 기존에 Jest/Vitest가 전혀 없었음(E2E용 `@playwright/test`만 있었음). `vitest.config.mts` 추가하고 #36에서 만든 `getMyInfo()`/`useMe()`를 대상으로 작성:
+
+| 파일                             | 테스트                                                                | 결과     |
+| -------------------------------- | --------------------------------------------------------------------- | -------- |
+| `src/apis/services/auth.test.ts` | 로그인된 유저 → `UserDto` 반환 / 401 → `null` / 401 아닌 에러 → throw | 3개 pass |
+| `src/hooks/useMe.test.tsx`       | 성공/확인된 guest(`null`)/에러(`isError`) 세 상태 구분                | 3개 pass |
+
+`npm run test`(`vitest run`)로 실행, 총 6/6 pass. 둘 다 기존 코드(SSR auth, Zustand)는 전혀 안 건드리는 신규 코드라 회귀 위험 없음.
+
+### Playwright 회귀 테스트 — 운영 도메인 대상, 의도대로 전부 fail
+
+`frontend/test/23-groupbuying-e2e` 브랜치의 `tests/` 하네스를 선별 반영하고, 운영 도메인 전용 설정(`tests/playwright.prod.config.ts`, `baseURL: https://moijang.vercel.app`, `webServer` 없음)과 신규 spec(`tests/e2e/specs/auth-cross-site-restore.prod.spec.ts`)을 추가함. 로컬 dev 서버로는 cross-site 쿠키 문제가 재현이 안 돼서, 반드시 운영 도메인을 직접 대상으로 해야 함.
+
+`tests/.env`에 이미 있던 실제 테스트 계정(`leader_test`)으로 실행한 결과 — **의도대로 2개 다 fail**:
+
+| 테스트                              | 기대 결과             | 실제 결과                                                  |
+| ----------------------------------- | --------------------- | ---------------------------------------------------------- |
+| 로그인 후 Header에 유저 이름 반영   | `.user-name` 표시     | **fail** — "로그인" 버튼이 그대로 남아있음                 |
+| 로그인 후 `/dashboard/leading` 진입 | 보호 라우트 정상 진입 | **fail** — `/login?redirect=%2Fdashboard%2Fleading`로 튕김 |
+
+추가로 로그인 응답의 실제 쿠키를 `page.context().cookies()`로 직접 확인함(1회성 디버그 스크립트, 커밋 안 함):
+
+```
+accessToken: domain=3-37-239-36.sslip.io, secure=true, sameSite=None
+refreshToken: domain=3-37-239-36.sslip.io, secure=true, sameSite=None
+```
+
+→ `SameSite=None;Secure`는 정확히 적용돼있고, **쿠키가 백엔드 도메인에만 묶여서 `moijang.vercel.app`에 전혀 안 보내진다는 것이 실측으로 확정됨.**
+
+**TTD 관점에서 이 두 fail은 베이스라인임** — GH #37(인증 transport 전환)이 끝나면 이 2개가 pass로 바뀌는 게 완료 기준.
+
+**이번에 안 쓴 것**: "소프트 네비게이션 선진입 → 로그인 → `router.push()` 이동 시 redirect loop" 시나리오. 지금 로그인 코드가 `window.location.href`를 써서 이 경로 자체가 안 타져서 지금 작성하면 당연히 pass함 — TDD로서 의미가 없어서, #37에서 로그인을 `router.push()`로 바꾼 뒤에 추가하는 게 맞다고 보고 미룸.
+
 ---
 
 ## 마이그레이션 완료 기준 (Definition of Done)
@@ -291,6 +384,9 @@ SSR 인증 의존 제거 + React Query 전환이 끝났다고 판단할 수 있�
 
 - 운영 백엔드 도메인(`https://3-37-239-36.sslip.io`) — 배포된 프론트 JS 번들(`root-layout.js`, `login-page.js`)에서 `baseURL:"..."` 문자열을 직접 grep해서 찾음
 - CORS 응답 헤더 — `curl -i -X OPTIONS/POST`로 운영 백엔드에 직접 요청 보내서 `Access-Control-Allow-Origin`/`-Credentials`가 실제로 저렇게 내려오는 걸 확인함
+- 백엔드 직접 호출 vs Vercel 호출 TTFB — `curl -w`로 같은 위치에서 두 경로 모두 측정 (31ms vs 780ms~2.8s), "UX 트레이드오프 — BFF와 비교" 절의 숫자 근거
+- **실제 로그인 응답의 쿠키 속성** — `tests/.env`에 있던 실제 테스트 계정(`leader_test`)으로 운영(`https://moijang.vercel.app`)에 Playwright로 로그인해서 `page.context().cookies()`로 직접 확인함: `accessToken`/`refreshToken` 둘 다 `domain: "3-37-239-36.sslip.io"`, `secure: true`, `sameSite: "None"`. `SameSite=None;Secure`는 정확히 적용돼있고, **도메인이 백엔드에만 묶여있는 것도 확정**(`moijang.vercel.app` 몫은 전혀 없음)
+- **위 쿠키 문제가 실제로 화면에 미치는 영향** — 같은 로그인으로 운영에서 Playwright E2E 실행: 로그인 성공 후에도 Header가 "로그인" 버튼을 그대로 보여줌(`.user-name`으로 안 바뀜), `/dashboard/leading` 진입 시 `/login?redirect=...`로 튕겨나감. 둘 다 실패로 재현 확인 (`tests/e2e/specs/auth-cross-site-restore.prod.spec.ts`, GH #43)
 
 ### 과거 세션에서 실측·확정된 내용 (메모리에 기록된 걸 인용, 이번에 재실행 안 함)
 
@@ -306,7 +402,6 @@ SSR 인증 의존 제거 + React Query 전환이 끝났다고 판단할 수 있�
 - cross-origin 응답의 `Set-Cookie`가 호출자 도메인이 아니라 응답자 도메인에 저장된다는 것
 - `SameSite=Lax`가 cross-site `fetch`/XHR에는 쿠키를 안 실어준다는 것
 
-### 아직 확인 안 됨 (사용자 확인 또는 테스트 계정 필요)
+### 전부 실측 완료 (2026-10-31, `tests/e2e/specs/auth-cross-site-restore.prod.spec.ts`)
 
-- 운영 로그인 응답의 실제 `Set-Cookie` 헤더에 `SameSite=None; Secure`가 정확히 찍히는지 — 테스트 계정이 없어서 로그인 성공 응답을 직접 못 봄. 코드(`auth.service.ts`의 `getAuthCookieOptions`)와 배포 경로(`docker-compose.prod.yml`의 `NODE_ENV=production` 하드코딩)로 미루어 "그럴 것"이라고 추론한 상태.
-- 실제 브라우저에서 `accessToken`/`refreshToken` 쿠키가 `moijang.vercel.app`이 아니라 `sslip.io` 밑에 저장되는지 — DevTools로 직접 확인해달라고 요청했지만 아직 그 결과를 전달받은 적 없음. 쿠키 스펙상 당연히 그래야 하지만, 이 레포/배포에 한정된 **실측 확인은 안 된 상태**.
+위 두 항목("Set-Cookie 속성", "쿠키가 백엔드 도메인에만 저장되는지")은 전에는 테스트 계정이 없어서 추론으로만 남겨뒀던 것인데, `tests/.env`에 이미 있던 실제 테스트 계정(`leader_test`)을 찾아서 운영 도메인 기준으로 Playwright로 직접 로그인해 확인함 — 둘 다 추론이 맞았음이 실측으로 확정됨. 더 이상 미확인 항목 없음.
