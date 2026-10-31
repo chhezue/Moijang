@@ -21,6 +21,7 @@ import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import { logout } from "@/apis/services/auth";
 import { useSetMe } from "@/hooks/useSetMe";
+import { useSnackbar } from "@/providers/SnackbarProvider";
 
 interface UserMenuProps {
   displayName: string;
@@ -49,6 +50,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ displayName }) => {
   const router = useRouter();
   const pathname = usePathname();
   const setMe = useSetMe();
+  const { showSnackbar } = useSnackbar();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [open, setOpen] = useState(false);
 
@@ -57,8 +59,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ displayName }) => {
       await logout(); // 백엔드 쿠키 정리까지 확인한 다음에 캐시를 비움
       await setMe(null);
     } catch {
-      // 로그아웃 요청 실패해도 클라이언트 상태는 일단 정리
-      await setMe(null);
+      showSnackbar("로그아웃에 실패했습니다. 다시 시도해주세요.", "error");
     }
     handleClose();
   };
